@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 import { Circle, Layer, Rect, Stage, Star, Text } from "react-konva";
+import { useNavigate } from "react-router-dom";
+import Description from "./Description";
 
 const BALL_COUNT_WEIGHT = 1;
 // const BALL_COUNT_WEIGHT = 20;
@@ -21,19 +24,7 @@ const BALL_TYPE = [
   },
 ];
 
-const csvData = [
-  {
-    // UserID: "KDW",
-    // NumLight: 2,
-    // Trial: 12345,
-    // Colored: 2,
-    // Pressed: 2,
-    // Correct: 10,
-    // trialStartT: 13.5,
-    // PressedT: 14.4,
-    // ReactionTime: 0.9,
-  },
-];
+const csvData = [];
 
 const ReactionCanvas = () => {
   const [initalBallType, setInitalBallType] = useState(BALL_TYPE);
@@ -50,7 +41,7 @@ const ReactionCanvas = () => {
   const [tempRow, setTempRow] = useState({
     UserID: "KDW",
     NumLight: 2,
-    Trial: 1,
+    Trial: 0,
     Colored: 2,
     Pressed: 2,
     Correct: 10,
@@ -59,6 +50,9 @@ const ReactionCanvas = () => {
     ReactionTime: 0.9,
   });
   const [csvData, setCsvData] = useState([]);
+  const [isFinished, setIsFinished] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const navigate = useNavigate();
 
   const generateShapes = () => {
     return [...Array(ballType.numberOfBalls)].map((_, i) => ({
@@ -71,22 +65,32 @@ const ReactionCanvas = () => {
 
   //키보드 눌렀을 때 실행
   const handleKeyDown = (e) => {
+    //esc keydown
+    if (!isReady && e.key === "Escape") {
+      navigate("/");
+    }
+    //s keydown
+    if (!isReady && e.key === "s") {
+      setIsReady(true);
+    }
+    //number keydown
     if (isBlinking && e.key <= ballType.numberOfBalls && e.key > 0) {
+      let now = performance.now();
+      console.log(now);
       setCsvData((old) => [
         ...old,
         {
           ...tempRow,
-          PressedT: timeStamp,
-          ReactionTime: timeStamp - tempRow.trialStartT,
+          PressedT: now - timeStamp,
+          ReactionTime: now - timeStamp - tempRow.trialStartT,
           Pressed: e.key,
-          Correct: e.key === tempRow.Colored + 1 + "",
+          Correct: +(e.key === tempRow.Colored + ""),
         },
       ]);
+
       const newShapes = shapes.map((shape) => {
         return { ...shape, fill: "grey" };
       });
-
-      console.log(csvData);
       setIsBlinking(false);
       setShapes(newShapes);
       setTrial((old) => {
@@ -103,17 +107,8 @@ const ReactionCanvas = () => {
   };
 
   useEffect(() => {
-    let interval = null;
-
-    if (isRecording) {
-      interval = setInterval(() => {
-        setTimeStamp((old) => old + 10);
-      }, 10);
-    } else {
-      clearInterval(interval);
-    }
-
-    return () => clearInterval(interval);
+    const stamp = performance.now();
+    setTimeStamp(stamp);
   }, [isRecording]);
 
   //도형 생성
@@ -134,8 +129,10 @@ const ReactionCanvas = () => {
   useEffect(() => {
     //trial 종료
     if (trial.current === trial.total) {
-      if (initalBallType.length === 0) {
+      if (initalBallType.length === 1) {
+        //마지막 라운드이고, 마지막 시도 종료시
         alert("TRIAL FINISH");
+        setIsFinished(true);
       }
 
       const newInitialBallType = initalBallType.filter((type, i) => {
@@ -149,8 +146,8 @@ const ReactionCanvas = () => {
       setIsResting(true);
 
       setTimeout(() => {
-        setIsResting(false);
         setInitalBallType(newInitialBallType);
+        setIsResting(false);
       }, REST_TIME);
     }
   }, [trial]);
@@ -158,21 +155,26 @@ const ReactionCanvas = () => {
   //공 점멸
   useEffect(() => {
     if (trial.current !== trial.total && ballType) {
-      const time = getRandomArbitrary(0.3, 2);
+      // const time = getRandomArbitrary(0.3, 2);
+      const time = getRandomArbitrary(0.5, 0.5);
+      const s_time = performance.now();
       setTimeout(() => {
         const newShapes = [...shapes];
         const colored = Math.floor(Math.random() * newShapes.length);
         newShapes[colored].fill = "red";
         setShapes(newShapes);
         setIsBlinking(true);
-
+        console.log(performance.now());
         setTempRow((old) => {
+          const p = performance.now();
+          console.log(p);
           return {
             ...old,
             NumLight: newShapes.length,
-            Colored: colored,
+            Colored: colored + 1,
             Trial: old.Trial + 1,
-            trialStartT: timeStamp,
+            trialStartT: p - timeStamp,
+            random: p - s_time,
           };
         });
       }, time * 1000);
@@ -181,16 +183,13 @@ const ReactionCanvas = () => {
 
   //balltype
   useEffect(() => {
-    if (initalBallType.length !== 0) {
+    if (initalBallType.length !== 0 && isReady) {
       setIsRecording(true);
       setBallType(
         initalBallType[Math.floor(Math.random() * initalBallType.length)]
       );
-    } else {
-      alert("DONE");
-      console.log(csvData);
     }
-  }, [initalBallType]);
+  }, [initalBallType, isReady]);
 
   //focus해서 keydown 이벤트 걸리게
   useEffect(() => {
@@ -198,90 +197,99 @@ const ReactionCanvas = () => {
   }, []);
 
   return (
-    <div id={"focus"} tabIndex={0} onKeyDown={handleKeyDown}>
-      <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
-        onKeyPress={(e) => {
-          console.log(e);
-        }}
-      >
-        <Layer>
-          {isResting && (
-            <Text
-              fontSize={50}
-              text="RESTING...."
-              x={window.innerWidth / 3}
-              y={window.innerHeight / 2}
-            />
-          )}
-          {shapes && !isResting && (
-            <>
-              <Text text={timeStamp} />
+    <div
+      id="focus"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      style={{
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }}
+    >
+      {isFinished && <CSVLink data={csvData}>Download me</CSVLink>}
+      {!isReady && <Description />}
+      {!isFinished && isReady && (
+        <Stage width={window.innerWidth} height={window.innerHeight}>
+          <Layer>
+            {isResting && (
               <Text
-                text={`round : ${4 - initalBallType.length}/3`}
-                x={window.innerWidth - 250}
-                y={50}
-                fontSize={24}
+                fontSize={50}
+                text="RESTING...."
+                x={window.innerWidth / 3}
+                y={window.innerHeight / 2}
               />
-              <Text
-                text={`trial ${trial.current + 1}/${trial.total}`}
-                x={window.innerWidth - 250}
-                y={100}
-                fontSize={24}
-              />
-              {shapes.map((circle) => (
-                <Circle
-                  key={circle.id}
-                  id={circle.id}
-                  x={circle.x}
-                  y={circle.y}
-                  radius={40}
-                  fill={circle.fill}
-                  shadowColor="black"
-                  shadowBlur={10}
-                  shadowOpacity={0.2}
-                  shadowOffsetX={0}
-                  shadowOffsetY={5}
-                />
-              ))}
-              {shapes.map((rect) => (
-                <Rect
-                  key={`rect${rect.id}`}
-                  x={rect.x - 40}
-                  y={rect.y + 200}
-                  fill={"grey"}
-                  width={80}
-                  height={80}
-                  shadowColor="black"
-                  shadowBlur={10}
-                  shadowOpacity={0.2}
-                  shadowOffsetX={0}
-                  shadowOffsetY={5}
-                />
-              ))}
-
-              {shapes.map((text) => (
+            )}
+            {shapes && !isResting && (
+              <>
+                <Text text={timeStamp} />
                 <Text
-                  text={parseInt(text.id) + 1}
-                  fontSize={40}
-                  key={`text${text.id}`}
-                  x={text.x - 10}
-                  y={text.y + 220}
-                  fill={"white"}
-                  width={80}
-                  height={80}
-                  shadowColor="black"
-                  shadowBlur={10}
-                  shadowOpacity={0.2}
-                  shadowOffsetX={0}
-                  shadowOffsetY={5}
+                  text={`round : ${4 - initalBallType.length}/3`}
+                  x={window.innerWidth - 250}
+                  y={50}
+                  fontSize={24}
                 />
-              ))}
-            </>
-          )}
-        </Layer>
-      </Stage>
+                <Text
+                  text={`trial : ${trial.current + 1}/${trial.total}`}
+                  x={window.innerWidth - 250}
+                  y={100}
+                  fontSize={24}
+                />
+                {shapes.map((circle) => {
+                  console.log(performance.now());
+                  return (
+                    <Circle
+                      key={circle.id}
+                      id={circle.id}
+                      x={circle.x}
+                      y={circle.y}
+                      radius={40}
+                      fill={circle.fill}
+                      shadowColor="black"
+                      shadowBlur={10}
+                      shadowOpacity={0.2}
+                      shadowOffsetX={0}
+                      shadowOffsetY={5}
+                    />
+                  );
+                })}
+                {shapes.map((rect) => (
+                  <Rect
+                    key={`rect${rect.id}`}
+                    x={rect.x - 40}
+                    y={rect.y + 200}
+                    fill={"grey"}
+                    width={80}
+                    height={80}
+                    shadowColor="black"
+                    shadowBlur={10}
+                    shadowOpacity={0.2}
+                    shadowOffsetX={0}
+                    shadowOffsetY={5}
+                  />
+                ))}
+
+                {shapes.map((text) => (
+                  <Text
+                    text={parseInt(text.id) + 1}
+                    fontSize={40}
+                    key={`text${text.id}`}
+                    x={text.x - 10}
+                    y={text.y + 220}
+                    fill={"white"}
+                    width={80}
+                    height={80}
+                    shadowColor="black"
+                    shadowBlur={10}
+                    shadowOpacity={0.2}
+                    shadowOffsetX={0}
+                    shadowOffsetY={5}
+                  />
+                ))}
+              </>
+            )}
+          </Layer>
+        </Stage>
+      )}
     </div>
   );
 };
