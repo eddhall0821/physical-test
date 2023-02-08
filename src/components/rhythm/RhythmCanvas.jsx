@@ -3,6 +3,7 @@ import { Layer, Rect, Stage } from "react-konva";
 import Konva from "konva";
 
 const RhythmCanvas = () => {
+  const canvasRef = useRef(null);
   const barRef = useRef(null);
 
   //focus해서 keydown 이벤트 걸리게
@@ -10,21 +11,20 @@ const RhythmCanvas = () => {
     window.location = "#focus";
   }, []);
 
-  // const tick = () => {
-  //   console.log(barRef);
+  useEffect(() => {
+    moveBar();
+  }, []);
+
+  // const tick = (e) => {
   //   barRef.current = requestAnimationFrame(tick);
   // };
 
   // useEffect(() => {
-  //   barRef.current = requestAnimationFrame(tick);
+  //   requestAnimationFrame(tick);
   //   return () => {
   //     cancelAnimationFrame(barRef.current);
   //   };
   // }, []);
-
-  useEffect(() => {
-    moveBar();
-  }, []);
 
   const moveBar = () => {
     // move a node to the right at 50 pixels / second

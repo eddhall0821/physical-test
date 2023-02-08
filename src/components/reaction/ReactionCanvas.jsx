@@ -6,7 +6,7 @@ import Description from "./Description";
 
 const BALL_COUNT_WEIGHT = 1;
 // const BALL_COUNT_WEIGHT = 20;
-const REST_TIME = 5000;
+const REST_TIME = 3000;
 // const REST_TIME = 30000;
 
 const BALL_TYPE = [
@@ -164,7 +164,7 @@ const ReactionCanvas = () => {
         newShapes[colored].fill = "red";
         setShapes(newShapes);
         setIsBlinking(true);
-        console.log(performance.now());
+
         setTempRow((old) => {
           const p = performance.now();
           console.log(p);
@@ -172,7 +172,7 @@ const ReactionCanvas = () => {
             ...old,
             NumLight: newShapes.length,
             Colored: colored + 1,
-            Trial: old.Trial + 1,
+            Trial: trial.current + 1,
             trialStartT: p - timeStamp,
             random: p - s_time,
           };
