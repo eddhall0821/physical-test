@@ -221,7 +221,6 @@ const ReactionCanvas = () => {
             )}
             {shapes && !isResting && (
               <>
-                <Text text={timeStamp} />
                 <Text
                   text={`round : ${4 - initalBallType.length}/3`}
                   x={window.innerWidth - 250}
