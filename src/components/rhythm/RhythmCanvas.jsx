@@ -21,6 +21,10 @@ const shuffle = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
 
+//trial 관련 수정...
+//현재 -> 공 출발, 다음 공 등장 전까지가 1cycle
+//수정 -> 공 출발 전(delay)부터 다음 공 delay 전까지 1cycle
+
 const RhythmCanvas = () => {
   const ballRef = useRef(null);
   const navigate = useNavigate();
@@ -67,10 +71,9 @@ const RhythmCanvas = () => {
     //spacebar 이벤트
     if (e.key === " " && !keyDownDelay) {
       setKeyDownDelay(true);
-
-      setTimeout(() => {
-        setKeyDownDelay(false);
-      }, 500);
+      // console.log(performance.now());
+      // setTimeout(() => {
+      // }, 500);
 
       if (
         BAR_X < ballRef?.current?.attrs?.x &&
@@ -125,8 +128,6 @@ const RhythmCanvas = () => {
   }, [trial]);
 
   useEffect(() => {
-    //change animation
-    console.log(condition);
     if (ballRef && condition) {
       createAnimation(condition);
     }
@@ -140,19 +141,27 @@ const RhythmCanvas = () => {
   useEffect(() => {
     if (animation) {
       let p = performance.now();
-
       test_s.push(p);
 
-      animation.start();
       setTimeout(() => {
-        setTrial((old) => {
-          return { ...old, current: old.current + 1 };
-        });
-      }, condition.cycle * 1000);
+        animation.start();
+        runNextTrial();
+      }, 1000);
     }
   }, [animation]);
 
+  const runNextTrial = () => {
+    setTimeout(() => {
+      console.log("SET trial");
+      setTrial((old) => {
+        return { ...old, current: old.current + 1 };
+      });
+    }, condition.cycle * 1000);
+  };
+
   const createAnimation = (condition) => {
+    setKeyDownDelay(false);
+
     if (animation) {
       animation.stop();
     }
