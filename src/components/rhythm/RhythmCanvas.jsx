@@ -4,7 +4,9 @@ import Konva from "konva";
 import Description from "./Description";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
+import Rest from "../Rest";
 
+const REST_TIME = 1;
 const TOTAL_TRIAL = 2;
 const BAR_HEIGHT = 300;
 const BAR_WIDTH = 100;
@@ -31,6 +33,8 @@ const RhythmCanvas = () => {
 
   const [csvData, setCsvData] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [isResting, setIsResting] = useState(false);
+  const [restTime, setRestTime] = useState(0);
 
   const [timeStamp, setTimeStamp] = useState(0);
   const [timeTargetAppeared, setTimeTargetAppeared] = useState(0);
@@ -184,11 +188,15 @@ const RhythmCanvas = () => {
       return false;
     }
 
-    if (trial.current !== trial.total && animation) {
+    if (trial.current !== trial.total && animation && !isResting) {
       createAnimation(condition);
     }
 
     if (trial.current === trial.total) {
+      console.log("resting...");
+      setIsResting(true);
+      setRestTime(REST_TIME);
+
       setTrial({
         current: 0,
         total: TOTAL_TRIAL,
@@ -198,10 +206,10 @@ const RhythmCanvas = () => {
   }, [trial]);
 
   useEffect(() => {
-    if (ballRef && condition && isReady) {
+    if (ballRef && condition && isReady && !isResting) {
       createAnimation(condition);
     }
-  }, [condition, ballRef, isReady]);
+  }, [condition, ballRef, isReady, isResting]);
 
   useEffect(() => {
     if (animation) {
@@ -269,6 +277,16 @@ const RhythmCanvas = () => {
     setAnimation(anim);
   };
 
+  useEffect(() => {
+    if (restTime > 0) {
+      setTimeout(() => {
+        setRestTime((old) => old - 1);
+      }, 1000);
+    } else {
+      setIsResting(false);
+    }
+  }, [restTime]);
+
   return (
     <div
       id="focus"
@@ -287,40 +305,45 @@ const RhythmCanvas = () => {
             <Text
               text={`${condition.reach}거리 ${condition.stayTime}속도 ${condition.cycle}등장주기 `}
             />
-            <Text
-              text={`round : ${8 - combination.length}/8`}
-              x={window.innerWidth - 250}
-              y={50}
-              fontSize={24}
-            />
-            <Text
-              text={`trial : ${trial.current + 1}/${trial.total} `}
-              x={window.innerWidth - 250}
-              y={100}
-              fontSize={24}
-            />
-            <Text
-              text={`success/fail : ${summary.success}/${summary.fail}`}
-              x={window.innerWidth - 250}
-              y={150}
-              fontSize={24}
-            />
+            {isResting && <Rest time={restTime} />}
+            {!isResting && (
+              <>
+                <Text
+                  text={`round : ${8 - combination.length}/8`}
+                  x={window.innerWidth - 250}
+                  y={50}
+                  fontSize={24}
+                />
+                <Text
+                  text={`trial : ${trial.current + 1}/${trial.total} `}
+                  x={window.innerWidth - 250}
+                  y={100}
+                  fontSize={24}
+                />
+                <Text
+                  text={`success/fail : ${summary.success}/${summary.fail}`}
+                  x={window.innerWidth - 250}
+                  y={150}
+                  fontSize={24}
+                />
 
-            <Rect
-              x={BAR_X}
-              y={BAR_Y}
-              width={BAR_WIDTH}
-              height={BAR_HEIGHT}
-              fill={barFill}
-            />
+                <Rect
+                  x={BAR_X}
+                  y={BAR_Y}
+                  width={BAR_WIDTH}
+                  height={BAR_HEIGHT}
+                  fill={barFill}
+                />
 
-            <Circle
-              ref={ballRef}
-              x={BAR_X}
-              y={window.innerHeight / 2}
-              radius={BALL_RADIUS}
-              fill="green"
-            />
+                <Circle
+                  ref={ballRef}
+                  x={BAR_X}
+                  y={window.innerHeight / 2}
+                  radius={BALL_RADIUS}
+                  fill="green"
+                />
+              </>
+            )}
           </Layer>
         </Stage>
       )}

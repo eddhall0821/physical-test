@@ -1,6 +1,7 @@
 import { Text } from "react-konva";
 
-const Rest = ({ time }) => {
+const TIME = 5;
+const Rest = ({ time = TIME }) => {
   return (
     <Text
       fontSize={50}
