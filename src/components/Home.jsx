@@ -7,9 +7,11 @@ const Home = () => {
       <Layout.Header />
       <Layout.Content style={{ padding: 50 }}>
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Button type="default" block>
-            pointing
-          </Button>
+          <Link to="/pointing">
+            <Button type="default" block>
+              pointing
+            </Button>
+          </Link>
           <Link to="/reaction">
             <Button type="primary" block>
               reaction
