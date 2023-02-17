@@ -20,7 +20,9 @@ function degToRad(degrees) {
   return result;
 }
 
-const logArr = [["movementX", "movementY", "screenX", "screenY", "timeDiff"]];
+const logArr = [
+  ["movementX", "movementY", "screenX", "screenY", "timeDiff", "buttons"],
+];
 let p1 = 0;
 let p2 = 0;
 
@@ -29,13 +31,40 @@ const PointingCanvas = () => {
 
   useEffect(() => {
     const isReplayMode = window.confirm("replay?");
-    console.log(isReplayMode);
-
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
 
     let x = centerX;
     let y = centerY;
+
+    let target_x = 0;
+    let target_y = 0;
+    let animation;
+
+    const fileInput = document.getElementById("replay");
+    fileInput.addEventListener("change", readFile);
+
+    canvas.addEventListener("click", async () => {
+      if (!document.pointerLockElement) {
+        await canvas.requestPointerLock({
+          unadjustedMovement: true,
+        });
+      }
+    });
+
+    if (!isReplayMode) {
+      fileInput.style.display = "none";
+      document.addEventListener("pointerlockchange", lockChangeAlert, false);
+    }
+    function lockChangeAlert() {
+      if (document.pointerLockElement === canvas) {
+        console.log("The pointer lock status is now locked");
+        document.addEventListener("mousemove", updatePosition, false);
+      } else {
+        console.log("The pointer lock status is now unlocked");
+        document.removeEventListener("mousemove", updatePosition, false);
+      }
+    }
 
     const canvasDraw = () => {
       ctx.fillStyle = "#88b04b";
@@ -68,8 +97,12 @@ const PointingCanvas = () => {
         ctx.arc(x, y, TARGET_RADIUS, 0, degToRad(360), true);
 
         if (cnt % 2 === 0 && i === cnt / 2) {
+          target_x = x;
+          target_y = y;
           ctx.fill();
         } else if (cnt % 2 === 1 && i === numPoints / 2 + parseInt(cnt / 2)) {
+          target_x = x;
+          target_y = y;
           ctx.fill();
         }
       }
@@ -86,33 +119,11 @@ const PointingCanvas = () => {
     canvasDraw();
     drawTarget();
 
-    canvas.addEventListener("click", async () => {
-      if (!document.pointerLockElement) {
-        await canvas.requestPointerLock({
-          unadjustedMovement: true,
-        });
-      }
-    });
-
-    document.addEventListener("pointerlockchange", lockChangeAlert, false);
-
-    function lockChangeAlert() {
-      if (document.pointerLockElement === canvas) {
-        console.log("The pointer lock status is now locked");
-        document.addEventListener("mousemove", updatePosition, false);
-      } else {
-        console.log("The pointer lock status is now unlocked");
-        document.removeEventListener("mousemove", updatePosition, false);
-      }
-    }
-
-    let animation;
     const downloadCSV = () => {
       let csvContent =
         "data:text/csv;charset=utf-8," +
         logArr
           .map((e) => {
-            console.log(e);
             return e.join(",");
           })
           .join("\n");
@@ -120,8 +131,6 @@ const PointingCanvas = () => {
       var encodedUri = encodeURI(csvContent);
       window.open(encodedUri);
     };
-
-    const replayActions = () => {};
 
     function updatePosition(e) {
       const p = performance.now();
@@ -132,14 +141,24 @@ const PointingCanvas = () => {
         (x += e.movementX),
         (y += e.movementY),
         p1 - p2,
+        e.buttons,
       ]);
-      console.log(e);
       p2 = p;
 
       if (e.buttons === 1) {
+        const dist_x = target_x - x;
+        const dist_y = target_y - y;
+
+        const distance = Math.sqrt(dist_x * dist_x + dist_y * dist_y);
+        console.log(distance);
+        if (distance < TARGET_RADIUS) {
+          summary.success++;
+        } else {
+          summary.fail++;
+        }
         cnt++;
       }
-      if (cnt > NUM_POINTS) {
+      if (cnt >= NUM_POINTS) {
         cnt = 0;
         downloadCSV();
       }
@@ -159,6 +178,7 @@ const PointingCanvas = () => {
 
       if (!animation) {
         animation = requestAnimationFrame(function () {
+          console.log("hahaha.");
           animation = null;
           drawTarget();
           canvasDraw();
@@ -166,13 +186,67 @@ const PointingCanvas = () => {
         });
       }
     }
+
+    async function readFile() {
+      const file = fileInput.files[0];
+      fileInput.style.display = "none";
+      const reader = new FileReader();
+      const content = reader.readAsText(file);
+
+      reader.onload = async function () {
+        const result = reader.result;
+        const arr = result.split("\n");
+        arr.shift();
+        const log = await arr.map((item) => {
+          const itemArr = item.split(",");
+          return {
+            movementX: parseInt(itemArr[0]),
+            movementY: parseInt(itemArr[1]),
+            screenX: parseInt(itemArr[2]),
+            scrrenY: parseInt(itemArr[3]),
+            timeDiff: parseInt(itemArr[4]),
+            buttons: parseInt(itemArr[5]),
+          };
+        });
+        startReplay(log);
+      };
+    }
+
+    function startReplay(arr) {
+      let replayCnt = 0;
+      replayCallback(arr, cnt);
+    }
+
+    function replayCallback(arr, replayCnt) {
+      replayCnt++;
+
+      x += arr[replayCnt].movementX;
+      y += arr[replayCnt].movementY;
+
+      if (arr[replayCnt].buttons) {
+        cnt++;
+      }
+
+      if (!animation) {
+        animation = requestAnimationFrame(function () {
+          animation = null;
+          drawTarget();
+          canvasDraw();
+          drawText();
+        });
+      }
+
+      if (replayCnt < arr.length) {
+        setTimeout(() => {
+          replayCallback(arr, replayCnt);
+        }, arr[replayCnt].timeDiff);
+      }
+    }
   }, []);
 
   return (
     <div>
-      {/* <canvas width={window.innerWidth} height={window.innerHeight}>
-        Your browser does not support HTML5 canvas
-      </canvas> */}
+      <input type="file" id="replay" />
       <Stage width={window.innerWidth} height={window.innerHeight}>
         <Layer ref={canvasRef}></Layer>
       </Stage>
