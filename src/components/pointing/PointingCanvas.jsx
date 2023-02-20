@@ -27,8 +27,6 @@ let p1 = 0;
 let p2 = 0;
 
 const PointingCanvas = () => {
-  const canvasRef = useRef(null);
-
   useEffect(() => {
     const isReplayMode = window.confirm("replay?");
     const canvas = document.querySelector("canvas");
@@ -36,6 +34,9 @@ const PointingCanvas = () => {
 
     let x = centerX;
     let y = centerY;
+
+    let movementX;
+    let movementY;
 
     let target_x = 0;
     let target_y = 0;
@@ -163,22 +164,29 @@ const PointingCanvas = () => {
         downloadCSV();
       }
 
-      if (x > canvas.width + RADIUS) {
-        x = -RADIUS;
-      }
-      if (y > canvas.height + RADIUS) {
-        y = -RADIUS;
-      }
-      if (x < -RADIUS) {
-        x = canvas.width + RADIUS;
-      }
-      if (y < -RADIUS) {
-        y = canvas.height + RADIUS;
+      if (x > window.innerWidth - RADIUS) {
+        //오른쪽 테두리 밖
+        x = window.innerWidth - RADIUS;
+        movementY = e.movementY;
+      } else if (y > window.innerHeight - RADIUS) {
+        //아래쪽 테두리 밖
+        y = window.innerHeight - RADIUS;
+        movementX = e.movementX;
+      } else if (x < RADIUS) {
+        //왼쪽 테두리 밖
+        x = RADIUS;
+        movementY = e.movementY;
+      } else if (y < RADIUS) {
+        //위쪽 테두리 밖
+        y = RADIUS;
+        movementX = e.movementX;
+      } else {
+        movementX = e.movementX;
+        movementY = e.movementY;
       }
 
       if (!animation) {
         animation = requestAnimationFrame(function () {
-          console.log("hahaha.");
           animation = null;
           drawTarget();
           canvasDraw();
@@ -213,7 +221,6 @@ const PointingCanvas = () => {
     }
 
     function startReplay(arr) {
-      let replayCnt = 0;
       replayCallback(arr, cnt);
     }
 
@@ -242,13 +249,26 @@ const PointingCanvas = () => {
         }, arr[replayCnt].timeDiff);
       }
     }
+
+    //logging
+    let myReq;
+    let ms = 0;
+    function step() {
+      var progress = ms++;
+      console.log(movementX, movementY);
+      if (progress < 10000) {
+        myReq = requestAnimationFrame(step);
+      }
+    }
+    myReq = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(myReq);
   }, []);
 
   return (
     <div>
       <input type="file" id="replay" />
       <Stage width={window.innerWidth} height={window.innerHeight}>
-        <Layer ref={canvasRef}></Layer>
+        <Layer></Layer>
       </Stage>
     </div>
   );
