@@ -40,6 +40,9 @@ const PointingCanvas = () => {
     let x = centerX;
     let y = centerY;
 
+    let xx = 956 - 809;
+    let yy = 577 - 1098;
+
     let target_x = 0;
     let target_y = 0;
     let animation;
@@ -76,6 +79,10 @@ const PointingCanvas = () => {
       ctx.fill();
     };
 
+    const resetCanvas = () => {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
     const drawTarget = () => {
       // Radius of the circle
       const radius = TARGET_ZONE_RADIUS;
@@ -85,9 +92,6 @@ const PointingCanvas = () => {
 
       // Calculate the angle between two adjacent points
       const angleBetweenPoints = (2 * Math.PI) / numPoints;
-
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Calculate the coordinates of each point
       for (let i = 0; i < numPoints; i++) {
@@ -119,6 +123,7 @@ const PointingCanvas = () => {
       ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
     };
 
+    resetCanvas();
     canvasDraw();
     drawTarget();
 
@@ -183,6 +188,7 @@ const PointingCanvas = () => {
         // elapsed = timestamp - then;
         // if (elapsed >= FPS_INTERVAL) {
         // then = timestamp;
+        resetCanvas();
         drawTarget();
         canvasDraw();
         drawText();
@@ -204,14 +210,18 @@ const PointingCanvas = () => {
         const log = await arr.map((item) => {
           const itemArr = item.split(",");
           return {
-            movementX: parseInt(itemArr[0]),
-            movementY: parseInt(itemArr[1]),
-            screenX: parseInt(itemArr[2]),
-            scrrenY: parseInt(itemArr[3]),
-            timeDiff: parseInt(itemArr[4]),
-            buttons: parseInt(itemArr[5]),
+            ballSize: parseInt(itemArr[4]),
+            ballX: parseInt(itemArr[5]),
+            ballY: parseInt(itemArr[6]),
+            movementX: parseInt(itemArr[11]),
+            movementY: parseInt(itemArr[12]),
+            screenX: parseInt(itemArr[9]),
+            screenY: parseInt(itemArr[10]),
+            timeDiff: parseInt(5),
+            buttons: parseInt(itemArr[13]),
           };
         });
+        console.log(log);
         startReplay(log);
       };
     }
@@ -224,8 +234,13 @@ const PointingCanvas = () => {
     function replayCallback(arr, replayCnt) {
       replayCnt++;
 
-      x += arr[replayCnt].movementX;
-      y += arr[replayCnt].movementY;
+      x = arr[replayCnt].screenX;
+      y = arr[replayCnt].screenY;
+
+      xx += arr[replayCnt].movementX;
+      yy += arr[replayCnt].movementY;
+
+      console.log(xx, yy);
 
       if (arr[replayCnt].buttons) {
         cnt++;
@@ -234,7 +249,24 @@ const PointingCanvas = () => {
       if (!animation) {
         animation = requestAnimationFrame(function () {
           animation = null;
-          drawTarget();
+          // drawTarget();
+          resetCanvas();
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(
+            arr[replayCnt].ballX,
+            arr[replayCnt].ballY,
+            arr[replayCnt].ballSize,
+            0,
+            degToRad(360),
+            true
+          );
+          ctx.fill();
+
+          ctx.fillStyle = "blue";
+          ctx.beginPath();
+          ctx.arc(xx, yy, RADIUS, 0, degToRad(360), true);
+          ctx.fill();
           canvasDraw();
           drawText();
         });
