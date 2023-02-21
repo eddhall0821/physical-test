@@ -35,9 +35,6 @@ const PointingCanvas = () => {
     let x = centerX;
     let y = centerY;
 
-    let movementX;
-    let movementY;
-
     let target_x = 0;
     let target_y = 0;
     let animation;
@@ -165,24 +162,16 @@ const PointingCanvas = () => {
       }
 
       if (x > window.innerWidth - RADIUS) {
-        //오른쪽 테두리 밖
         x = window.innerWidth - RADIUS;
-        movementY = e.movementY;
-      } else if (y > window.innerHeight - RADIUS) {
-        //아래쪽 테두리 밖
+      }
+      if (y > window.innerHeight - RADIUS) {
         y = window.innerHeight - RADIUS;
-        movementX = e.movementX;
-      } else if (x < RADIUS) {
-        //왼쪽 테두리 밖
+      }
+      if (x < RADIUS) {
         x = RADIUS;
-        movementY = e.movementY;
-      } else if (y < RADIUS) {
-        //위쪽 테두리 밖
+      }
+      if (y < RADIUS) {
         y = RADIUS;
-        movementX = e.movementX;
-      } else {
-        movementX = e.movementX;
-        movementY = e.movementY;
       }
 
       if (!animation) {
@@ -221,6 +210,7 @@ const PointingCanvas = () => {
     }
 
     function startReplay(arr) {
+      let replayCnt = 0;
       replayCallback(arr, cnt);
     }
 
@@ -249,19 +239,6 @@ const PointingCanvas = () => {
         }, arr[replayCnt].timeDiff);
       }
     }
-
-    //logging
-    let myReq;
-    let ms = 0;
-    function step() {
-      var progress = ms++;
-      console.log(movementX, movementY);
-      if (progress < 10000) {
-        myReq = requestAnimationFrame(step);
-      }
-    }
-    myReq = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(myReq);
   }, []);
 
   return (
