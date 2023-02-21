@@ -7,6 +7,11 @@ let summary = {
   fail: 0,
 };
 
+const FPS = 60;
+let FPS_INTERVAL = 1000 / FPS;
+let elapsed = 0;
+let then = 0;
+
 const RADIUS = 10;
 const TARGET_RADIUS = 20;
 const TARGET_ZONE_RADIUS = window.innerHeight / 3;
@@ -174,16 +179,18 @@ const PointingCanvas = () => {
         y = RADIUS;
       }
 
-      if (!animation) {
-        animation = requestAnimationFrame(function () {
-          animation = null;
-          drawTarget();
-          canvasDraw();
-          drawText();
-        });
-      }
+      requestAnimationFrame((timestamp) => {
+        // elapsed = timestamp - then;
+        // if (elapsed >= FPS_INTERVAL) {
+        // then = timestamp;
+        drawTarget();
+        canvasDraw();
+        drawText();
+        // }
+      });
     }
 
+    //------------- replay -------------
     async function readFile() {
       const file = fileInput.files[0];
       fileInput.style.display = "none";
