@@ -134,22 +134,16 @@ const PointingCanvas = () => {
     };
 
     function updatePosition(e) {
-      const p = performance.now();
-      p1 = p;
-      logArr.push([
-        e.movementX,
-        e.movementY,
-        (x += e.movementX),
-        (y += e.movementY),
-        p1 - p2,
-        e.buttons,
-      ]);
-      p2 = p;
+      // const p = performance.now();
+
+      x += e.movementX;
+      y += e.movementY;
 
       if (e.buttons === 1) {
         const dist_x = target_x - x;
         const dist_y = target_y - y;
 
+        //좌표평면 상에서 점과 점 사이의 거리
         const distance = Math.sqrt(dist_x * dist_x + dist_y * dist_y);
         console.log(distance);
         if (distance < TARGET_RADIUS) {
@@ -159,6 +153,7 @@ const PointingCanvas = () => {
         }
         cnt++;
       }
+
       if (cnt >= NUM_POINTS) {
         cnt = 0;
         downloadCSV();
@@ -216,6 +211,7 @@ const PointingCanvas = () => {
             buttons: parseInt(itemArr[5]),
           };
         });
+
         startReplay(log);
       };
     }
@@ -225,6 +221,7 @@ const PointingCanvas = () => {
     }
 
     function replayCallback(arr, replayCnt) {
+      console.log("replay");
       replayCnt++;
 
       x += arr[replayCnt].movementX;
@@ -244,9 +241,9 @@ const PointingCanvas = () => {
       }
 
       if (replayCnt < arr.length) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           replayCallback(arr, replayCnt);
-        }, arr[replayCnt].timeDiff);
+        });
       }
     }
 
@@ -255,7 +252,12 @@ const PointingCanvas = () => {
     let ms = 0;
     function step() {
       var progress = ms++;
-      console.log(movementX, movementY);
+      console.log("logging");
+      logArr.push([movementX, movementY, x, y, 0, 0]);
+
+      movementX = 0;
+      movementY = 0;
+
       if (progress < 10000) {
         myReq = requestAnimationFrame(step);
       }
