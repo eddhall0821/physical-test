@@ -28,6 +28,33 @@ let p2 = 0;
 
 const PointingCanvas = () => {
   useEffect(() => {
+    // var stop = false;
+    // var frameCount = 0;
+    // var fps, fpsInterval, startTime, now, then, elapsed;
+    // var sinceStart = now - startTime;
+
+    // var currentFps =
+    //   Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+
+    // function startAnimating(fps) {
+    //   fpsInterval = 1000 / fps;
+    //   then = Date.now();
+    //   startTime = then;
+    //   animate();
+    // }
+
+    // function animate() {
+    //   requestAnimationFrame(animate);
+    //   now = Date.now();
+    //   elapsed = now - then;
+
+    //   if (elapsed > fpsInterval) {
+    //     then = now - (elapsed % fpsInterval);
+    //     console.log("draw..");
+    //   }
+    // }
+    // startAnimating(10);
+
     const isReplayMode = window.confirm("replay?");
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
@@ -116,9 +143,6 @@ const PointingCanvas = () => {
       ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
       ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
     };
-
-    canvasDraw();
-    drawTarget();
 
     const downloadCSV = () => {
       let csvContent =
@@ -252,7 +276,6 @@ const PointingCanvas = () => {
     let ms = 0;
     function step() {
       var progress = ms++;
-      console.log("logging");
       logArr.push([movementX, movementY, x, y, 0, 0]);
 
       movementX = 0;
