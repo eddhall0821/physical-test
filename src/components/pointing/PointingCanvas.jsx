@@ -28,32 +28,37 @@ let p2 = 0;
 
 const PointingCanvas = () => {
   useEffect(() => {
-    // var stop = false;
-    // var frameCount = 0;
-    // var fps, fpsInterval, startTime, now, then, elapsed;
-    // var sinceStart = now - startTime;
+    var stop = false;
+    var frameCount = 0;
+    var fps, fpsInterval, startTime, now, then, elapsed;
 
-    // var currentFps =
-    //   Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+    startAnimating(60);
 
-    // function startAnimating(fps) {
-    //   fpsInterval = 1000 / fps;
-    //   then = Date.now();
-    //   startTime = then;
-    //   animate();
-    // }
+    function startAnimating(fps) {
+      fpsInterval = 1000 / fps;
+      then = Date.now();
+      startTime = then;
+      console.log(startTime);
+      animate();
+    }
 
-    // function animate() {
-    //   requestAnimationFrame(animate);
-    //   now = Date.now();
-    //   elapsed = now - then;
+    function animate() {
+      if (stop) {
+        return;
+      }
 
-    //   if (elapsed > fpsInterval) {
-    //     then = now - (elapsed % fpsInterval);
-    //     console.log("draw..");
-    //   }
-    // }
-    // startAnimating(10);
+      requestAnimationFrame(animate);
+      now = Date.now();
+      elapsed = now - then;
+
+      if (elapsed > fpsInterval) {
+        then = now - (elapsed % fpsInterval);
+        var sinceStart = now - startTime;
+        var currentFps =
+          Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+        console.log(currentFps);
+      }
+    }
 
     const isReplayMode = window.confirm("replay?");
     const canvas = document.querySelector("canvas");
@@ -142,6 +147,7 @@ const PointingCanvas = () => {
       ctx.fillText(`cnt: ${cnt}`, window.innerWidth - 200, 50);
       ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
       ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
+      // ctx.fillText(`fps: ${currentFps}`, window.innerWidth - 200, 200);
     };
 
     const downloadCSV = () => {
