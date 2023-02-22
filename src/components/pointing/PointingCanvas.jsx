@@ -40,8 +40,8 @@ const PointingCanvas = () => {
     let x = centerX;
     let y = centerY;
 
-    let xx = 956 - 809;
-    let yy = 577 - 1098;
+    let xx = window.innerWidth / 2 - 809;
+    let yy = window.innerHeight / 2 - 1098;
 
     let target_x = 0;
     let target_y = 0;
