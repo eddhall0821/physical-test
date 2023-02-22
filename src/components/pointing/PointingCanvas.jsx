@@ -11,11 +11,12 @@ const FPS = 60;
 let FPS_INTERVAL = 1000 / FPS;
 let elapsed = 0;
 let then = 0;
+let nextClick = 0;
 
 const RADIUS = 10;
 const TARGET_RADIUS = 20;
 const TARGET_ZONE_RADIUS = window.innerHeight / 3;
-const NUM_POINTS = 10;
+const NUM_POINTS = 12;
 
 const centerX = window.innerWidth / 2;
 const centerY = window.innerHeight / 2;
@@ -69,6 +70,7 @@ const PointingCanvas = () => {
       }
     }
 
+    //Draw mouse pointer
     const canvasDraw = () => {
       ctx.fillStyle = "#88b04b";
       ctx.beginPath();
@@ -91,26 +93,62 @@ const PointingCanvas = () => {
 
       // Calculate the coordinates of each point
       for (let i = 0; i < numPoints; i++) {
-        ctx.fillStyle = `#f${i}${i}`;
-
         const angle = i * angleBetweenPoints;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
         ctx.beginPath();
         ctx.arc(x, y, TARGET_RADIUS, 0, degToRad(360), true);
 
-        if (cnt % 2 === 0 && i === cnt / 2) {
+        if (i === cnt / 2) {
+          ctx.fillStyle = "red";
+          ctx.fill();
+        }
+
+        if (i === numPoints / 2 + parseInt(cnt / 2)) {
+          ctx.fillStyle = "blue";
+          ctx.fill();
+        }
+
+        if (i === cnt / 2 && cnt % 2 === 0) {
           target_x = x;
           target_y = y;
-          ctx.fill();
-        } else if (cnt % 2 === 1 && i === numPoints / 2 + parseInt(cnt / 2)) {
+        }
+
+        if (i === numPoints / 2 + parseInt(cnt / 2) && cnt % 2 === 1) {
           target_x = x;
           target_y = y;
-          ctx.fill();
         }
       }
     };
 
+    const getCurrentTarget = () => {
+      // Radius of the circle
+      const radius = TARGET_ZONE_RADIUS;
+
+      // Number of points
+      const numPoints = NUM_POINTS;
+
+      // Calculate the angle between two adjacent points
+      const angleBetweenPoints = (2 * Math.PI) / numPoints;
+
+      for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleBetweenPoints;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        if (i === cnt / 2 && cnt % 2 === 0) {
+          target_x = x;
+          target_y = y;
+        }
+
+        if (i === numPoints / 2 + parseInt(cnt / 2) && cnt % 2 === 1) {
+          target_x = x;
+          target_y = y;
+        }
+      }
+      return { target_x, target_y };
+    };
+
+    //Draw text
     const drawText = () => {
       ctx.font = "30px serif";
       ctx.fillStyle = "#fff";
@@ -118,9 +156,6 @@ const PointingCanvas = () => {
       ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
       ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
     };
-
-    canvasDraw();
-    drawTarget();
 
     const downloadCSV = () => {
       let csvContent =
@@ -246,6 +281,10 @@ const PointingCanvas = () => {
         }, arr[replayCnt].timeDiff);
       }
     }
+
+    canvasDraw();
+    drawTarget();
+    console.log(getCurrentTarget());
   }, []);
 
   return (
