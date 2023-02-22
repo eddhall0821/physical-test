@@ -237,6 +237,11 @@ const PointingCanvas = () => {
       x = arr[replayCnt].screenX;
       y = arr[replayCnt].screenY;
 
+      if (xx < 0 || xx > 1980 || yy < 0 || yy > 1080) {
+        xx = window.innerWidth / 2;
+        yy = window.innerHeight / 2;
+      }
+
       xx += arr[replayCnt].movementX;
       yy += arr[replayCnt].movementY;
 
