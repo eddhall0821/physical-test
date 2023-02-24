@@ -22,9 +22,11 @@ const Home = () => {
               rhythm
             </Button>
           </Link>
-          <Button type="primary" block>
-            Primary
-          </Button>
+          <Link to="/MTP">
+            <Button type="primary" block>
+              MTP
+            </Button>
+          </Link>
         </Space>
       </Layout.Content>
     </Layout>

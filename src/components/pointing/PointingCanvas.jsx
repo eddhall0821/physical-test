@@ -106,10 +106,6 @@ const PointingCanvas = () => {
 
     //Draw mouse pointer
     const canvasDraw = () => {
-      // ctx.fillStyle = "#88b04b";
-      // ctx.beginPath();
-      // ctx.arc(x, y, RADIUS, 0, degToRad(360), true);
-      // ctx.fill();
       ctx.lineWidth = 3;
       ctx.strokeStyle = "green";
       ctx.beginPath();
