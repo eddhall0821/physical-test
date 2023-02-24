@@ -56,7 +56,6 @@ const PointingCanvas = () => {
         var sinceStart = now - startTime;
         var currentFps =
           Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
-        console.log(currentFps);
       }
     }
 
@@ -192,19 +191,25 @@ const PointingCanvas = () => {
       if (x > window.innerWidth - RADIUS) {
         //오른쪽 테두리 밖
         x = window.innerWidth - RADIUS;
+
+        movementX = 0;
         movementY = e.movementY;
       } else if (y > window.innerHeight - RADIUS) {
         //아래쪽 테두리 밖
         y = window.innerHeight - RADIUS;
+
         movementX = e.movementX;
+        movementY = 0;
       } else if (x < RADIUS) {
         //왼쪽 테두리 밖
         x = RADIUS;
+        movementX = 0;
         movementY = e.movementY;
       } else if (y < RADIUS) {
         //위쪽 테두리 밖
         y = RADIUS;
         movementX = e.movementX;
+        movementY = 0;
       } else {
         movementX = e.movementX;
         movementY = e.movementY;
@@ -251,7 +256,6 @@ const PointingCanvas = () => {
     }
 
     function replayCallback(arr, replayCnt) {
-      console.log("replay");
       replayCnt++;
 
       x += arr[replayCnt].movementX;
