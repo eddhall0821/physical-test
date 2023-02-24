@@ -5,6 +5,7 @@ import Description from "./Description";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import Rest from "../Rest";
+import { shuffle } from "../../utils";
 
 const REST_TIME = 1;
 const TOTAL_TRIAL = 2;
@@ -18,10 +19,6 @@ const BALL_RADIUS = 20;
 const cycleArr = [1.25, 1.8]; //등장 주기, 단위 초
 const reachArr = [0, 0.2]; //등장 후 zone에 만나기까지 시간, 단위 초
 const stayTimeArr = [0.08, 0.15]; // zone에 머무르는 시간, 단위 초
-
-const shuffle = (array) => {
-  return array.sort(() => Math.random() - 0.5);
-};
 
 //trial 관련 수정...
 //현재 -> 공 출발, 다음 공 등장 전까지가 1cycle
@@ -264,6 +261,12 @@ const RhythmCanvas = () => {
           console.log("pass ms");
           isFirstMeet = false;
           setTimeTargetMeetZone(performance.now());
+        }
+        if (
+          BAR_X < ballRef.current.attrs.x &&
+          BAR_X + BAR_WIDTH > ballRef.current.attrs.x
+        ) {
+          console.log("pass");
         }
 
         cnt++;
