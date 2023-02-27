@@ -10,8 +10,8 @@ let summary = {
 
 //조건
 const targetZoneRadiusArr = [400, 800];
-// const targetRadiusArr = [15, 50, 36.6667];
-const targetRadiusArr = [50];
+const targetRadiusArr = [15, 50, 36.6667];
+// const targetRa1diusArr = [50];
 
 let target_zone_radius = 0;
 let target_radius = 0;

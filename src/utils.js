@@ -13,6 +13,7 @@ export const resetCanvas = (canvas) => {
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
+
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, w, h);
 };
@@ -76,4 +77,8 @@ export const drawMTPTarget = (ctx, x, y, speed, radius) => {
   ctx.arc(x, y, radius, 0, degToRad(360), true);
   ctx.fillStyle = "red";
   ctx.fill();
+};
+
+export const getRandomArbitrary = (min, max) => {
+  return Math.random() * (max - min) + min;
 };
