@@ -2,11 +2,16 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+
+## Requirement
+node, npm 최신 버전 필요
+
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+### `npm intall` 한 후,
+### `npm start` 로 실행
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
