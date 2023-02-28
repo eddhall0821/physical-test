@@ -9,7 +9,7 @@ const Home = () => {
         <Space direction="vertical" style={{ width: "100%" }}>
           <Link to="/pointing">
             <Button type="default" block>
-              pointing
+              STP
             </Button>
           </Link>
           <Link to="/reaction">
@@ -19,7 +19,7 @@ const Home = () => {
           </Link>
           <Link to="/rhythm">
             <Button type="default" block>
-              rhythm
+              MTA
             </Button>
           </Link>
           <Link to="/MTP">
