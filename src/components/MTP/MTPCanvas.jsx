@@ -14,6 +14,10 @@ const MTPCanvas = () => {
     let x = 0;
     let y = 0;
     let delay = 0;
+    let summary = {
+      fail: 0,
+      success: 0,
+    };
 
     let target_radius, target_x, target_y, v_x, v_y;
 
@@ -51,7 +55,14 @@ const MTPCanvas = () => {
       }
     }
 
+    //test---
+    let mouse_cnt = 0;
+    let cnt = 0;
+    let tt = performance.now();
+    //test---
+
     function updatePosition(e) {
+      mouse_cnt++;
       const p = performance.now();
       p1 = p;
       // console.log(p1 - p2);
@@ -74,12 +85,13 @@ const MTPCanvas = () => {
       }
 
       if (e.buttons === 1) {
-        console.log(p - delay > 300);
         if (p - delay > 300) {
           const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
           // console.log(distance - target_radius);
           if (target_radius - distance > 0) {
-            // console.log("correct");
+            summary.success++;
+          } else {
+            summary.fail++;
           }
           targetInit();
           delay = p;
@@ -87,8 +99,29 @@ const MTPCanvas = () => {
         timeDiff = 0;
       }
     }
+    const drawText = () => {
+      ctx.font = "30px serif";
+      ctx.fillStyle = "#fff";
+      ctx.fillText(
+        `cnt: ${summary.fail + summary.success}`,
+        window.innerWidth - 200,
+        50
+      );
+      ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
+      ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
+    };
 
+    //step function execute every frame
     function step(timestamp) {
+      if (tt + 1000 < performance.now()) {
+        console.log("frame rate: " + cnt);
+        console.log("mouse event per second: " + mouse_cnt);
+        tt = performance.now();
+        cnt = 0;
+        mouse_cnt = 0;
+      }
+      cnt++;
+
       if (start === undefined) {
         start = timestamp;
       }
@@ -123,6 +156,7 @@ const MTPCanvas = () => {
 
       start = timestamp;
       resetCanvas(canvas);
+      drawText();
       drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
       drawPointer(ctx, x, y);
       requestAnimationFrame(step);
