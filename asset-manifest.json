@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/physical-test/static/css/main.a4cecf1a.css",
+    "main.js": "/physical-test/static/js/main.faf6438b.js",
+    "static/js/787.72f0fb3f.chunk.js": "/physical-test/static/js/787.72f0fb3f.chunk.js",
+    "index.html": "/physical-test/index.html",
+    "main.a4cecf1a.css.map": "/physical-test/static/css/main.a4cecf1a.css.map",
+    "main.faf6438b.js.map": "/physical-test/static/js/main.faf6438b.js.map",
+    "787.72f0fb3f.chunk.js.map": "/physical-test/static/js/787.72f0fb3f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a4cecf1a.css",
+    "static/js/main.faf6438b.js"
+  ]
+}
