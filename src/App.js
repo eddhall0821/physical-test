@@ -5,30 +5,36 @@ import MTPCanvas from "./components/MTP/MTPCanvas";
 import PointingCanvas from "./components/pointing/PointingCanvas";
 import ReactionCanvas from "./components/reaction/ReactionCanvas";
 import RhythmCanvas from "./components/rhythm/RhythmCanvas";
+import "./firebaseConfig";
 
 function App() {
-  const router = createBrowserRouter([
+  const router = createBrowserRouter(
+    [
+      {
+        path: "",
+        element: <Home />,
+      },
+      {
+        path: "pointing",
+        element: <PointingCanvas />,
+      },
+      {
+        path: "reaction",
+        element: <ReactionCanvas />,
+      },
+      {
+        path: "/rhythm",
+        element: <RhythmCanvas />,
+      },
+      {
+        path: "/MTP",
+        element: <MTPCanvas />,
+      },
+    ],
     {
-      path: "/",
-      element: <Home />,
-    },
-    {
-      path: "/pointing",
-      element: <PointingCanvas />,
-    },
-    {
-      path: "/reaction",
-      element: <ReactionCanvas />,
-    },
-    {
-      path: "/rhythm",
-      element: <RhythmCanvas />,
-    },
-    {
-      path: "/MTP",
-      element: <MTPCanvas />,
-    },
-  ]);
+      basename: process.env.PUBLIC_URL,
+    }
+  );
 
   return (
     <div className="App">

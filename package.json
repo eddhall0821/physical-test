@@ -1,5 +1,6 @@
 {
   "name": "physical-test",
+  "homepage": "https://eddhall0821.github.io/physical-test",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,7 +10,8 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.1.7",
     "csv-writer": "^1.6.0",
-    "fs": "^0.0.1-security",
+    "firebase": "^10.5.0",
+    "gh-pages": "^6.0.0",
     "konva": "^8.4.2",
     "react": "^18.2.0",
     "react-csv": "^2.2.2",
@@ -17,6 +19,7 @@
     "react-konva": "^18.2.4",
     "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
+    "react-timer-hook": "^3.0.7",
     "web-vitals": "^2.1.4"
   },
   "browser": {
@@ -28,7 +31,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

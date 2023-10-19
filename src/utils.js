@@ -19,7 +19,7 @@ export const resetCanvas = (canvas) => {
 };
 
 export const drawPointer = (ctx, x, y) => {
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 4;
   ctx.strokeStyle = "green";
   ctx.beginPath();
   ctx.moveTo(x - 10, y);
@@ -52,12 +52,13 @@ export const initCanvas = async (canvas) => {
     }
   });
 
-  document.addEventListener(
-    "keydown",
+  canvas.addEventListener(
+    "click",
     (e) => {
-      if (e.key === "Enter") {
-        toggleFullScreen(canvas);
-      }
+      toggleFullScreen(canvas);
+      canvas.requestPointerLock({
+        unadjustedMovement: true,
+      });
     },
     false
   );
@@ -81,4 +82,42 @@ export const drawMTPTarget = (ctx, x, y, speed, radius) => {
 
 export const getRandomArbitrary = (min, max) => {
   return Math.random() * (max - min) + min;
+};
+
+export const getRandomValueInArray = (arr) => {
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+export const random_point_between_circles = ({
+  center,
+  inner_radius,
+  outer_radius,
+  ball_radius,
+  screen_width,
+  screen_height,
+}) => {
+  console.log(
+    center,
+    inner_radius,
+    outer_radius,
+    ball_radius,
+    screen_width,
+    screen_height
+  );
+  while (true) {
+    const theta = getRandomArbitrary(0, 2 * Math.PI);
+    const r = getRandomArbitrary(inner_radius, outer_radius);
+
+    const x = center.x + r * Math.cos(theta);
+    const y = center.y + r * Math.sin(theta);
+
+    if (
+      ball_radius <= x &&
+      x <= screen_width - ball_radius &&
+      ball_radius <= y &&
+      y <= screen_height - ball_radius
+    ) {
+      return { x: x, y: y };
+    }
+  }
 };
