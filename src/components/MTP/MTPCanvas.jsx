@@ -12,15 +12,19 @@ import {
 import Description from "./Description";
 import { a } from "./test";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 const RADIUS = 10;
 const startStamp = performance.now();
 const MTPCanvas = () => {
+  const navigate = useNavigate();
   const logArr = [
     [
       "target_radius",
-      "targetX",
-      "targetY",
+      "target_x",
+      "target_y",
+      "x",
+      "y",
       "movementX",
       "movementY",
       "screenX",
@@ -130,9 +134,13 @@ const MTPCanvas = () => {
       document.body.removeChild(link);
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      uploadBytes(storageRef, blob).then((snapshot) => {
-        console.log("blob..");
-      });
+      uploadBytes(storageRef, blob)
+        .then((snapshot) => {
+          console.log("blob..");
+        })
+        .finally(() => {
+          navigate("/replay");
+        });
     }
 
     function updatePosition(e) {
@@ -192,6 +200,20 @@ const MTPCanvas = () => {
 
     //step function execute every frame
     function step(timestamp) {
+      const tempRow = [
+        target_radius,
+        target_x,
+        target_y,
+        x,
+        y,
+        "",
+        "",
+        window.innerWidth,
+        window.innerHeight,
+      ];
+
+      logArr.push(tempRow);
+
       // if (performance.now() - startStamp > 30 * 60 * 1000 && !end) {
       //   console.log(logArr);
       //   end = !end;
@@ -209,8 +231,6 @@ const MTPCanvas = () => {
       // }
 
       if (tt + 1000 < performance.now()) {
-        // console.log("frame rate: " + cnt);
-        // console.log("mouse event per second: " + mouse_cnt);
         tt = performance.now();
         cnt = 0;
         mouse_cnt = 0;
@@ -245,17 +265,6 @@ const MTPCanvas = () => {
       start = timestamp;
 
       if (!end) {
-        const tempRow = [
-          target_radius,
-          target_x,
-          target_y,
-          x,
-          y,
-          "TESTTESTTESTTEST",
-        ];
-
-        logArr.push(tempRow);
-
         resetCanvas(canvas);
         drawText();
         drawMTPTarget(ctx, target_x, target_y, 0, target_radius);

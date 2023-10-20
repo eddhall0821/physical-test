@@ -6,6 +6,7 @@ import PointingCanvas from "./components/pointing/PointingCanvas";
 import ReactionCanvas from "./components/reaction/ReactionCanvas";
 import RhythmCanvas from "./components/rhythm/RhythmCanvas";
 import "./firebaseConfig";
+import MTPReplay from "./components/MTP/MTPReplay";
 
 function App() {
   const router = createBrowserRouter(
@@ -13,6 +14,14 @@ function App() {
       {
         path: "",
         element: <Home />,
+      },
+      {
+        path: "pnc",
+        element: <MTPCanvas />,
+      },
+      {
+        path: "replay",
+        element: <MTPReplay />,
       },
       {
         path: "pointing",
