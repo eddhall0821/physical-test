@@ -88,7 +88,7 @@ const MTPReplay = () => {
       const startReplay = (log) => {
         toggleFullScreen(canvas);
         window.onresize = () => {
-          canvas.width = window.innerWidth;
+          canvas.width = window.innerWidth - 100;
           canvas.height = window.innerHeight;
         };
 

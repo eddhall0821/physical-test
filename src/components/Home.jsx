@@ -6,7 +6,8 @@ import {
   PlayCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import PNC from "../images/pnc.png";
+import PNC2 from "../images/pnc2.jpg";
+import PNC3 from "../images/pnc3.jpg";
 
 const Home = () => {
   return (
@@ -18,9 +19,8 @@ const Home = () => {
             <Link to="pnc">
               <Card
                 hoverable
-                // style={{ width: 240 }}
                 actions={[<PlayCircleOutlined />]}
-                cover={<img alt="example" src={PNC} />}
+                cover={<img alt="example" src={PNC2} />}
               >
                 <Meta
                   title="Point and Click"
@@ -33,9 +33,8 @@ const Home = () => {
             <Link to="replay">
               <Card
                 hoverable
-                // style={{ width: 240 }}
                 actions={[<PlayCircleOutlined />]}
-                cover={<img alt="example" src={PNC} />}
+                cover={<img alt="example" src={PNC3} />}
               >
                 <Meta
                   title="Replay Point and Click"

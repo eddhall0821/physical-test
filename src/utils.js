@@ -43,6 +43,7 @@ export const initCanvas = async (canvas) => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   };
+  toggleFullScreen(canvas);
 
   canvas.addEventListener("click", async () => {
     if (!document.pointerLockElement) {
@@ -55,7 +56,6 @@ export const initCanvas = async (canvas) => {
   canvas.addEventListener(
     "click",
     (e) => {
-      toggleFullScreen(canvas);
       canvas.requestPointerLock({
         unadjustedMovement: true,
       });
@@ -120,4 +120,14 @@ export const random_point_between_circles = ({
       return { x: x, y: y };
     }
   }
+};
+
+export const drawStartButton = (ctx) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.fillText(
+    "click to start!",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
 };
