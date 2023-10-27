@@ -3,9 +3,9 @@ import Title from "antd/es/typography/Title";
 import { useEffect, useState } from "react";
 const { Text, Link } = Typography;
 
-const Description = ({ setSettings, setRecord, record }) => {
+const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
   const [name, setName] = useState("player");
-  const [trial, setTrial] = useState(5);
+  const [trial, setTrial] = useState(20);
   const [lowerBound, setLowerBound] = useState(300);
   const [upperBound, setUpperBound] = useState(1000);
 
@@ -41,7 +41,7 @@ const Description = ({ setSettings, setRecord, record }) => {
   return (
     <Card
       style={{
-        display: record ? "none" : "block",
+        display: isSettingMode ? "block" : "none",
         left: "50%",
         top: "50%",
         transform: "translateX(-50%) translateY(-50%)",
@@ -49,6 +49,8 @@ const Description = ({ setSettings, setRecord, record }) => {
         background: "white",
         position: "fixed",
         zIndex: 9999,
+        height: "100%",
+        overflowY: "auto",
       }}
     >
       <Space direction="vertical" style={{ width: "100%", textAlign: "left" }}>
@@ -59,7 +61,12 @@ const Description = ({ setSettings, setRecord, record }) => {
 
         <Text>Trial</Text>
         <Input type="number" disabled value={trial} />
-        <Slider min={5} max={50} value={trial} onChange={(e) => setTrial(e)} />
+        <Slider
+          min={5}
+          max={10000}
+          value={trial}
+          onChange={(e) => setTrial(e)}
+        />
 
         <Text>lower bound</Text>
         <Input type="number" disabled value={lowerBound} addonAfter="px" />
@@ -125,7 +132,7 @@ const Description = ({ setSettings, setRecord, record }) => {
           block
           type="primary"
           onClick={() => {
-            setRecord(true);
+            setIsSettingMode(false);
           }}
         >
           save

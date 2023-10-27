@@ -1,15 +1,20 @@
 import { Button, Card, Col, Layout, Row, Skeleton, Space } from "antd";
 import Meta from "antd/es/card/Meta";
-import { Link } from "react-router-dom";
-import {
-  EditOutlined,
-  PlayCircleOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
+import { PlayCircleOutlined } from "@ant-design/icons";
 import PNC2 from "../images/pnc2.jpg";
 import PNC3 from "../images/pnc3.jpg";
+import { useEffect } from "react";
+import QueryString from "qs";
+import MoneyBag from "../images/moneybag.png";
 
 const Home = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const qs = QueryString.parse(location.search, { ignoreQueryPrefix: true });
+    console.log(qs);
+  }, [location]);
   return (
     <Layout>
       <Layout.Header />
@@ -45,6 +50,12 @@ const Home = () => {
           </Col>
         </Row>
       </Layout.Content>
+      <div style={{ background: "black" }}>
+        <img src={MoneyBag} width={150} />
+        <img src={MoneyBag} width={150} />
+        <img src={MoneyBag} width={150} />
+        <img src={MoneyBag} width={150} />
+      </div>
     </Layout>
   );
 };

@@ -3,30 +3,31 @@ import {
   distanceBetweenTwoPoint,
   drawMTPTarget,
   drawPointer,
+  drawRewardText,
   drawStartButton,
-  getRandomArbitrary,
   getRandomValueInArray,
   initCanvas,
   random_point_between_circles,
   resetCanvas,
-  toggleFullScreen,
 } from "../../utils";
 import Description from "./Description";
-import { a } from "./test";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import Moneybag from "../../images/moneybag.png";
 
 const RADIUS = 10;
+const SHOW_REWARD_TIME = 1000; //ms
 const startStamp = performance.now();
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
     name: "player",
     lowerBound: 30,
     upperBound: 70,
-    trial: 5,
+    trial: 20,
   });
-  const [record, setRecord] = useState(false);
+
+  const [isSettingMode, setIsSettingMode] = useState(true);
 
   const navigate = useNavigate();
   const logArr = [
@@ -44,7 +45,12 @@ const MTPCanvas = () => {
   ];
 
   useEffect(() => {
-    if (record) {
+    if (!isSettingMode) {
+      let moneybag = new Image();
+      moneybag.src = Moneybag;
+
+      let show_reward_counter = performance.now();
+
       let lower_bound = settings.lowerBound;
       let upper_bound = settings.upperBound;
       let trial = settings.trial;
@@ -58,10 +64,16 @@ const MTPCanvas = () => {
         success: 0,
       };
 
+      let start;
+      let end = false;
+      let timeDiff = 0;
+      let p1 = 0;
+      let p2 = 0;
+
       let target_radius, target_x, target_y;
 
       const targetInit = () => {
-        target_radius = getRandomValueInArray([10, 30, 90]);
+        target_radius = getRandomValueInArray([5, 10, 30]);
 
         const target_location = random_point_between_circles({
           center: { x, y },
@@ -75,12 +87,6 @@ const MTPCanvas = () => {
         target_x = target_location.x;
         target_y = target_location.y;
       };
-
-      let start;
-      let end = false;
-      let timeDiff = 0;
-      let p1 = 0;
-      let p2 = 0;
 
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
@@ -147,6 +153,7 @@ const MTPCanvas = () => {
         x += e.movementX;
         y += e.movementY;
 
+        //마우스 가두기
         if (x > canvas.width - RADIUS) {
           x = canvas.width - RADIUS;
         }
@@ -161,6 +168,7 @@ const MTPCanvas = () => {
         }
 
         if (e.buttons === 1) {
+          show_reward_counter = performance.now();
           if (p - delay > 300) {
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
             if (target_radius - distance > 0) {
@@ -211,7 +219,10 @@ const MTPCanvas = () => {
         ];
 
         logArr.push(tempRow);
+
         if (tt + 1000 < performance.now()) {
+          console.log("frame rate: " + cnt);
+          console.log("mouse event per second: " + mouse_cnt);
           tt = performance.now();
           cnt = 0;
           mouse_cnt = 0;
@@ -220,30 +231,44 @@ const MTPCanvas = () => {
 
         if (!end) {
           resetCanvas(canvas);
-          if (start) {
-            drawText();
+          drawText();
+
+          if (show_reward_counter + SHOW_REWARD_TIME > performance.now()) {
+            drawRewardText(ctx, moneybag);
+          } else {
             drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
             drawPointer(ctx, x, y);
-          } else {
-            drawStartButton(ctx);
           }
 
           requestAnimationFrame(step);
         }
       }
 
+      function pre_step() {
+        resetCanvas(canvas);
+
+        if (start) {
+          show_reward_counter = performance.now();
+          requestAnimationFrame(step);
+        } else {
+          drawStartButton(ctx);
+          requestAnimationFrame(pre_step);
+        }
+      }
+
+      //init
       targetInit();
       initCanvas(canvas);
-      requestAnimationFrame(step);
+      requestAnimationFrame(pre_step);
     }
-  }, [record]);
+  }, [isSettingMode]);
 
   return (
     <>
       <Description
         setSettings={setSettings}
-        setRecord={setRecord}
-        record={record}
+        setIsSettingMode={setIsSettingMode}
+        isSettingMode={isSettingMode}
       />
       <canvas
         id="canvas"

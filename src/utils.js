@@ -19,13 +19,14 @@ export const resetCanvas = (canvas) => {
 };
 
 export const drawPointer = (ctx, x, y) => {
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "green";
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "white";
   ctx.beginPath();
   ctx.moveTo(x - 10, y);
   ctx.lineTo(x + 10, y);
   ctx.moveTo(x, y - 10);
   ctx.lineTo(x, y + 10);
+
   ctx.stroke();
 };
 
@@ -96,14 +97,6 @@ export const random_point_between_circles = ({
   screen_width,
   screen_height,
 }) => {
-  console.log(
-    center,
-    inner_radius,
-    outer_radius,
-    ball_radius,
-    screen_width,
-    screen_height
-  );
   while (true) {
     const theta = getRandomArbitrary(0, 2 * Math.PI);
     const r = getRandomArbitrary(inner_radius, outer_radius);
@@ -122,9 +115,45 @@ export const random_point_between_circles = ({
   }
 };
 
+export const drawRewardText = (ctx, moneybag) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "center";
+  ctx.fillText(
+    `maximum reward: ${30} P!`,
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+
+  ctx.drawImage(
+    moneybag,
+    window.innerWidth / 2 - 100,
+    window.innerHeight / 2 + 20,
+    100,
+    100
+  );
+  ctx.drawImage(
+    moneybag,
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 20,
+    100,
+    100
+  );
+  ctx.drawImage(
+    moneybag,
+    window.innerWidth / 2 - 50,
+    window.innerHeight / 2 + 20,
+    100,
+    100
+  );
+};
+
 export const drawStartButton = (ctx) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "center";
   ctx.fillText(
     "click to start!",
     window.innerWidth / 2,
