@@ -6,7 +6,6 @@ import PNC2 from "../images/pnc2.jpg";
 import PNC3 from "../images/pnc3.jpg";
 import { useEffect } from "react";
 import QueryString from "qs";
-import MoneyBag from "../images/moneybag.png";
 
 const Home = () => {
   const location = useLocation();
@@ -15,13 +14,14 @@ const Home = () => {
     const qs = QueryString.parse(location.search, { ignoreQueryPrefix: true });
     console.log(qs);
   }, [location]);
+
   return (
     <Layout>
       <Layout.Header />
       <Layout.Content style={{ padding: 50 }}>
         <Row gutter={16}>
           <Col span={6}>
-            <Link to="pnc">
+            <Link to="monitor">
               <Card
                 hoverable
                 actions={[<PlayCircleOutlined />]}
@@ -50,12 +50,6 @@ const Home = () => {
           </Col>
         </Row>
       </Layout.Content>
-      <div style={{ background: "black" }}>
-        <img src={MoneyBag} width={150} />
-        <img src={MoneyBag} width={150} />
-        <img src={MoneyBag} width={150} />
-        <img src={MoneyBag} width={150} />
-      </div>
     </Layout>
   );
 };

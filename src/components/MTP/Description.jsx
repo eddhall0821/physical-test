@@ -1,6 +1,8 @@
 import { Button, Card, Input, Slider, Space, Typography } from "antd";
 import Title from "antd/es/typography/Title";
 import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { dpiState, ppiState } from "../../recoil/atom";
 const { Text, Link } = Typography;
 
 const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
@@ -8,6 +10,8 @@ const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
   const [trial, setTrial] = useState(20);
   const [lowerBound, setLowerBound] = useState(300);
   const [upperBound, setUpperBound] = useState(1000);
+  const dpi = useRecoilValue(dpiState);
+  const ppi = useRecoilValue(ppiState);
 
   useEffect(() => {
     if (lowerBound > upperBound) {
@@ -54,10 +58,14 @@ const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
       }}
     >
       <Space direction="vertical" style={{ width: "100%", textAlign: "left" }}>
-        <Title level={2}>Settings</Title>
-
+        <Title level={2}>developer settings</Title>
         <Text>name</Text>
         <Input value={name} onChange={(e) => setName(e.target.value)} />
+
+        <Text>monitor PPI</Text>
+        <Input type="number" disabled value={ppi} />
+        <Text>mouse DPI</Text>
+        <Input type="number" disabled value={dpi.measurement} />
 
         <Text>Trial</Text>
         <Input type="number" disabled value={trial} />

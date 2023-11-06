@@ -5,6 +5,7 @@ import {
   drawPointer,
   drawRewardText,
   drawStartButton,
+  drawText,
   getRandomValueInArray,
   initCanvas,
   random_point_between_circles,
@@ -15,6 +16,15 @@ import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Moneybag from "../../images/moneybag.png";
+import { useRecoilValue } from "recoil";
+import {
+  mointorBoundState,
+  pointerWeightState,
+  ppiState,
+} from "../../recoil/atom";
+
+export const INCH_24_WIDTH = 20.92;
+export const INCH_24_HEIGHT = 11.77;
 
 const RADIUS = 10;
 const SHOW_REWARD_TIME = 1000; //ms
@@ -28,6 +38,9 @@ const MTPCanvas = () => {
   });
 
   const [isSettingMode, setIsSettingMode] = useState(true);
+  const weight = useRecoilValue(pointerWeightState);
+  const ppi = useRecoilValue(ppiState);
+  const monitorBound = useRecoilValue(mointorBoundState);
 
   const navigate = useNavigate();
   const logArr = [
@@ -48,6 +61,7 @@ const MTPCanvas = () => {
     if (!isSettingMode) {
       let moneybag = new Image();
       moneybag.src = Moneybag;
+      let total_point = 0;
 
       let show_reward_counter = performance.now();
 
@@ -62,6 +76,7 @@ const MTPCanvas = () => {
       let summary = {
         fail: 0,
         success: 0,
+        point: 0,
       };
 
       let start;
@@ -71,9 +86,11 @@ const MTPCanvas = () => {
       let p2 = 0;
 
       let target_radius, target_x, target_y;
+      let target_reward;
 
       const targetInit = () => {
         target_radius = getRandomValueInArray([5, 10, 30]);
+        target_reward = getRandomValueInArray([0, 10, 50]);
 
         const target_location = random_point_between_circles({
           center: { x, y },
@@ -143,28 +160,30 @@ const MTPCanvas = () => {
             navigate("/replay");
           });
       }
-
+      // let weight = 0.0575;
       function updatePosition(e) {
         mouse_cnt++;
         const p = performance.now();
         p1 = p;
         p2 = p;
 
-        x += e.movementX;
-        y += e.movementY;
+        if (show_reward_counter + SHOW_REWARD_TIME < performance.now()) {
+          x += e.movementX * weight * 10;
+          y += e.movementY * weight * 10;
+        }
 
         //마우스 가두기
-        if (x > canvas.width - RADIUS) {
-          x = canvas.width - RADIUS;
+        if (x > window.screen.width - monitorBound.left) {
+          x = window.screen.width - monitorBound.left;
         }
-        if (y > canvas.height - RADIUS) {
-          y = canvas.height - RADIUS;
+        if (y > window.screen.height - monitorBound.top) {
+          y = window.screen.height - monitorBound.top;
         }
-        if (x < RADIUS) {
-          x = RADIUS;
+        if (x < monitorBound.left) {
+          x = monitorBound.left;
         }
-        if (y < RADIUS) {
-          y = RADIUS;
+        if (y < monitorBound.top) {
+          y = monitorBound.top;
         }
 
         if (e.buttons === 1) {
@@ -172,8 +191,11 @@ const MTPCanvas = () => {
           if (p - delay > 300) {
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
             if (target_radius - distance > 0) {
+              //성공시 이펙트 추가
+              summary.point += target_reward;
               summary.success++;
             } else {
+              //실패시 이펙트 추가
               summary.fail++;
             }
             targetInit();
@@ -187,22 +209,6 @@ const MTPCanvas = () => {
           uploadCSV();
         }
       }
-
-      const drawText = () => {
-        ctx.font = "30px serif";
-        ctx.fillStyle = "#fff";
-        ctx.fillText(
-          `cnt: ${summary.fail + summary.success}`,
-          window.innerWidth - 200,
-          50
-        );
-        ctx.fillText(
-          `success: ${summary.success}`,
-          window.innerWidth - 200,
-          100
-        );
-        ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
-      };
 
       //step function execute every frame
       function step(timestamp) {
@@ -221,20 +227,22 @@ const MTPCanvas = () => {
         logArr.push(tempRow);
 
         if (tt + 1000 < performance.now()) {
-          console.log("frame rate: " + cnt);
-          console.log("mouse event per second: " + mouse_cnt);
+          // console.log("frame rate: " + cnt);
+          // console.log("mouse event per second: " + mouse_cnt);
           tt = performance.now();
           cnt = 0;
           mouse_cnt = 0;
         }
         cnt++;
 
+        //TO-DO end 매번 검사 안할 방법
         if (!end) {
-          resetCanvas(canvas);
-          drawText();
+          resetCanvas(canvas, monitorBound);
+          drawText(ctx, summary);
 
           if (show_reward_counter + SHOW_REWARD_TIME > performance.now()) {
-            drawRewardText(ctx, moneybag);
+            drawRewardText(ctx, moneybag, target_reward);
+            drawPointer(ctx, x, y);
           } else {
             drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
             drawPointer(ctx, x, y);
@@ -245,11 +253,11 @@ const MTPCanvas = () => {
       }
 
       function pre_step() {
-        resetCanvas(canvas);
-
+        resetCanvas(canvas, monitorBound);
         if (start) {
+          targetInit();
           show_reward_counter = performance.now();
-          requestAnimationFrame(step);
+          step();
         } else {
           drawStartButton(ctx);
           requestAnimationFrame(pre_step);
@@ -257,7 +265,6 @@ const MTPCanvas = () => {
       }
 
       //init
-      targetInit();
       initCanvas(canvas);
       requestAnimationFrame(pre_step);
     }

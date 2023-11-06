@@ -9,13 +9,19 @@ export const distanceBetweenTwoPoint = (x1, y1, x2, y2) => {
   return Math.sqrt(dist_x * dist_x + dist_y * dist_y);
 };
 
-export const resetCanvas = (canvas) => {
+export const resetCanvas = (canvas, monitorBound) => {
   const ctx = canvas.getContext("2d");
-  const w = canvas.width;
-  const h = canvas.height;
 
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = "#eee";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#000";
+  ctx.fillRect(
+    monitorBound.left,
+    monitorBound.top,
+    monitorBound.width,
+    monitorBound.height
+  );
 };
 
 export const drawPointer = (ctx, x, y) => {
@@ -98,6 +104,7 @@ export const random_point_between_circles = ({
   screen_height,
 }) => {
   while (true) {
+    console.log("generate....");
     const theta = getRandomArbitrary(0, 2 * Math.PI);
     const r = getRandomArbitrary(inner_radius, outer_radius);
 
@@ -115,38 +122,50 @@ export const random_point_between_circles = ({
   }
 };
 
-export const drawRewardText = (ctx, moneybag) => {
+export const drawRewardText = (ctx, moneybag, target_reward) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "center";
+
   ctx.fillText(
-    `maximum reward: ${30} P!`,
+    `maximum reward: ${target_reward} P!`,
     window.innerWidth / 2,
     window.innerHeight / 2
   );
 
-  ctx.drawImage(
-    moneybag,
-    window.innerWidth / 2 - 100,
-    window.innerHeight / 2 + 20,
-    100,
-    100
-  );
-  ctx.drawImage(
-    moneybag,
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 20,
-    100,
-    100
-  );
-  ctx.drawImage(
-    moneybag,
-    window.innerWidth / 2 - 50,
-    window.innerHeight / 2 + 20,
-    100,
-    100
-  );
+  if (target_reward > 40) {
+    ctx.drawImage(
+      moneybag,
+      window.innerWidth / 2 - 100,
+      window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+    ctx.drawImage(
+      moneybag,
+      window.innerWidth / 2,
+      window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+    ctx.drawImage(
+      moneybag,
+      window.innerWidth / 2 - 50,
+      window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+  } else if (target_reward > 5) {
+    ctx.drawImage(
+      moneybag,
+      window.innerWidth / 2 - 50,
+      window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+  } else {
+  }
 };
 
 export const drawStartButton = (ctx) => {
@@ -159,4 +178,17 @@ export const drawStartButton = (ctx) => {
     window.innerWidth / 2,
     window.innerHeight / 2
   );
+};
+
+export const drawText = (ctx, summary) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.fillText(
+    `cnt: ${summary.fail + summary.success}`,
+    window.innerWidth - 200,
+    50
+  );
+  ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
+  ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
+  ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
 };
