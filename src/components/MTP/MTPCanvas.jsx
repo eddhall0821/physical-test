@@ -27,7 +27,7 @@ export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
 const RADIUS = 10;
-const SHOW_REWARD_TIME = 1000; //ms
+const SHOW_REWARD_TIME = 500; //ms
 const startStamp = performance.now();
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
@@ -97,8 +97,10 @@ const MTPCanvas = () => {
           inner_radius: lower_bound,
           outer_radius: upper_bound,
           ball_radius: target_radius,
-          screen_width: window.innerWidth,
-          screen_height: window.innerHeight,
+          screen_width: monitorBound.width,
+          screen_height: monitorBound.height,
+          top: monitorBound.top,
+          left: monitorBound.left,
         });
 
         target_x = target_location.x;

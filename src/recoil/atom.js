@@ -73,10 +73,43 @@ export const mointorBoundState = selector({
     const left = (window.screen.width - width) / 2;
 
     return {
-      width,
-      height,
-      top,
-      left,
+      width: Math.round(width),
+      height: Math.round(height),
+      top: Math.round(top),
+      left: Math.round(left),
     };
   },
 });
+
+export const skillTestState = atom({
+  key: "skillTestState",
+  default: {
+    target_radius: 0.1,
+    ball_distance: [
+      0.1,
+      0.3,
+      0.7,
+      1.5,
+      3.1,
+      6.2,
+      12.7, //group1
+      0.1,
+      0.3,
+      0.7,
+      1.5,
+      3.1,
+      6.2,
+      12.7, //group2
+      0.1,
+      0.3,
+      0.7,
+      1.5,
+      3.1,
+      6.2,
+      12.7, //group3
+    ],
+    measurement: [],
+  },
+});
+
+const mouse_check_mode_click = () => {};

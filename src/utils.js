@@ -12,7 +12,7 @@ export const distanceBetweenTwoPoint = (x1, y1, x2, y2) => {
 export const resetCanvas = (canvas, monitorBound) => {
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#eee";
+  ctx.fillStyle = "#1c1c1c";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "#000";
@@ -51,6 +51,12 @@ export const initCanvas = async (canvas) => {
     canvas.height = window.innerHeight;
   };
   toggleFullScreen(canvas);
+
+  window.addEventListener("keypress", async (e) => {
+    if (e.key === "Enter") {
+      toggleFullScreen(canvas);
+    }
+  });
 
   canvas.addEventListener("click", async () => {
     if (!document.pointerLockElement) {
@@ -102,24 +108,30 @@ export const random_point_between_circles = ({
   ball_radius,
   screen_width,
   screen_height,
+  top,
+  left,
 }) => {
-  while (true) {
-    console.log("generate....");
+  for (let i = 0; i < 1000; i++) {
     const theta = getRandomArbitrary(0, 2 * Math.PI);
     const r = getRandomArbitrary(inner_radius, outer_radius);
 
     const x = center.x + r * Math.cos(theta);
     const y = center.y + r * Math.sin(theta);
-
     if (
-      ball_radius <= x &&
-      x <= screen_width - ball_radius &&
-      ball_radius <= y &&
-      y <= screen_height - ball_radius
+      left + ball_radius <= x &&
+      x <= left + screen_width - ball_radius &&
+      top + ball_radius <= y &&
+      y <= screen_height + top - ball_radius
+      // ball_radius <= x &&
+      // x <= screen_width - ball_radius &&
+      // ball_radius <= y &&
+      // y <= screen_height - ball_radius
     ) {
       return { x: x, y: y };
     }
   }
+
+  return { x: window.screen.width / 2, y: window.screen.height / 2 };
 };
 
 export const drawRewardText = (ctx, moneybag, target_reward) => {
@@ -191,4 +203,12 @@ export const drawText = (ctx, summary) => {
   ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
   ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
   ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
+};
+
+export const inch = (ppi, inch) => {
+  return Math.round(ppi * inch);
+};
+
+export const fittsLaw = (w, d) => {
+  return Math.log2(1 + d / w);
 };

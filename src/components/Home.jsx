@@ -2,7 +2,7 @@ import { Button, Card, Col, Layout, Row, Skeleton, Space } from "antd";
 import Meta from "antd/es/card/Meta";
 import { Link, useLocation } from "react-router-dom";
 import { PlayCircleOutlined } from "@ant-design/icons";
-import PNC2 from "../images/pnc2.jpg";
+import PNC2 from "../images/pixel_style.jpg";
 import PNC3 from "../images/pnc3.jpg";
 import { useEffect } from "react";
 import QueryString from "qs";

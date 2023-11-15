@@ -8,6 +8,9 @@ import Measure from "./components/measure";
 import MonitorMeasure from "./components/measure/MonitorMeasure";
 import { RecoilRoot } from "recoil";
 import ScreenCheck from "./components/measure/ScreenCheck";
+import MTPTest from "./components/MTP/MTPTest";
+import LinearRegressionComponent from "./components/measure/LinearRegression";
+import PointingTest from "./components/MTP/PointingTest";
 
 function App() {
   const router = createBrowserRouter(
@@ -35,6 +38,18 @@ function App() {
       {
         path: "check",
         element: <ScreenCheck />,
+      },
+      {
+        path: "test",
+        element: <MTPTest />,
+      },
+      {
+        path: "linear",
+        element: <LinearRegressionComponent />,
+      },
+      {
+        path: "pointing",
+        element: <PointingTest />,
       },
     ],
     {

@@ -8,6 +8,22 @@ import { Button, Card, Input, Space, Switch, Typography } from "antd";
 const Measure = () => {
   const [x, setX] = useState(0);
   const [dpi, setDpi] = useRecoilState(dpiState);
+  const [isChanged, setIsChanged] = useState(false);
+
+  useEffect(() => {
+    if (isChanged) {
+      const current_dpi = Math.round(Math.abs(x) / 3.375);
+      if (current_dpi > 3200) {
+        alert("extreme high DPI");
+      }
+      if (current_dpi < 400) {
+        alert("extreme low DPI");
+      }
+
+      setDpiState(ENUM.MEASUREMENT, current_dpi);
+      setX(0);
+    }
+  }, [isChanged]);
 
   const setDpiState = (key, input) => {
     setDpi((old) => {
@@ -21,10 +37,7 @@ const Measure = () => {
   const exitPointerLock = () => {
     if (document.pointerLockElement) {
       document.exitPointerLock();
-      setX((old) => {
-        setDpiState(ENUM.MEASUREMENT, Math.round(Math.abs(old) / 3.375));
-        return 0;
-      });
+      setIsChanged(true);
     }
   };
 
@@ -44,9 +57,12 @@ const Measure = () => {
     document.addEventListener("mouseup", exitPointerLock);
 
     function PLMouseMove(e) {
-      setX((old) => {
-        return (old += e.movementX);
-      });
+      if (document.pointerLockElement === document.body) {
+        setIsChanged(false);
+        setX((old) => {
+          return (old += e.movementX);
+        });
+      }
     }
 
     return () => {
@@ -68,8 +84,8 @@ const Measure = () => {
         <Typography>input your dpi.</Typography>
         <Switch
           checked={dpi.isUserKnow}
-          checkedChildren="I know my dpi"
-          unCheckedChildren="I don't know my dpi"
+          checkedChildren="I know my mouse dpi"
+          unCheckedChildren="I don't know my mouse dpi"
           onChange={() => setDpiState(ENUM.IS_USER_KNOW, !dpi.isUserKnow)}
         />
         <Input
@@ -83,7 +99,6 @@ const Measure = () => {
         <Typography>dpi : {dpi.measurement}</Typography>
         <div
           onMouseDown={() => document.body.requestPointerLock()}
-          onMouseOut={() => setX(0)}
           style={{
             color: "white",
             textAlign: "center",
@@ -98,7 +113,7 @@ const Measure = () => {
           {x ? "MEASUREING....." : ""}
         </div>
         <Button type="primary" size="large">
-          <Link to="/pnc">NEXT STEP!</Link>
+          <Link to="/pointing">NEXT STEP!</Link>
         </Button>
       </Space>
     </Card>
