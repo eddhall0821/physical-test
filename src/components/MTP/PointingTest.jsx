@@ -82,6 +82,7 @@ const PointingTest = () => {
     let target_y = 0;
     let miss_target_x = 0;
     let miss_target_y = 0;
+    let miss_radius = 0;
     let show_miss = 0;
 
     let start_time = performance.now();
@@ -141,7 +142,7 @@ const PointingTest = () => {
         const angle = i * angleBetweenPoints;
         const x = centerX + target_zone_radius * Math.cos(angle);
         const y = centerY + target_zone_radius * Math.sin(angle);
-        drawTarget(x, y, target_radius, "#454545");
+        // drawTarget(x, y, target_radius, "#454545");
       }
 
       //blue ball
@@ -155,7 +156,7 @@ const PointingTest = () => {
 
       //miss ball
       if (show_miss + SHOW_MISS_TIME > performance.now()) {
-        missBall(miss_target_x, miss_target_y);
+        drawTarget(miss_target_x, miss_target_y, miss_radius, "red");
       }
     };
 
@@ -164,10 +165,6 @@ const PointingTest = () => {
       ctx.arc(x, y, target_radius, 0, degToRad(360), true);
       ctx.fillStyle = color;
       ctx.fill();
-    };
-
-    const missBall = (x, y) => {
-      drawTarget(x, y, target_radius, "red");
     };
 
     const generateSequence = (n, max) => {
@@ -206,6 +203,7 @@ const PointingTest = () => {
           show_miss = performance.now();
           miss_target_x = target_x;
           miss_target_y = target_y;
+          miss_radius = target_radius;
         }
 
         cnt++;

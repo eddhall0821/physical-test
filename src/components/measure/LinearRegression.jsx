@@ -8,10 +8,20 @@ import {
   LineElement,
   Tooltip,
   Legend,
+  BarElement,
+  registerables,
 } from "chart.js";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "antd";
-ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
+ChartJS.register(...registerables);
+ChartJS.register(
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Tooltip,
+  Legend
+);
 
 const LinearRegression = () => {
   const { state } = useLocation();
@@ -47,6 +57,19 @@ const LinearRegression = () => {
           type: "line",
           fill: false,
         },
+        {
+          type: "bar",
+          data: [
+            {
+              x: (400 - b) / m,
+              y: 400,
+            },
+            {
+              x: (1000 - b) / m,
+              y: 1000,
+            },
+          ],
+        },
       ],
     });
 
@@ -71,12 +94,15 @@ const LinearRegression = () => {
           options={{
             responsive: false,
             scales: {
-              y: {
-                // min: 0,
-                // max: 2000,
-                // stepSize: 500,
-              },
-              x: {},
+              // y: {
+              //   min: 0,
+              //   max: 2000,
+              //   stepSize: 500,
+              // },
+              // x: {
+              //   min: 0,
+              //   max: 8,
+              // },
             },
           }}
         />

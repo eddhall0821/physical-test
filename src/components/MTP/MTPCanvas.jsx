@@ -6,10 +6,14 @@ import {
   drawRewardText,
   drawStartButton,
   drawText,
+  getRandomArbitrary,
   getRandomValueInArray,
+  getWdithByIDAndDistance,
+  inch,
   initCanvas,
   random_point_between_circles,
   resetCanvas,
+  shuffle,
 } from "../../utils";
 import Description from "./Description";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
@@ -57,11 +61,54 @@ const MTPCanvas = () => {
     ],
   ];
 
+  const balls = {
+    designs: [],
+    randomDesignArray: [],
+
+    generateRandomDesigns: function () {
+      let randomDesignArray = [];
+      for (let design of this.designs) {
+        for (let i = 0; i < design.cnt; i++) {
+          const random = Math.random();
+
+          const minDistance = 2;
+          const maxDistance = INCH_24_HEIGHT / 2;
+          const randId = random * design.idStep + design.idStart;
+          const distance = random * (maxDistance - minDistance) + minDistance;
+          const width = getWdithByIDAndDistance(randId, distance);
+          randomDesignArray.push({
+            random: random,
+            id: randId,
+            d: distance,
+            w: width,
+          });
+        }
+      }
+      this.randomDesignArray = shuffle(randomDesignArray);
+    },
+
+    getRandomDesignArray: function () {
+      if (this.randomDesignArray.length !== 0) return this.randomDesignArray;
+      else return [];
+    },
+
+    init: function ({ groupCount, stepSize, startStep, totalCount }) {
+      this.designs = [];
+      for (let i = 0; i < groupCount; i++) {
+        this.designs.push({
+          index: i,
+          cnt: totalCount / groupCount,
+          idStart: startStep + i * stepSize,
+          idStep: stepSize,
+        });
+      }
+    },
+  };
+
   useEffect(() => {
     if (!isSettingMode) {
       let moneybag = new Image();
       moneybag.src = Moneybag;
-      let total_point = 0;
 
       let show_reward_counter = performance.now();
 
@@ -89,7 +136,7 @@ const MTPCanvas = () => {
       let target_reward;
 
       const targetInit = () => {
-        target_radius = getRandomValueInArray([5, 10, 30]);
+        target_radius = getRandomValueInArray([4, 4, 4]);
         target_reward = getRandomValueInArray([0, 10, 50]);
 
         const target_location = random_point_between_circles({

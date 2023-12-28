@@ -11,6 +11,7 @@ import ScreenCheck from "./components/measure/ScreenCheck";
 import MTPTest from "./components/MTP/MTPTest";
 import LinearRegressionComponent from "./components/measure/LinearRegression";
 import PointingTest from "./components/MTP/PointingTest";
+import Simulator from "./components/simulator/Simulator";
 
 function App() {
   const router = createBrowserRouter(
@@ -50,6 +51,10 @@ function App() {
       {
         path: "pointing",
         element: <PointingTest />,
+      },
+      {
+        path: "simulator",
+        element: <Simulator />,
       },
     ],
     {

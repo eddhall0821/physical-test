@@ -89,7 +89,7 @@ export const initCanvas = async (canvas) => {
 export const drawMTPTarget = (ctx, x, y, speed, radius) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, degToRad(360), true);
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "#00BFFF";
   ctx.fill();
 };
 
@@ -203,6 +203,10 @@ export const drawText = (ctx, summary) => {
   ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
   ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
   ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
+
+  ctx.fillText(`c1: ${summary.point}`, window.innerWidth - 200, 250);
+  ctx.fillText(`c2: ${summary.point}`, window.innerWidth - 200, 300);
+  ctx.fillText(`c3: ${summary.point}`, window.innerWidth - 200, 350);
 };
 
 export const inch = (ppi, inch) => {
@@ -211,4 +215,8 @@ export const inch = (ppi, inch) => {
 
 export const fittsLaw = (w, d) => {
   return Math.log2(1 + d / w);
+};
+
+export const getWdithByIDAndDistance = (id, d) => {
+  return d / (2 ** id - 1);
 };

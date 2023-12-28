@@ -7,7 +7,7 @@ const { Text, Link } = Typography;
 
 const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
   const [name, setName] = useState("player");
-  const [trial, setTrial] = useState(20);
+  const [trial, setTrial] = useState(3);
   const [lowerBound, setLowerBound] = useState(300);
   const [upperBound, setUpperBound] = useState(1000);
   const dpi = useRecoilValue(dpiState);
@@ -70,8 +70,9 @@ const Description = ({ setSettings, setIsSettingMode, isSettingMode }) => {
         <Text>Trial</Text>
         <Input type="number" disabled value={trial} />
         <Slider
-          min={5}
+          min={3}
           max={10000}
+          step={3}
           value={trial}
           onChange={(e) => setTrial(e)}
         />
