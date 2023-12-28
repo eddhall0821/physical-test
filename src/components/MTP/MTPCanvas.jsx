@@ -6,14 +6,11 @@ import {
   drawRewardText,
   drawStartButton,
   drawText,
-  getRandomArbitrary,
   getRandomValueInArray,
-  getWdithByIDAndDistance,
   inch,
   initCanvas,
   random_point_between_circles,
   resetCanvas,
-  shuffle,
 } from "../../utils";
 import Description from "./Description";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
@@ -26,12 +23,15 @@ import {
   pointerWeightState,
   ppiState,
 } from "../../recoil/atom";
+import { Balls } from "./Balls";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
 const RADIUS = 10;
-const SHOW_REWARD_TIME = 500; //ms
+const SHOW_REWARD_TIME = 1200; //ms
+const DELAY = SHOW_REWARD_TIME + 300;
+
 const startStamp = performance.now();
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
@@ -41,7 +41,7 @@ const MTPCanvas = () => {
     trial: 20,
   });
 
-  const [isSettingMode, setIsSettingMode] = useState(true);
+  const [isSettingMode, setIsSettingMode] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
   const ppi = useRecoilValue(ppiState);
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -60,50 +60,6 @@ const MTPCanvas = () => {
       "screenY",
     ],
   ];
-
-  const balls = {
-    designs: [],
-    randomDesignArray: [],
-
-    generateRandomDesigns: function () {
-      let randomDesignArray = [];
-      for (let design of this.designs) {
-        for (let i = 0; i < design.cnt; i++) {
-          const random = Math.random();
-
-          const minDistance = 2;
-          const maxDistance = INCH_24_HEIGHT / 2;
-          const randId = random * design.idStep + design.idStart;
-          const distance = random * (maxDistance - minDistance) + minDistance;
-          const width = getWdithByIDAndDistance(randId, distance);
-          randomDesignArray.push({
-            random: random,
-            id: randId,
-            d: distance,
-            w: width,
-          });
-        }
-      }
-      this.randomDesignArray = shuffle(randomDesignArray);
-    },
-
-    getRandomDesignArray: function () {
-      if (this.randomDesignArray.length !== 0) return this.randomDesignArray;
-      else return [];
-    },
-
-    init: function ({ groupCount, stepSize, startStep, totalCount }) {
-      this.designs = [];
-      for (let i = 0; i < groupCount; i++) {
-        this.designs.push({
-          index: i,
-          cnt: totalCount / groupCount,
-          idStart: startStep + i * stepSize,
-          idStep: stepSize,
-        });
-      }
-    },
-  };
 
   useEffect(() => {
     if (!isSettingMode) {
@@ -134,16 +90,28 @@ const MTPCanvas = () => {
 
       let target_radius, target_x, target_y;
       let target_reward;
+      let currentDesign = null;
 
-      const targetInit = () => {
+      const balls = new Balls();
+      balls.init({
+        groupCount: 3,
+        stepSize: 1.5,
+        startStep: 2,
+        totalCount: 30,
+      });
+
+      balls.generateRandomDesigns();
+      currentDesign = balls.popStack();
+
+      const targetInit = (d, w) => {
         target_radius = getRandomValueInArray([4, 4, 4]);
         target_reward = getRandomValueInArray([0, 10, 50]);
 
         const target_location = random_point_between_circles({
           center: { x, y },
-          inner_radius: lower_bound,
-          outer_radius: upper_bound,
-          ball_radius: target_radius,
+          inner_radius: inch(ppi, d),
+          outer_radius: inch(ppi, d),
+          ball_radius: inch(ppi, w),
           screen_width: monitorBound.width,
           screen_height: monitorBound.height,
           top: monitorBound.top,
@@ -237,7 +205,7 @@ const MTPCanvas = () => {
 
         if (e.buttons === 1) {
           show_reward_counter = performance.now();
-          if (p - delay > 300) {
+          if (p - delay > DELAY + 500) {
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
             if (target_radius - distance > 0) {
               //성공시 이펙트 추가
@@ -247,15 +215,19 @@ const MTPCanvas = () => {
               //실패시 이펙트 추가
               summary.fail++;
             }
-            targetInit();
+
+            if (balls.getRandomDesignArray().length === 0 && !end) {
+              alert("done!!");
+              // end = true;
+              // uploadCSV();
+            } else {
+              currentDesign = balls.popStack();
+              targetInit(currentDesign.d, currentDesign.w);
+            }
+
             delay = p;
           }
           timeDiff = 0;
-        }
-
-        if (summary.success + summary.fail === trial && !end) {
-          end = true;
-          uploadCSV();
         }
       }
 
@@ -287,7 +259,7 @@ const MTPCanvas = () => {
         //TO-DO end 매번 검사 안할 방법
         if (!end) {
           resetCanvas(canvas, monitorBound);
-          drawText(ctx, summary);
+          drawText(ctx, summary, 900);
 
           if (show_reward_counter + SHOW_REWARD_TIME > performance.now()) {
             drawRewardText(ctx, moneybag, target_reward);
@@ -304,7 +276,7 @@ const MTPCanvas = () => {
       function pre_step() {
         resetCanvas(canvas, monitorBound);
         if (start) {
-          targetInit();
+          targetInit(currentDesign.d, currentDesign.w);
           show_reward_counter = performance.now();
           step();
         } else {

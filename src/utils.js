@@ -192,7 +192,7 @@ export const drawStartButton = (ctx) => {
   );
 };
 
-export const drawText = (ctx, summary) => {
+export const drawText = (ctx, summary, remain) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.fillText(
@@ -203,10 +203,7 @@ export const drawText = (ctx, summary) => {
   ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
   ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
   ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
-
-  ctx.fillText(`c1: ${summary.point}`, window.innerWidth - 200, 250);
-  ctx.fillText(`c2: ${summary.point}`, window.innerWidth - 200, 300);
-  ctx.fillText(`c3: ${summary.point}`, window.innerWidth - 200, 350);
+  ctx.fillText(`remain: ${remain}`, window.innerWidth - 200, 250);
 };
 
 export const inch = (ppi, inch) => {
