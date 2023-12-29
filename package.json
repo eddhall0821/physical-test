@@ -1,6 +1,5 @@
 {
-  "name": "physical-test",
-  "homepage": "https://eddhall0821.github.io/physical-test",
+  "name": "test",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

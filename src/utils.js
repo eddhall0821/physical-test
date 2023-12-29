@@ -131,14 +131,41 @@ export const random_point_between_circles = ({
     }
   }
 
+  console.log("Err");
   return { x: window.screen.width / 2, y: window.screen.height / 2 };
 };
 
+export const drawClickResultText = (ctx, success, time, reward) => {
+  const successText = success ? "Success" : "failed";
+  const successColor = success ? "green" : "red";
+
+  ctx.font = "30px serif";
+  ctx.fillStyle = successColor;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    `click ${successText}!`,
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+  ctx.fillStyle = "#fff";
+
+  ctx.fillText(
+    `It took ${time} seconds.`,
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
+  );
+  ctx.fillText(
+    `You got ${reward} points`,
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
+  );
+};
 export const drawRewardText = (ctx, moneybag, target_reward) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
-  ctx.textBaseline = "center";
+  ctx.textBaseline = "middle";
 
   ctx.fillText(
     `maximum reward: ${target_reward} P!`,
@@ -184,11 +211,79 @@ export const drawStartButton = (ctx) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
-  ctx.textBaseline = "center";
+  ctx.textBaseline = "middle";
   ctx.fillText(
-    "click to start!",
+    "Before the main experiment, let's start with a simple inspection.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 - 50
+  );
+
+  ctx.fillText(
+    "You may not be familiar with mouse sensitivity, ",
     window.innerWidth / 2,
     window.innerHeight / 2
+  );
+  ctx.fillText(
+    "because the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
+  );
+
+  ctx.fillText(
+    "Click on the blue ball that appears on the screen as quickly and accurately as possible.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
+  );
+  ctx.fillText(
+    "If the ball does not appear on the screen, click anywhere.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 150
+  );
+
+  ctx.fillText(
+    "If it does not automatically go to full screen, or if full screen is released during operation, press the enter key.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 200
+  );
+
+  ctx.fillText(
+    "When you're ready, click to start.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 250
+  );
+};
+
+export const drawStartButton2 = (ctx) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "From now on, for each trial, the screen will display the amount of rewards you can earn.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+  ctx.fillText(
+    "Click on the blue ball in the game to receive a reward. ",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
+  );
+
+  ctx.fillText(
+    "After every attempt, you will receive a bonus based on the total reward amount.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
+  );
+
+  ctx.fillText(
+    "Rewards are given in points, with xx points equivalent to $xx.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 150
+  );
+  ctx.fillText(
+    "When you're ready, click to start.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 200
   );
 };
 

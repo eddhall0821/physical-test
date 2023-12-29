@@ -94,10 +94,46 @@ const PointingTest = () => {
       if (document.pointerLockElement === canvas) {
         start = true;
         document.addEventListener("mousemove", updatePosition, false);
+        document.addEventListener("mousedown", mouseDown);
       } else {
         document.removeEventListener("mousemove", updatePosition, false);
+        document.removeEventListener("mousedown", mouseDown);
       }
     }
+    const mouseDown = (e) => {
+      if (e.buttons === 1) {
+        const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
+        if (distance > target_radius) {
+          show_miss = performance.now();
+          miss_target_x = target_x;
+          miss_target_y = target_y;
+          miss_radius = target_radius;
+        }
+
+        cnt++;
+        end_time = performance.now();
+        const reaction_time = end_time - start_time;
+        reaction_time_arr.push({
+          target_zone_radius,
+          target_radius,
+          reaction_time,
+        });
+        start_time = performance.now();
+
+        if (cnt >= NUM_POINTS && trial + 1 === combination.length) {
+          const result = calculateAverages(reaction_time_arr);
+          navigate("/linear", { state: { result } });
+        }
+
+        if (cnt >= NUM_POINTS) {
+          //다음 trial 이동
+          cnt = 0;
+          trial++;
+          setTarget();
+        }
+      }
+    };
+
     const calculateAverages = (data) => {
       // target_zone_radius,
       // target_radius,
@@ -196,38 +232,6 @@ const PointingTest = () => {
         y = monitorBound.top;
       }
       //마우스 가두기 끝
-
-      if (e.buttons === 1) {
-        const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-        if (distance > target_radius) {
-          show_miss = performance.now();
-          miss_target_x = target_x;
-          miss_target_y = target_y;
-          miss_radius = target_radius;
-        }
-
-        cnt++;
-        end_time = performance.now();
-        const reaction_time = end_time - start_time;
-        reaction_time_arr.push({
-          target_zone_radius,
-          target_radius,
-          reaction_time,
-        });
-        start_time = performance.now();
-      }
-
-      if (cnt >= NUM_POINTS && trial + 1 === combination.length) {
-        const result = calculateAverages(reaction_time_arr);
-        navigate("/linear", { state: { result } });
-      }
-
-      if (cnt >= NUM_POINTS) {
-        //다음 trial 이동
-        cnt = 0;
-        trial++;
-        setTarget();
-      }
 
       p2 = p;
     }

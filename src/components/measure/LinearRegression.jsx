@@ -111,9 +111,11 @@ const LinearRegression = () => {
         Equation of the line: y = {linearModel.m.toFixed(2)}x +{" "}
         {linearModel.b.toFixed(2)}
       </p>
-      <Button type="primary" size="large">
-        <Link to="/pnc">NEXT STEP!</Link>
-      </Button>
+      <Link to="/pnc">
+        <Button type="primary" size="large">
+          NEXT STEP!
+        </Button>
+      </Link>
     </div>
   );
 };

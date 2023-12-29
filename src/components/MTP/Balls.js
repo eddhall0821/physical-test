@@ -28,6 +28,7 @@ export class Balls {
   };
 
   getRandomDesignArray = function () {
+    console.log(this.randomDesignArray);
     if (this.randomDesignArray.length !== 0) return this.randomDesignArray;
     else return [];
   };
