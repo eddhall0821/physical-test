@@ -66,8 +66,10 @@ const PointingTest = () => {
     },
     {
       //난이도 6.5
-      targetZoneRadius: inch(ppi, 8.951),
-      targetRadius: inch(ppi, 0.1),
+      // targetZoneRadius: inch(ppi, 8.951),
+      // targetRadius: inch(ppi, 0.1),
+      targetZoneRadius: inch(ppi, 6.266),
+      targetRadius: inch(ppi, 0.07),
     },
   ]);
 

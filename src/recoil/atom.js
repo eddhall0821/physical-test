@@ -1,5 +1,6 @@
 import { atom, selector } from "recoil";
 import { INCH_24_HEIGHT, INCH_24_WIDTH } from "../components/MTP/MTPCanvas";
+import { findLargest16by9Rectangle } from "../utils";
 
 //recoil state 생성
 
@@ -72,12 +73,25 @@ export const mointorBoundState = selector({
     const top = (window.screen.height - height) / 2;
     const left = (window.screen.width - width) / 2;
 
-    return {
-      width: Math.round(width),
-      height: Math.round(height),
-      top: Math.round(top),
-      left: Math.round(left),
-    };
+    const smallMonitor = findLargest16by9Rectangle(
+      window.screen.width,
+      window.screen.height
+    );
+    if (
+      width < window.screen.width &&
+      height < window.screen.height &&
+      top > 0 &&
+      left > 0
+    )
+      return {
+        width: Math.round(width),
+        height: Math.round(height),
+        top: Math.round(top),
+        left: Math.round(left),
+      };
+    else {
+      return smallMonitor;
+    }
   },
 });
 

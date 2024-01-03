@@ -112,6 +112,7 @@ export const random_point_between_circles = ({
   left,
 }) => {
   for (let i = 0; i < 1000; i++) {
+    console.log("create....");
     const theta = getRandomArbitrary(0, 2 * Math.PI);
     const r = getRandomArbitrary(inner_radius, outer_radius);
 
@@ -311,4 +312,31 @@ export const fittsLaw = (w, d) => {
 
 export const getWdithByIDAndDistance = (id, d) => {
   return d / (2 ** id - 1);
+};
+
+export const findLargest16by9Rectangle = (x, y) => {
+  // 가로 기준 16:9 비율 사각형
+  let widthBasedHeight = x * (9 / 16);
+  let widthBasedRectangle = {
+    width: x,
+    height: widthBasedHeight,
+    top: (y - widthBasedHeight) / 2,
+    left: 0,
+  };
+
+  // 세로 기준 16:9 비율 사각형
+  let heightBasedWidth = y * (16 / 9);
+  let heightBasedRectangle = {
+    width: heightBasedWidth,
+    height: y,
+    top: 0,
+    left: (x - heightBasedWidth) / 2,
+  };
+
+  // 두 사각형 중 더 작은 것을 반환
+  if (widthBasedHeight <= y) {
+    return widthBasedRectangle; // 가로 제한이 세로 제한보다 작거나 같은 경우
+  } else {
+    return heightBasedRectangle; // 세로 제한이 더 작은 경우
+  }
 };

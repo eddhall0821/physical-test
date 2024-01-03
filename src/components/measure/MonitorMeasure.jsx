@@ -45,7 +45,7 @@ const MonitorMeasure = () => {
         flexDirection: "column",
       }}
     >
-      <p style={{ width: 600 }}>
+      <p style={{ width: 800 }}>
         To calibrate place a physical credit card against the image of the card
         below and increase or decrease its size until it matches the size of the
         physical card exactly. Once both have the same size the calibration is
@@ -53,12 +53,16 @@ const MonitorMeasure = () => {
         have physical card you can use debit card, library card or a standard
         ID.
       </p>
+      <p>
+        If you are using multiple monitors, do not change the monitor you use
+        once the measurement is completed.
+      </p>
       {`${diagonal_in} inch ${ppi}`}
       <div style={{ width: 300 }}>
         <Slider
           step={0.001}
           min={0.5}
-          max={2}
+          max={2.3}
           value={monitor.scale}
           onChange={(e) => setScale(e)}
         />

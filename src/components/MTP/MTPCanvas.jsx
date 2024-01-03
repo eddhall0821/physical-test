@@ -31,8 +31,8 @@ export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
 const RADIUS = 10;
-const SHOW_REWARD_TIME = 1500; //ms
-const SHOW_RESULT_TIME = 1500; //ms
+const SHOW_REWARD_TIME = 1200; //ms
+const SHOW_RESULT_TIME = 1200; //ms
 const DELAY = SHOW_REWARD_TIME + SHOW_RESULT_TIME + 100;
 
 const startStamp = performance.now();
@@ -61,6 +61,9 @@ const MTPCanvas = () => {
       "movementY",
       "screenX",
       "screenY",
+      "buttons",
+      "reaction_time",
+      "timestamp",
     ],
   ];
 
@@ -76,6 +79,10 @@ const MTPCanvas = () => {
       let trial = settings.trial;
       let name = settings.name;
       let movement_stop_time = 0;
+
+      let movementX = 0;
+      let movementY = 0;
+      let buttons = 0;
 
       let x = window.innerWidth / 2;
       let y = window.innerHeight / 2;
@@ -104,7 +111,7 @@ const MTPCanvas = () => {
         groupCount: 3,
         stepSize: 1.5,
         startStep: 2,
-        totalCount: 30,
+        totalCount: 3,
       });
 
       balls.generateRandomDesigns();
@@ -155,6 +162,7 @@ const MTPCanvas = () => {
         const p = performance.now();
         if (e.buttons === 1) {
           if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
+            buttons = 1;
             lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
             show_reward_counter = p;
             delay = p;
@@ -191,10 +199,7 @@ const MTPCanvas = () => {
             .catch((err) => console.error(err));
         }
         const storage = getStorage();
-        const storageRef = ref(
-          storage,
-          `sdfsdfsfsdfsfdsfsdfasdfasdfasdf_asdfasdfasdfasdfasdfasdfasdfasdf_asdfasdfasdfasdfasdfasdfadfasdfasdfa${name}_${Date.now()}.csv`
-        );
+        const storageRef = ref(storage, `${name}_${Date.now()}.csv`);
 
         let csvContent = logArr
           .map((e) => {
@@ -232,6 +237,9 @@ const MTPCanvas = () => {
           show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
           performance.now()
         ) {
+          movementX += e.movementX;
+          movementY += e.movementY;
+
           x += e.movementX * weight * 10;
           y += e.movementY * weight * 10;
         }
@@ -249,35 +257,6 @@ const MTPCanvas = () => {
         if (y < monitorBound.top) {
           y = monitorBound.top;
         }
-
-        if (e.buttons === 1) {
-          if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
-            lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
-            show_reward_counter = p;
-            delay = p;
-            const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-            if (target_radius - distance > 0) {
-              //성공시 이펙트 추가
-              summary.point += target_reward;
-              summary.success++;
-              lastClickResult.success = true;
-            } else {
-              //실패시 이펙트 추가
-              summary.fail++;
-              lastClickResult.success = false;
-            }
-
-            if (balls.getRandomDesignArray().length === 0 && !end) {
-              alert("done!!");
-              end = true;
-              uploadCSV();
-            } else {
-              console.log("TARGET INIT");
-              currentDesign = balls.popStack();
-              targetInit(currentDesign.d, currentDesign.w);
-            }
-          }
-        }
       }
 
       //step function execute every frame
@@ -288,14 +267,14 @@ const MTPCanvas = () => {
           target_y,
           x,
           y,
-          "",
-          "",
+          movementX,
+          movementY,
           window.innerWidth,
           window.innerHeight,
+          buttons,
+          lastClickResult.time,
+          Date.now() / 1000,
         ];
-
-        logArr.push(tempRow);
-
         // if (tt + 1000 < timestamp) {
         //   console.log("frame rate: " + cnt);
         //   console.log("mouse event per second: " + mouse_cnt);
@@ -305,10 +284,29 @@ const MTPCanvas = () => {
         // }
         // cnt++;
 
-        console.log(performance.now() - movement_stop_time);
-        if (performance.now() - movement_stop_time > 3000) {
-          movement_stop_time = performance.now();
+        //움직임 감지되지 않음
+        if (
+          performance.now() - movement_stop_time >
+          3000 + SHOW_RESULT_TIME + SHOW_REWARD_TIME
+        ) {
+          const p = performance.now();
+          lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
+          show_reward_counter = p;
+          delay = p;
+
           console.log("stop.");
+          summary.fail++;
+          lastClickResult.success = false;
+          if (balls.getRandomDesignArray().length === 0 && !end) {
+            alert("done!!");
+            end = true;
+            uploadCSV();
+          } else {
+            console.log("TARGET INIT");
+            currentDesign = balls.popStack();
+            targetInit(currentDesign.d, currentDesign.w);
+          }
+          movement_stop_time = p;
         }
         //TO-DO end 매번 검사 안할 방법
         if (!end) {
@@ -333,9 +331,15 @@ const MTPCanvas = () => {
             drawRewardText(ctx, moneybag, target_reward);
             drawPointer(ctx, x, y);
           } else {
+            logArr.push(tempRow);
+
             drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
             drawPointer(ctx, x, y);
           }
+
+          movementX = 0;
+          movementY = 0;
+          if (buttons !== 0) buttons = 0;
 
           requestAnimationFrame(step);
         }

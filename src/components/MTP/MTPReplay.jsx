@@ -8,6 +8,8 @@ import {
 } from "../../utils";
 import { Link } from "react-router-dom";
 import { Button } from "antd";
+import { useRecoilValue } from "recoil";
+import { mointorBoundState } from "../../recoil/atom";
 
 Array.prototype.next = function () {
   return this[++this.current];
@@ -18,6 +20,8 @@ Array.prototype.prev = function () {
 Array.prototype.current = 0;
 
 const MTPReplay = () => {
+  const monitorBound = useRecoilValue(mointorBoundState);
+
   useEffect(() => {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -76,7 +80,7 @@ const MTPReplay = () => {
         } = logArr.next();
 
         if (logArr.length > logIndex) {
-          resetCanvas(canvas);
+          resetCanvas(canvas, monitorBound);
           drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
           drawPointer(ctx, x, y);
           logIndex++;
