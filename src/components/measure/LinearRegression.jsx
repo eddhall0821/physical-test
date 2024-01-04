@@ -13,6 +13,19 @@ import {
 } from "chart.js";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "antd";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  docIdState,
+  dpiState,
+  mointorBoundState,
+  monitorState,
+  pointerWeightState,
+  ppiState,
+} from "../../recoil/atom";
+import { addDoc, doc, collection } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import TextArea from "antd/es/input/TextArea";
+
 ChartJS.register(...registerables);
 ChartJS.register(
   LinearScale,
@@ -27,6 +40,17 @@ const LinearRegression = () => {
   const { state } = useLocation();
   const [chartData, setChartData] = useState({});
   const [linearModel, setLinearModel] = useState({ m: 0, b: 0 });
+  const monitor = useRecoilValue(monitorState);
+  const ppi = useRecoilValue(ppiState);
+  const dpi = useRecoilValue(dpiState);
+  const pointerWeight = useRecoilValue(pointerWeightState);
+  const monitorBound = useRecoilValue(mointorBoundState);
+  const prolificId = "1123";
+  const sessionId = "2234";
+  const [loading, setLoading] = useState(false);
+  const [finish, setFinish] = useState(false);
+  const [comment1, setComment1] = useState("");
+  const [docId, setDocId] = useRecoilState(docIdState);
 
   useEffect(() => {
     const data = state.result;
@@ -76,6 +100,54 @@ const LinearRegression = () => {
     setLinearModel({ m, b });
   }, [state.result]);
 
+  const handleCreateAccount = async () => {
+    // <p>ppi: {ppi}</p>
+    // <p>user dpi: {dpi.userInput}</p>
+    // <p>measure dpi: {dpi.measurement}</p>
+    // <p>pointer weight: {pointerWeight}</p>
+    // <p>height: {monitorBound.height}</p>
+    // <p>width: {monitorBound.width}</p>
+    // <p>top: {monitorBound.top}</p>
+    // <p>left: {monitorBound.left}</p>
+    // <p>a: {linearModel.m.toFixed(2)}</p>
+    // <p>b: {linearModel.b.toFixed(2)}</p>
+
+    const docData = {
+      prolific_id: prolificId,
+      session_id: sessionId,
+      ppi,
+      user_dpi: dpi.userInput,
+      measure_dpi: dpi.measurement,
+      pointer_weight: pointerWeight,
+      height: monitorBound.height,
+      width: monitorBound.height,
+      top: monitorBound.top,
+      left: monitorBound.left,
+      a: linearModel.m.toFixed(2),
+      b: linearModel.b.toFixed(2),
+      comment1: comment1,
+    };
+    setLoading(true);
+    const docRef = await addDoc(collection(db, "user"), docData);
+    // .then(() => {
+    //   console.log("success");
+    //   setFinish(true);
+    // })
+    // .catch((err) => {
+    //   alert("err!");
+    // })
+    // .finally(() => {
+    //   setLoading(false);
+    // });
+    setLoading(false);
+    if (docRef.id) {
+      setFinish(true);
+      setDocId(docRef.id);
+    } else {
+      alert("err!");
+    }
+  };
+
   return (
     <div
       style={{
@@ -88,31 +160,47 @@ const LinearRegression = () => {
       <h1>Linear Regression Graph</h1>
       {chartData.datasets && (
         <Scatter
-          height="500px"
-          width="500px"
+          height="300px"
+          width="300px"
           data={chartData}
           options={{
             responsive: false,
-            scales: {
-              // y: {
-              //   min: 0,
-              //   max: 2000,
-              //   stepSize: 500,
-              // },
-              // x: {
-              //   min: 0,
-              //   max: 8,
-              // },
-            },
+            scales: {},
           }}
         />
       )}
-      <p>
-        Equation of the line: y = {linearModel.m.toFixed(2)}x +{" "}
-        {linearModel.b.toFixed(2)}
-      </p>
+      <p>PROLIFIC_ID : xx</p>
+      <p>SESSION_ID : xx</p>
+      <p>scale: {monitor.scale}</p>
+      {/* <p>{monitor.ppi}</p> */}
+      <p>ppi: {ppi}</p>
+      <p>user dpi: {dpi.userInput}</p>
+      <p>measure dpi: {dpi.measurement}</p>
+      <p>pointer weight: {pointerWeight}</p>
+      <p>height: {monitorBound.height}</p>
+      <p>width: {monitorBound.width}</p>
+      <p>top: {monitorBound.top}</p>
+      <p>left: {monitorBound.left}</p>
+      <p>a: {linearModel.m.toFixed(2)}</p>
+      <p>b: {linearModel.b.toFixed(2)}</p>
+      <p>If you have any comments, please write them.</p>
+      <TextArea
+        rows={2}
+        style={{ width: 300 }}
+        value={comment1}
+        onChange={(e) => setComment1(e.target.value)}
+        disabled={loading || finish}
+      ></TextArea>
+      <Button
+        type="primary"
+        size="large"
+        onClick={() => handleCreateAccount()}
+        disabled={loading || finish}
+      >
+        create profile
+      </Button>
       <Link to="/pnc">
-        <Button type="primary" size="large">
+        <Button type="primary" size="large" disabled={docId === ""}>
           NEXT STEP!
         </Button>
       </Link>

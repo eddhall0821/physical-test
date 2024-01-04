@@ -46,7 +46,7 @@ export const dpiState = atom({
   key: "dpiState",
   default: {
     isUserKnow: true,
-    userInput: 1000,
+    userInput: 0,
     measurement: 1000,
   },
 });
@@ -66,10 +66,6 @@ export const mointorBoundState = selector({
     const ppi = get(ppiState);
     const width = ppi * INCH_24_WIDTH;
     const height = ppi * INCH_24_HEIGHT;
-
-    //width < screen width
-    //height < screen height
-    //screened out
     const top = (window.screen.height - height) / 2;
     const left = (window.screen.width - width) / 2;
 
@@ -126,4 +122,7 @@ export const skillTestState = atom({
   },
 });
 
-const mouse_check_mode_click = () => {};
+export const docIdState = atom({
+  key: "docIdState",
+  default: "",
+});

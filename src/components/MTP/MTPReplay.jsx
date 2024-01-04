@@ -20,8 +20,6 @@ Array.prototype.prev = function () {
 Array.prototype.current = 0;
 
 const MTPReplay = () => {
-  const monitorBound = useRecoilValue(mointorBoundState);
-
   useEffect(() => {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
@@ -58,6 +56,7 @@ const MTPReplay = () => {
             movementY: parseInt(itemArr[obj["movementY"]]),
             screenX: parseInt(itemArr[obj["screenX"]]),
             screenY: parseInt(itemArr[obj["screenY"]]),
+            buttons: parseInt(itemArr[obj["buttons"]]),
             // buttons: parseInt(itemArr[obj["buttons"]]),
             // reaction_time: parseInt(itemArr[obj["reaction_time"]]),
           };
@@ -77,10 +76,19 @@ const MTPReplay = () => {
           movementY,
           screenX,
           screenY,
+          buttons,
         } = logArr.next();
+        if (buttons !== 0) {
+          console.log(buttons);
+        }
 
         if (logArr.length > logIndex) {
-          resetCanvas(canvas, monitorBound);
+          resetCanvas(canvas, {
+            width: screenX,
+            height: screenY,
+            top: 0,
+            left: 0,
+          });
           drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
           drawPointer(ctx, x, y);
           logIndex++;

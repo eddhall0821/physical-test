@@ -17,6 +17,7 @@ const MonitorMeasure = () => {
   const width_in = useRecoilValue(monitorWidthInState);
   const height_in = useRecoilValue(monitorHeightInState);
   const ppi = useRecoilValue(ppiState);
+  const [zoom, setZoom] = useState(window.devicePixelRatio);
 
   const diagonal_in = useMemo(() => {
     return (
@@ -33,6 +34,18 @@ const MonitorMeasure = () => {
       };
     });
   };
+
+  const handleResize = () => {
+    if (window.devicePixelRatio !== 1) {
+      alert("do not change device pixel ratio");
+    }
+    setZoom(window.devicePixelRatio);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    // return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div
@@ -88,8 +101,8 @@ const MonitorMeasure = () => {
         CREDIT CARD
       </div>
       <Link to="/measure">
-        <Button type="primary" size="large">
-          NEXT STEP!
+        <Button type="primary" size="large" disabled={zoom !== 1}>
+          {zoom === 1 ? "NEXT STEP!" : "Please adjust the screen zoom to 100%."}
         </Button>
       </Link>
     </div>

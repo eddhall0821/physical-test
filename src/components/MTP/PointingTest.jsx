@@ -76,7 +76,7 @@ const PointingTest = () => {
   useEffect(() => {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-
+    ctx.scale(1, 1);
     let x = centerX;
     let y = centerY;
 

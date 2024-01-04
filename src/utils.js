@@ -11,9 +11,8 @@ export const distanceBetweenTwoPoint = (x1, y1, x2, y2) => {
 
 export const resetCanvas = (canvas, monitorBound) => {
   const ctx = canvas.getContext("2d");
-
   ctx.fillStyle = "#1c1c1c";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, window.screen.width, window.screen.height);
 
   ctx.fillStyle = "#000";
   ctx.fillRect(
@@ -49,6 +48,10 @@ export const initCanvas = async (canvas) => {
   window.onresize = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    //TODO demo
+    // const ctx = canvas.getContext("2d");
+    // ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // ctx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   };
   toggleFullScreen(canvas);
 
@@ -299,7 +302,7 @@ export const drawText = (ctx, summary, remain) => {
   ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
   ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
   ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
-  ctx.fillText(`remain: ${remain}`, window.innerWidth - 200, 250);
+  ctx.fillText(`total: ${remain}`, window.innerWidth - 200, 250);
 };
 
 export const inch = (ppi, inch) => {
@@ -340,3 +343,5 @@ export const findLargest16by9Rectangle = (x, y) => {
     return heightBasedRectangle; // 세로 제한이 더 작은 경우
   }
 };
+
+export const fastRound3 = (x) => ((x * 1000 + 0.5) << 0) / 1000;
