@@ -3,7 +3,14 @@ import { INCH_24_HEIGHT, INCH_24_WIDTH } from "../components/MTP/MTPCanvas";
 import { findLargest16by9Rectangle } from "../utils";
 
 //recoil state 생성
-
+export const prolificUserState = atom({
+  key: "prolificUserState",
+  default: {
+    PROLIFIC_PID: "",
+    SESSION_ID: "",
+    STUDY_ID: "",
+  },
+});
 export const monitorState = atom({
   key: "monitorState",
   default: {

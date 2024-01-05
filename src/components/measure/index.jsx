@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { useRecoilState } from "recoil";
-import { ENUM, dpiState } from "../../recoil/atom";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { ENUM, dpiState, prolificUserState } from "../../recoil/atom";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, Collapse, Input, Space, Switch, Typography } from "antd";
 import Guide from "../../images/mouse_guide.png";
@@ -11,6 +11,7 @@ const Measure = () => {
   const [x, setX] = useState(0);
   const [dpi, setDpi] = useRecoilState(dpiState);
   const [isChanged, setIsChanged] = useState(false);
+  const prolificUser = useRecoilValue(prolificUserState);
 
   useEffect(() => {
     if (isChanged) {
@@ -74,11 +75,11 @@ const Measure = () => {
 
   return (
     <Content style={{ padding: "20px 20px", textAlign: "left" }}>
-      <h2>
+      <h1>
         Measuring mouse sensitivity is essential for accurate experiments.
         Please follow the steps.
-      </h2>
-      <Collapse defaultActiveKey={["1"]}>
+      </h1>
+      <Collapse defaultActiveKey={["1"]} style={{ fontSize: 20 }}>
         <Collapse.Panel
           header="Step 1. turn off enhance pointer precision on windows PC."
           key="1"
@@ -102,7 +103,8 @@ const Measure = () => {
         </Collapse.Panel>
         <Collapse.Panel header="Step 2. Measuring DPI." key="2">
           <p>
-            drag the mouse the width of a credit card (3.37 inches, 8.56cm).
+            <b>Slowly</b> drag the mouse the width of the credit card (3.37
+            inches, 8.56 cm).
           </p>
           <div style={{ display: "flex", gap: 20 }}>
             <div
@@ -128,7 +130,7 @@ const Measure = () => {
             />
           </div>
           {/* <Typography>x : {Math.round(Math.abs(x) / 3.375)}</Typography> */}
-          <Typography>dpi : {dpi.measurement}</Typography>
+          {dpi && <p>dpi : {dpi.measurement}</p>}
         </Collapse.Panel>
         <Collapse.Panel
           header="Step 3. If you know your mouse dpi, please enter it.
@@ -231,7 +233,9 @@ const Measure = () => {
         </Link>
       </Space> */}
       <Footer style={{ textAlign: "center" }}>
-        <Link to="/pointing">
+        <Link
+          to={`/pointing?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
+        >
           <Button type="primary" size="large" disabled={dpi.measurement === 0}>
             {dpi.measurement === 0 && "you have to measure"}
             {dpi.measurement !== 0 && "NEXT STEP!"}

@@ -3,14 +3,18 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { Link, useLocation } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   monitorHeightInState,
   monitorState,
   monitorWidthInState,
   ppiState,
+  prolificUserState,
 } from "../../recoil/atom";
+import Right from "../../images/right.png";
+import Wrong from "../../images/wrong.png";
+import QueryString from "qs";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
@@ -18,6 +22,13 @@ const MonitorMeasure = () => {
   const height_in = useRecoilValue(monitorHeightInState);
   const ppi = useRecoilValue(ppiState);
   const [zoom, setZoom] = useState(window.devicePixelRatio);
+  const [prolificUser, setProlificUser] = useRecoilState(prolificUserState);
+  const location = useLocation();
+
+  useEffect(() => {
+    const qs = QueryString.parse(location.search, { ignoreQueryPrefix: true });
+    setProlificUser(qs);
+  }, [location]);
 
   const diagonal_in = useMemo(() => {
     return (
@@ -58,19 +69,15 @@ const MonitorMeasure = () => {
         flexDirection: "column",
       }}
     >
-      <p style={{ width: 800 }}>
-        To calibrate place a physical credit card against the image of the card
-        below and increase or decrease its size until it matches the size of the
-        physical card exactly. Once both have the same size the calibration is
-        complete and you can read the display dimensions above. If you don't
-        have physical card you can use debit card, library card or a standard
-        ID.
+      <p style={{ width: 1000, fontSize: 20 }}>
+        <br /> Place a physical credit card against the image of the card on the
+        screen and adjust its size until they match.
+        <br />
+        You can also use a debit card, library card, standard ID or ruler.
+        <br />
+        If using multiple monitors, don't switch monitors after measuring.
       </p>
-      <p>
-        If you are using multiple monitors, do not change the monitor you use
-        once the measurement is completed.
-      </p>
-      {`${diagonal_in} inch ${ppi}`}
+      {/* {`${diagonal_in} inch ${ppi}`} */}
       <div style={{ width: 300 }}>
         <Slider
           step={0.001}
@@ -88,19 +95,39 @@ const MonitorMeasure = () => {
           </Button>
         </Button.Group>
       </div>
-      <div
-        style={{
-          margin: 30,
-          borderRadius: 10,
-          width: `${3.375 * monitor.scale}in`,
-          height: `${2.125 * monitor.scale}in`,
-          background: "blue",
-          color: "white",
-        }}
-      >
-        CREDIT CARD
+      <div style={{ display: "flex", gap: 50 }}>
+        <img
+          style={{
+            width: 350,
+          }}
+          src={Wrong}
+        />
+        <div
+          style={{
+            margin: 30,
+            borderRadius: 10,
+            width: `${3.375 * monitor.scale}in`,
+            height: `${2.125 * monitor.scale}in`,
+            background: "blue",
+            color: "white",
+          }}
+        >
+          CREDIT CARD
+          <br />
+          3.37 inch
+          <br />
+          8.56 cm
+        </div>
+        <img
+          style={{
+            width: 350,
+          }}
+          src={Right}
+        />
       </div>
-      <Link to="/measure">
+      <Link
+        to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
+      >
         <Button type="primary" size="large" disabled={zoom !== 1}>
           {zoom === 1 ? "NEXT STEP!" : "Please adjust the screen zoom to 100%."}
         </Button>

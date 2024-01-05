@@ -5,11 +5,9 @@ import {
   drawMTPTarget,
   drawPointer,
   drawRewardText,
-  drawStartButton,
   drawStartButton2,
   drawText,
   fastRound3,
-  getRandomValueInArray,
   inch,
   initCanvas,
   random_point_between_circles,
@@ -26,18 +24,16 @@ import {
   mointorBoundState,
   pointerWeightState,
   ppiState,
+  prolificUserState,
 } from "../../recoil/atom";
 import { Balls } from "./Balls";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
-const RADIUS = 10;
 const SHOW_REWARD_TIME = 1200; //ms
 const SHOW_RESULT_TIME = 1200; //ms
-const DELAY = SHOW_REWARD_TIME + SHOW_RESULT_TIME + 100;
 
-const startStamp = performance.now();
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
     name: "player",
@@ -51,30 +47,33 @@ const MTPCanvas = () => {
   const ppi = useRecoilValue(ppiState);
   const monitorBound = useRecoilValue(mointorBoundState);
   const docId = useRecoilValue(docIdState);
+  const prolificUser = useRecoilValue(prolificUserState);
 
   const navigate = useNavigate();
   const logArr = [
     [
+      "trial",
       "target_radius",
       "target_x",
       "target_y",
-      "x",
-      "y",
+      "cursor_x",
+      "cursor_y",
       "movementX",
       "movementY",
       "screenX",
       "screenY",
       "buttons",
-      "reaction_time",
       "timestamp",
       "dpr",
       "id",
       "w",
       "d",
-      "success",
       "target_p",
       "total_p",
     ],
+  ];
+  const summaryLogArr = [
+    ["trial", "success", "reaction_time", "target_p", "total_p"],
   ];
 
   useEffect(() => {
@@ -83,9 +82,6 @@ const MTPCanvas = () => {
       moneybag.src = Moneybag;
       let show_reward_counter = performance.now();
 
-      let lower_bound = settings.lowerBound;
-      let upper_bound = settings.upperBound;
-      let trial = settings.trial;
       let name = settings.name;
       let movement_stop_time = 0;
 
@@ -120,7 +116,7 @@ const MTPCanvas = () => {
         groupCount: 3,
         stepSize: 1.5,
         startStep: 2,
-        totalCount: 3,
+        totalCount: 1 * 9,
       });
 
       balls.generateRandomDesigns();
@@ -130,7 +126,7 @@ const MTPCanvas = () => {
         movement_stop_time = performance.now();
         p1 = performance.now();
         target_radius = inch(ppi, w);
-        target_reward = getRandomValueInArray([0, 10, 50]);
+        target_reward = currentDesign.reward;
 
         const target_location = random_point_between_circles({
           center: { x, y },
@@ -176,6 +172,15 @@ const MTPCanvas = () => {
             show_reward_counter = p;
             delay = p;
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
+            const current_target_success = target_radius - distance > 0 ? 1 : 0;
+            const summaryLogRow = [
+              summary.fail + summary.success,
+              current_target_success,
+              lastClickResult.time,
+              target_reward,
+              summary.point,
+            ];
+
             if (target_radius - distance > 0) {
               //성공시 이펙트 추가
               summary.point += target_reward;
@@ -188,6 +193,7 @@ const MTPCanvas = () => {
               lastClickResult.success = false;
             }
 
+            summaryLogArr.push(summaryLogRow);
             if (balls.getRandomDesignArray().length === 0 && !end) {
               alert("done!!");
               end = true;
@@ -196,6 +202,8 @@ const MTPCanvas = () => {
               currentDesign = balls.popStack();
               targetInit(currentDesign.d, currentDesign.w);
             }
+
+            console.log(summaryLogArr);
           }
         }
       };
@@ -208,7 +216,25 @@ const MTPCanvas = () => {
             .catch((err) => console.error(err));
         }
         const storage = getStorage();
-        const storageRef = ref(storage, `${name}_${Date.now()}.csv`);
+
+        const summaryStorageRef = ref(
+          storage,
+          `summary/${prolificUser.PROLIFIC_PID}_${
+            prolificUser.SESSION_ID
+          }_${Date.now()}.csv`
+        );
+        const storageRef = ref(
+          storage,
+          `trajectory/${prolificUser.PROLIFIC_PID}_${
+            prolificUser.SESSION_ID
+          }_${Date.now()}.csv`
+        );
+
+        let summaryContent = summaryLogArr
+          .map((e) => {
+            return e.join(",");
+          })
+          .join("\n");
 
         let csvContent = logArr
           .map((e) => {
@@ -216,26 +242,33 @@ const MTPCanvas = () => {
           })
           .join("\n");
 
-        var encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
-        //download in local pc
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "pnc.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        //---download in local pc---
+        // var summaryEncodedUri = encodeURI(
+        //   `data:text/csv;charset=utf-8,${summaryContent}`
+        // );
+        // var encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
 
+        // var link = document.createElement("a");
+        // link.setAttribute("href", encodedUri);
+        // link.setAttribute("download", "pnc.csv");
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+        //---download in local pc---
+
+        const summaryBlob = new Blob([summaryContent], {
+          type: "text/csv;charset=utf-8;",
+        });
         const blob = new Blob([csvContent], {
           type: "text/csv;charset=utf-8;",
         });
+        const summarySnapshot = await uploadBytes(
+          summaryStorageRef,
+          summaryBlob
+        );
         const snapshot = await uploadBytes(storageRef, blob);
-        // .then((snapshot) => {
-        //   console.log("blob..");
-        // })
-        // .finally(() => {
-        //   navigate("/replay");
-        // });
 
+        console.log(summarySnapshot);
         console.log(snapshot);
       }
       // let weight = 0.0575;
@@ -272,6 +305,7 @@ const MTPCanvas = () => {
       const logging = () => {
         console.log("log log");
         const tempRow = [
+          summary.fail + summary.success,
           fastRound3(target_radius),
           fastRound3(target_x - monitorBound.left),
           fastRound3(target_y - monitorBound.top),
@@ -282,12 +316,14 @@ const MTPCanvas = () => {
           monitorBound.width,
           monitorBound.height,
           buttons,
-          lastClickResult.time,
+          // lastClickResult.time,
           Date.now() / 1000,
           window.devicePixelRatio,
           fastRound3(currentDesign.id),
           fastRound3(currentDesign.w),
           fastRound3(currentDesign.d),
+          target_reward,
+          summary.point,
         ];
         logArr.push(tempRow);
         if (buttons !== 0) buttons = 0;

@@ -14,6 +14,7 @@ import {
   mointorBoundState,
   pointerWeightState,
   ppiState,
+  prolificUserState,
 } from "../../recoil/atom";
 import { useNavigate } from "react-router-dom";
 
@@ -48,6 +49,8 @@ const PointingTest = () => {
   const weight = useRecoilValue(pointerWeightState);
   const monitorBound = useRecoilValue(mointorBoundState);
   const ppi = useRecoilValue(ppiState);
+  const prolificUser = useRecoilValue(prolificUserState);
+
   const combination = shuffle([
     {
       //난이도 2
@@ -124,7 +127,10 @@ const PointingTest = () => {
 
         if (cnt >= NUM_POINTS && trial + 1 === combination.length) {
           const result = calculateAverages(reaction_time_arr);
-          navigate("/linear", { state: { result } });
+          navigate(
+            `/linear?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`,
+            { state: { result } }
+          );
         }
 
         if (cnt >= NUM_POINTS) {

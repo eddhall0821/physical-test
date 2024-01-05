@@ -172,7 +172,7 @@ export const drawRewardText = (ctx, moneybag, target_reward) => {
   ctx.textBaseline = "middle";
 
   ctx.fillText(
-    `maximum reward: ${target_reward} P!`,
+    `reward: ${target_reward} P!`,
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -222,13 +222,13 @@ export const drawStartButton = (ctx) => {
     window.innerHeight / 2 - 50
   );
 
+  // ctx.fillText(
+  //   "You may not be familiar with mouse sensitivity, ",
+  //   window.innerWidth / 2,
+  //   window.innerHeight / 2
+  // );
   ctx.fillText(
-    "You may not be familiar with mouse sensitivity, ",
-    window.innerWidth / 2,
-    window.innerHeight / 2
-  );
-  ctx.fillText(
-    "because the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
+    "the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 50
   );
@@ -280,7 +280,7 @@ export const drawStartButton2 = (ctx) => {
   );
 
   ctx.fillText(
-    "Rewards are given in points, with xx points equivalent to $xx.",
+    "Rewards are given in points, with 1000 points equivalent to 1 euro.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 150
   );

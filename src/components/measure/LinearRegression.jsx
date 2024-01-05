@@ -21,6 +21,7 @@ import {
   monitorState,
   pointerWeightState,
   ppiState,
+  prolificUserState,
 } from "../../recoil/atom";
 import { addDoc, doc, collection } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
@@ -45,12 +46,11 @@ const LinearRegression = () => {
   const dpi = useRecoilValue(dpiState);
   const pointerWeight = useRecoilValue(pointerWeightState);
   const monitorBound = useRecoilValue(mointorBoundState);
-  const prolificId = "1123";
-  const sessionId = "2234";
   const [loading, setLoading] = useState(false);
   const [finish, setFinish] = useState(false);
   const [comment1, setComment1] = useState("");
   const [docId, setDocId] = useRecoilState(docIdState);
+  const prolificUser = useRecoilValue(prolificUserState);
 
   useEffect(() => {
     const data = state.result;
@@ -113,8 +113,8 @@ const LinearRegression = () => {
     // <p>b: {linearModel.b.toFixed(2)}</p>
 
     const docData = {
-      prolific_id: prolificId,
-      session_id: sessionId,
+      prolific_id: prolificUser.PROLIFIC_PID,
+      session_id: prolificUser.SESSION_ID,
       ppi,
       user_dpi: dpi.userInput,
       measure_dpi: dpi.measurement,
@@ -157,8 +157,8 @@ const LinearRegression = () => {
         alignItems: "center",
       }}
     >
-      <h1>Linear Regression Graph</h1>
-      {chartData.datasets && (
+      <h1>Create User Profile</h1>
+      {/* {chartData.datasets && (
         <Scatter
           height="300px"
           width="300px"
@@ -168,11 +168,10 @@ const LinearRegression = () => {
             scales: {},
           }}
         />
-      )}
-      <p>PROLIFIC_ID : xx</p>
-      <p>SESSION_ID : xx</p>
+      )} */}
+      <p>PROLIFIC_ID : {prolificUser.PROLIFIC_PID}</p>
+      {/* <p>SESSION_ID : {prolificUser.SESSION_ID}</p>
       <p>scale: {monitor.scale}</p>
-      {/* <p>{monitor.ppi}</p> */}
       <p>ppi: {ppi}</p>
       <p>user dpi: {dpi.userInput}</p>
       <p>measure dpi: {dpi.measurement}</p>
@@ -182,8 +181,11 @@ const LinearRegression = () => {
       <p>top: {monitorBound.top}</p>
       <p>left: {monitorBound.left}</p>
       <p>a: {linearModel.m.toFixed(2)}</p>
-      <p>b: {linearModel.b.toFixed(2)}</p>
-      <p>If you have any comments, please write them.</p>
+      <p>b: {linearModel.b.toFixed(2)}</p> */}
+      <p>
+        Please provide any comments before starting the main experiment.
+        (optional)
+      </p>
       <TextArea
         rows={2}
         style={{ width: 300 }}
@@ -196,10 +198,13 @@ const LinearRegression = () => {
         size="large"
         onClick={() => handleCreateAccount()}
         disabled={loading || finish}
+        style={{ margin: 10 }}
       >
         create profile
       </Button>
-      <Link to="/pnc">
+      <Link
+        to={`/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
+      >
         <Button type="primary" size="large" disabled={docId === ""}>
           NEXT STEP!
         </Button>

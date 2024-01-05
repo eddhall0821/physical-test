@@ -6,11 +6,10 @@ export class Balls {
   randomDesignArray = [];
 
   generateRandomDesigns = function () {
-    let randomDesignArray = [];
+    const randomDesignArray = [];
     for (let design of this.designs) {
       for (let i = 0; i < design.cnt; i++) {
         const random = Math.random();
-
         const minDistance = 2;
         const maxDistance = INCH_24_HEIGHT / 2;
         const randId = random * design.idStep + design.idStart;
@@ -21,10 +20,12 @@ export class Balls {
           id: randId,
           d: distance,
           w: width,
+          reward: design.reward[i],
         });
       }
     }
     this.randomDesignArray = shuffle(randomDesignArray);
+    // this.randomDesignArray = randomDesignArray;
   };
 
   getRandomDesignArray = function () {
@@ -41,14 +42,35 @@ export class Balls {
     }
   };
 
+  createRewardArray = function (n) {
+    const resultArray = [];
+    for (let i = 0; i < n; i++) {
+      switch (i % 3) {
+        case 0:
+          resultArray.push(0);
+          break;
+        case 1:
+          resultArray.push(10);
+          break;
+        case 2:
+          resultArray.push(50);
+          break;
+      }
+    }
+    return resultArray;
+  };
+
   init = function ({ groupCount, stepSize, startStep, totalCount }) {
     this.designs = [];
     for (let i = 0; i < groupCount; i++) {
+      const reward = this.createRewardArray(totalCount / groupCount);
       this.designs.push({
         index: i,
         cnt: totalCount / groupCount,
         idStart: startStep + i * stepSize,
         idStep: stepSize,
+        // reward,
+        reward: shuffle(reward),
       });
     }
   };
