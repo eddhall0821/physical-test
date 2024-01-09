@@ -14,7 +14,9 @@ import {
 } from "../../recoil/atom";
 import Right from "../../images/right.png";
 import Wrong from "../../images/wrong.png";
+import Card from "../../images/card.png";
 import QueryString from "qs";
+import Arrow from "../../images/arrow.png";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
@@ -63,7 +65,7 @@ const MonitorMeasure = () => {
       style={{
         display: "flex",
         width: "100%",
-        height: window.innerHeight,
+        minHeight: window.innerHeight,
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
@@ -76,7 +78,9 @@ const MonitorMeasure = () => {
         You can also use a debit card, library card, standard ID or ruler.
         <br />
         If using multiple monitors, don't switch monitors after measuring.
+        <br />
       </p>
+
       {/* {`${diagonal_in} inch ${ppi}`} */}
       <div style={{ width: 300 }}>
         <Slider
@@ -95,41 +99,71 @@ const MonitorMeasure = () => {
           </Button>
         </Button.Group>
       </div>
-      <div style={{ display: "flex", gap: 50 }}>
-        <img
-          style={{
-            width: 350,
-          }}
-          src={Wrong}
-        />
+      <div>
         <div
           style={{
-            margin: 30,
-            borderRadius: 10,
-            width: `${3.375 * monitor.scale}in`,
-            height: `${2.125 * monitor.scale}in`,
-            background: "blue",
-            color: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          CREDIT CARD
-          <br />
-          3.37 inch
-          <br />
-          8.56 cm
+          <img
+            style={{
+              width: 100,
+              transform: "rotate(-90deg)",
+            }}
+            src={Arrow}
+          />
+          <div
+            style={{
+              margin: 30,
+              borderRadius: "0.125in",
+              width: `${3.375 * monitor.scale}in`,
+              height: `${2.125 * monitor.scale}in`,
+              backgroundImage: `url(${Card})`,
+              color: "white",
+              backgroundSize: "contain",
+            }}
+          />
+          <img
+            style={{
+              width: 100,
+              transform: "rotate(90deg)",
+            }}
+            src={Arrow}
+          />
         </div>
-        <img
-          style={{
-            width: 350,
-          }}
-          src={Right}
-        />
       </div>
+      <div
+        style={{
+          border: "1px solid black",
+          borderRadius: 20,
+          padding: 4,
+          marginBottom: 16,
+        }}
+      >
+        <h2>Examples.</h2>
+        <div style={{ display: "flex", gap: 50, margin: 10 }}>
+          <img
+            style={{
+              width: 250,
+            }}
+            src={Wrong}
+          />
+          <img
+            style={{
+              width: 250,
+            }}
+            src={Right}
+          />
+        </div>
+      </div>
+      <h2>Do not refresh or close the web page during the experiment.</h2>
       <Link
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >
         <Button type="primary" size="large" disabled={zoom !== 1}>
-          {zoom === 1 ? "NEXT STEP!" : "Please adjust the screen zoom to 100%."}
+          {zoom === 1 ? "Next step" : "Please adjust the screen zoom to 100%."}
         </Button>
       </Link>
     </div>

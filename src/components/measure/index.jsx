@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, Collapse, Input, Space, Switch, Typography } from "antd";
 import Guide from "../../images/mouse_guide.png";
 import { Content, Footer } from "antd/es/layout/layout";
+import GuideGif from "../../images/mouse_guide.gif";
 
 const Measure = () => {
   const [x, setX] = useState(0);
@@ -79,7 +80,7 @@ const Measure = () => {
         Measuring mouse sensitivity is essential for accurate experiments.
         Please follow the steps.
       </h1>
-      <Collapse defaultActiveKey={["1"]} style={{ fontSize: 20 }}>
+      <Collapse accordion defaultActiveKey={["1"]} style={{ fontSize: 20 }}>
         <Collapse.Panel
           header="Step 1. turn off enhance pointer precision on windows PC."
           key="1"
@@ -102,11 +103,7 @@ const Measure = () => {
           </Link>
         </Collapse.Panel>
         <Collapse.Panel header="Step 2. Measuring DPI." key="2">
-          <p>
-            <b>Slowly</b> drag the mouse the width of the credit card (3.37
-            inches, 8.56 cm).
-          </p>
-          <div style={{ display: "flex", gap: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div
               onMouseDown={() => document.body.requestPointerLock()}
               style={{
@@ -116,17 +113,33 @@ const Measure = () => {
                 display: "flex",
                 alignItems: "center",
                 background: "#1E1E1E",
-                width: 300,
+                width: "100%",
                 height: 300,
+                cursor: "grab",
               }}
             >
-              {x ? "MEASUREING....." : "drag here"}
+              {x ? (
+                <p>Measuring.....</p>
+              ) : (
+                <p>
+                  <b>Slowly</b> click and hold the screen <b>here</b> and move
+                  the mouse <b>horizontally</b> the size of the card (3.37
+                  inches / 8.56 cm).
+                </p>
+              )}
             </div>
-            <img
+            {/* <img
               style={{
                 width: 350,
               }}
               src={Guide}
+            /> */}
+            <img
+              alt="example"
+              style={{
+                width: 350,
+              }}
+              src={GuideGif}
             />
           </div>
           {/* <Typography>x : {Math.round(Math.abs(x) / 3.375)}</Typography> */}
@@ -151,6 +164,14 @@ const Measure = () => {
               value={dpi.userInput}
               onChange={(e) => setDpiState(ENUM.USER_INPUT, e.target.value)}
             />
+          </Space>
+        </Collapse.Panel>
+        <Collapse.Panel
+          header="Step 4. Please write down the approximate distance between your eyes and the monitor."
+          key="4"
+        >
+          <Space>
+            <Input />
           </Space>
         </Collapse.Panel>
       </Collapse>
@@ -233,6 +254,7 @@ const Measure = () => {
         </Link>
       </Space> */}
       <Footer style={{ textAlign: "center" }}>
+        <h2>Do not refresh or close the web page during the experiment.</h2>
         <Link
           to={`/pointing?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
         >
