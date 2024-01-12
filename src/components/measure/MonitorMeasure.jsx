@@ -17,6 +17,7 @@ import Wrong from "../../images/wrong.png";
 import Card from "../../images/card.png";
 import Arrow from "../../images/arrow.png";
 import QueryString from "qs";
+import TaskSteps from "../TaskSteps";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
@@ -62,7 +63,20 @@ const MonitorMeasure = () => {
   }, []);
 
   useEffect(() => {
-    console.log(monitor);
+    setBehaviorLog((old) => {
+      return {
+        ...old,
+        monitor: [
+          ...old.monitor,
+          {
+            scale: monitor.scale,
+            timestamp: Date.now(),
+          },
+        ],
+      };
+    });
+
+    console.log(behaviorLog);
   }, [monitor]);
 
   return (
@@ -71,11 +85,12 @@ const MonitorMeasure = () => {
         display: "flex",
         width: "100%",
         minHeight: window.innerHeight,
-        justifyContent: "center",
+        // justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
       }}
     >
+      <TaskSteps current={0} />
       <p style={{ width: 1000, fontSize: 20 }}>
         Place a physical credit card against the image of the card on the screen
         and adjust its size until they match.
@@ -122,13 +137,22 @@ const MonitorMeasure = () => {
             style={{
               margin: 30,
               borderRadius: `${0.125 * monitor.scale}in`,
-              width: `${3.375 * monitor.scale}in`,
-              height: `${2.125 * monitor.scale}in`,
-              backgroundImage: `url(${Card})`,
-              color: "white",
-              backgroundSize: "contain",
+              border: "5px dotted black",
+              opacity: 0.7,
             }}
-          />
+          >
+            <div
+              style={{
+                margin: 0,
+                borderRadius: `${0.125 * monitor.scale}in`,
+                width: `${3.375 * monitor.scale}in`,
+                height: `${2.125 * monitor.scale}in`,
+                backgroundImage: `url(${Card})`,
+                color: "white",
+                backgroundSize: "contain",
+              }}
+            />
+          </div>
         </div>
       </div>
       <div

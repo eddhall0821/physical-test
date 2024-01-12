@@ -6,6 +6,7 @@ import {
   drawPointer,
   drawRewardText,
   drawStartButton2,
+  drawTest,
   drawText,
   fastRound3,
   inch,
@@ -34,6 +35,7 @@ export const INCH_24_HEIGHT = 11.77;
 const SHOW_REWARD_TIME = 1200; //ms
 const SHOW_RESULT_TIME = 1200; //ms
 const TOTAL_TRIALS = 1 * 9;
+const STOP_TIME = 3000 * 1000; //배포전에 수정;
 
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
@@ -304,7 +306,7 @@ const MTPCanvas = () => {
       }
 
       const logging = () => {
-        console.log("log log");
+        // console.log("log log");
         const tempRow = [
           summary.fail + summary.success,
           fastRound3(target_radius),
@@ -341,7 +343,7 @@ const MTPCanvas = () => {
           //움직임 감지되지 않음
           if (
             performance.now() - movement_stop_time >
-            3000 + SHOW_RESULT_TIME + SHOW_REWARD_TIME
+            STOP_TIME + SHOW_RESULT_TIME + SHOW_REWARD_TIME
           ) {
             const p = performance.now();
             lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
@@ -372,7 +374,8 @@ const MTPCanvas = () => {
               fastRound3(lastClickResult.time / 1000),
               lastClickResult.point,
               x,
-              y
+              y,
+              monitorBound
             );
             drawPointer(ctx, x, y);
           } else if (
@@ -380,7 +383,7 @@ const MTPCanvas = () => {
               timestamp ||
             !timestamp
           ) {
-            drawRewardText(ctx, moneybag, target_reward, x, y);
+            drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
             drawPointer(ctx, x, y);
           }
           if (

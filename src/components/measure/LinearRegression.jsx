@@ -229,10 +229,11 @@ const LinearRegression = () => {
             label="What is your gender?"
             rules={[{ required: true }]}
           >
+            {/* https://www.psychologytoday.com/ca/blog/the-science-behind-behavior/201609/how-should-market-researchers-ask-about-gender-in-surveys */}
             <Radio.Group>
-              <Radio value="Male">Male</Radio>
-              <Radio value="Female">Female</Radio>
-              <Radio value="Other">Other</Radio>
+              <Radio value="male">Male</Radio>
+              <Radio value="female">Female</Radio>
+              <Radio value="other">Other</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item

@@ -13,6 +13,7 @@ import LinearRegressionComponent from "./components/measure/LinearRegression";
 import PointingTest from "./components/MTP/PointingTest";
 import Simulator from "./components/simulator/Simulator";
 import { ConfigProvider } from "antd";
+import MainGuideLines from "./components/MTP/MainGuideLines";
 
 function App() {
   const router = createBrowserRouter(
@@ -56,6 +57,10 @@ function App() {
       {
         path: "simulator",
         element: <Simulator />,
+      },
+      {
+        path: "main-guidelines",
+        element: <MainGuideLines />,
       },
     ],
     {

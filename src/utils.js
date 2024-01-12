@@ -139,18 +139,43 @@ export const random_point_between_circles = ({
   return { x: window.screen.width / 2, y: window.screen.height / 2 };
 };
 
-export const drawClickResultText = (ctx, success, time, reward, x, y) => {
-  const successText = success ? "Success" : "failed";
+export const drawClickResultText = (
+  ctx,
+  success,
+  time,
+  reward,
+  x,
+  y,
+  monitorBound
+) => {
+  // const successText = success ? "Success" : "failed";
+  const successText = success ? "✅" : "❌";
   const successColor = success ? "green" : "red";
+
+  let textY = 0;
+  let textX = 0;
+
+  if (monitorBound.top + 200 > y) {
+    textY = -200;
+  }
+  if (monitorBound.left + 100 > x) {
+    textX = -200;
+  }
+  if (monitorBound.left + monitorBound.width - 100 < x) {
+    textX = 200;
+  }
+
+  const adjX = x - textX;
+  const adY = y - textY;
 
   ctx.font = "30px serif";
   ctx.fillStyle = successColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    `click ${successText}!`,
-    x,
-    y - 150
+    `${successText}`,
+    adjX,
+    adY - 150
     // window.innerWidth / 2,
     // window.innerHeight / 2
   );
@@ -158,20 +183,61 @@ export const drawClickResultText = (ctx, success, time, reward, x, y) => {
 
   ctx.fillText(
     `It took ${time} seconds.`,
-    x,
-    y - 100
+    adjX,
+    adY - 100
     // window.innerWidth / 2,
     // window.innerHeight / 2 + 50
   );
   ctx.fillText(
     `You got ${reward} points`,
-    x,
-    y - 50
+    adjX,
+    adY - 50
     // window.innerWidth / 2,
     // window.innerHeight / 2 + 100
   );
 };
-export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
+
+export const drawTest = (ctx, x, y, monitorBound) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  let textY = 150;
+  let textX = 0;
+
+  if (monitorBound.top + textY > y) {
+    textY = -20;
+  }
+  if (monitorBound.left + 100 > x) {
+    textX = -100;
+  }
+  ctx.fillText(`Test`, x - textX, y - textY);
+};
+
+export const drawRewardText = (
+  ctx,
+  moneybag,
+  target_reward,
+  x,
+  y,
+  monitorBound
+) => {
+  let textY = 0;
+  let textX = 0;
+
+  if (monitorBound.top + 200 > y) {
+    textY = -200;
+  }
+  if (monitorBound.left + 100 > x) {
+    textX = -200;
+  }
+  if (monitorBound.left + monitorBound.width - 100 < x) {
+    textX = 200;
+  }
+
+  const adjX = x - textX;
+  const adY = y - textY;
+
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
@@ -179,8 +245,8 @@ export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
 
   ctx.fillText(
     `Next reward: ${target_reward} P!`,
-    x,
-    y - 150
+    adjX,
+    adY - 150
     // window.innerWidth / 2,
     // window.innerHeight / 2
   );
@@ -188,8 +254,8 @@ export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
   if (target_reward > 40) {
     ctx.drawImage(
       moneybag,
-      x - 100,
-      y - 100,
+      adjX - 100,
+      adY - 100,
       // window.innerWidth / 2 - 100,
       // window.innerHeight / 2 + 20,
       100,
@@ -197,8 +263,8 @@ export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
     );
     ctx.drawImage(
       moneybag,
-      x,
-      y - 100,
+      adjX,
+      adY - 100,
       // window.innerWidth / 2,
       // window.innerHeight / 2 + 20,
       100,
@@ -206,8 +272,8 @@ export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
     );
     ctx.drawImage(
       moneybag,
-      x - 50,
-      y - 100,
+      adjX - 50,
+      adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
       100,
@@ -216,8 +282,8 @@ export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
   } else if (target_reward > 5) {
     ctx.drawImage(
       moneybag,
-      x - 50,
-      y - 100,
+      adjX - 50,
+      adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
       100,
@@ -274,7 +340,7 @@ export const drawStartButton = (ctx) => {
 };
 
 export const drawStartButton2 = (ctx) => {
-  ctx.font = "30px serif";
+  ctx.font = "30px  serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -308,7 +374,7 @@ export const drawStartButton2 = (ctx) => {
 };
 
 export const drawText = (ctx, summary, remain) => {
-  ctx.font = "30px serif";
+  ctx.font = "30px sans-serif";
   ctx.fillStyle = "#fff";
   const boardInterval = window.innerWidth / 6;
   ctx.fillText(
@@ -316,9 +382,15 @@ export const drawText = (ctx, summary, remain) => {
     boardInterval,
     50
   );
+
+  // ctx.fillStyle = "#14e1df";
+  // ctx.fillStyle = "#da2c4d";
+  // ctx.fillRect(boardInterval * 2, 25, 50, 50);
+  // ctx.fillStyle = "#fff";
   ctx.fillText(`✅: ${summary.success}`, boardInterval * 2, 50);
-  ctx.fillText(`you earn ${summary.point / 1000}€`, boardInterval * 3, 50);
+  ctx.fillText(`Earned Bonus: ${summary.point / 1000}€`, boardInterval * 3, 50);
   ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
+  ctx.fillText(`Current Bonus: 100p`, boardInterval * 5, 50);
 
   // ctx.fillText(
   //   `Trials: ${summary.fail + summary.success}`,
