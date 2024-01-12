@@ -12,6 +12,7 @@ import MTPTest from "./components/MTP/MTPTest";
 import LinearRegressionComponent from "./components/measure/LinearRegression";
 import PointingTest from "./components/MTP/PointingTest";
 import Simulator from "./components/simulator/Simulator";
+import { ConfigProvider } from "antd";
 
 function App() {
   const router = createBrowserRouter(
@@ -65,7 +66,23 @@ function App() {
   return (
     <RecoilRoot>
       <div className="App">
-        <RouterProvider router={router} />
+        <ConfigProvider
+          theme={{
+            components: {
+              Slider: {
+                railSize: 10,
+                handleSize: 15,
+                handleSizeHover: 17,
+              },
+              Form: {
+                labelFontSize: 20,
+                // verticalLabelMargin: "0 0 8px",
+              },
+            },
+          }}
+        >
+          <RouterProvider router={router} />
+        </ConfigProvider>
       </div>
     </RecoilRoot>
   );

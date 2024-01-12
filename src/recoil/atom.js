@@ -54,7 +54,8 @@ export const dpiState = atom({
   default: {
     isUserKnow: true,
     userInput: 0,
-    measurement: 0,
+    // measurement: 0,
+    measurement: 1000,
   },
 });
 
@@ -132,4 +133,11 @@ export const skillTestState = atom({
 export const docIdState = atom({
   key: "docIdState",
   default: "",
+});
+
+export const behaviorLogState = atom({
+  key: "behaviorLogState",
+  default: {
+    monitor: [],
+  },
 });

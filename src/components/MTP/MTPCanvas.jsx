@@ -33,6 +33,7 @@ export const INCH_24_HEIGHT = 11.77;
 
 const SHOW_REWARD_TIME = 1200; //ms
 const SHOW_RESULT_TIME = 1200; //ms
+const TOTAL_TRIALS = 1 * 9;
 
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({
@@ -116,7 +117,7 @@ const MTPCanvas = () => {
         groupCount: 3,
         stepSize: 1.5,
         startStep: 2,
-        totalCount: 1 * 9,
+        totalCount: TOTAL_TRIALS,
       });
 
       balls.generateRandomDesigns();
@@ -335,7 +336,7 @@ const MTPCanvas = () => {
         //TO-DO end 매번 검사 안할 방법
         if (!end) {
           resetCanvas(canvas, monitorBound);
-          drawText(ctx, summary, 900);
+          drawText(ctx, summary, TOTAL_TRIALS);
 
           //움직임 감지되지 않음
           if (
@@ -369,7 +370,9 @@ const MTPCanvas = () => {
               ctx,
               lastClickResult.success,
               fastRound3(lastClickResult.time / 1000),
-              lastClickResult.point
+              lastClickResult.point,
+              x,
+              y
             );
             drawPointer(ctx, x, y);
           } else if (
@@ -377,7 +380,7 @@ const MTPCanvas = () => {
               timestamp ||
             !timestamp
           ) {
-            drawRewardText(ctx, moneybag, target_reward);
+            drawRewardText(ctx, moneybag, target_reward, x, y);
             drawPointer(ctx, x, y);
           }
           if (

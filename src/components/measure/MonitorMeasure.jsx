@@ -1,11 +1,11 @@
 import { Button, Slider } from "antd";
-import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
+  behaviorLogState,
   monitorHeightInState,
   monitorState,
   monitorWidthInState,
@@ -15,13 +15,14 @@ import {
 import Right from "../../images/right.png";
 import Wrong from "../../images/wrong.png";
 import Card from "../../images/card.png";
-import QueryString from "qs";
 import Arrow from "../../images/arrow.png";
+import QueryString from "qs";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
   const width_in = useRecoilValue(monitorWidthInState);
   const height_in = useRecoilValue(monitorHeightInState);
+  const [behaviorLog, setBehaviorLog] = useRecoilState(behaviorLogState);
   const ppi = useRecoilValue(ppiState);
   const [zoom, setZoom] = useState(window.devicePixelRatio);
   const [prolificUser, setProlificUser] = useRecoilState(prolificUserState);
@@ -60,6 +61,10 @@ const MonitorMeasure = () => {
     // return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    console.log(monitor);
+  }, [monitor]);
+
   return (
     <div
       style={{
@@ -72,8 +77,8 @@ const MonitorMeasure = () => {
       }}
     >
       <p style={{ width: 1000, fontSize: 20 }}>
-        <br /> Place a physical credit card against the image of the card on the
-        screen and adjust its size until they match.
+        Place a physical credit card against the image of the card on the screen
+        and adjust its size until they match.
         <br />
         You can also use a debit card, library card, standard ID or ruler.
         <br />
@@ -83,7 +88,13 @@ const MonitorMeasure = () => {
 
       {/* {`${diagonal_in} inch ${ppi}`} */}
       <div style={{ width: 300 }}>
+        {/* <img
+          src={Arrow}
+          style={{ width: 30, marginRight : 10, transform: "rotate(90deg)" }}
+        />
+        <img src={Arrow} style={{ width: 30, transform: "rotate(-90deg)" }} /> */}
         <Slider
+          tooltip={{ open: false }}
           step={0.001}
           min={0.5}
           max={2.3}
@@ -92,10 +103,10 @@ const MonitorMeasure = () => {
         />
         <Button.Group>
           <Button onClick={(e) => setScale(monitor.scale + 0.01)}>
-            increase
+            Increase
           </Button>
           <Button onClick={(e) => setScale(monitor.scale - 0.01)}>
-            decrease
+            Decrease
           </Button>
         </Button.Group>
       </div>
@@ -107,30 +118,16 @@ const MonitorMeasure = () => {
             alignItems: "center",
           }}
         >
-          <img
-            style={{
-              width: 100,
-              transform: "rotate(-90deg)",
-            }}
-            src={Arrow}
-          />
           <div
             style={{
               margin: 30,
-              borderRadius: "0.125in",
+              borderRadius: `${0.125 * monitor.scale}in`,
               width: `${3.375 * monitor.scale}in`,
               height: `${2.125 * monitor.scale}in`,
               backgroundImage: `url(${Card})`,
               color: "white",
               backgroundSize: "contain",
             }}
-          />
-          <img
-            style={{
-              width: 100,
-              transform: "rotate(90deg)",
-            }}
-            src={Arrow}
           />
         </div>
       </div>
@@ -142,7 +139,7 @@ const MonitorMeasure = () => {
           marginBottom: 16,
         }}
       >
-        <h2>Examples.</h2>
+        <h3>Examples</h3>
         <div style={{ display: "flex", gap: 50, margin: 10 }}>
           <img
             style={{

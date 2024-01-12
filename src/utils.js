@@ -139,7 +139,7 @@ export const random_point_between_circles = ({
   return { x: window.screen.width / 2, y: window.screen.height / 2 };
 };
 
-export const drawClickResultText = (ctx, success, time, reward) => {
+export const drawClickResultText = (ctx, success, time, reward, x, y) => {
   const successText = success ? "Success" : "failed";
   const successColor = success ? "green" : "red";
 
@@ -149,61 +149,77 @@ export const drawClickResultText = (ctx, success, time, reward) => {
   ctx.textBaseline = "middle";
   ctx.fillText(
     `click ${successText}!`,
-    window.innerWidth / 2,
-    window.innerHeight / 2
+    x,
+    y - 150
+    // window.innerWidth / 2,
+    // window.innerHeight / 2
   );
   ctx.fillStyle = "#fff";
 
   ctx.fillText(
     `It took ${time} seconds.`,
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 50
+    x,
+    y - 100
+    // window.innerWidth / 2,
+    // window.innerHeight / 2 + 50
   );
   ctx.fillText(
     `You got ${reward} points`,
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 100
+    x,
+    y - 50
+    // window.innerWidth / 2,
+    // window.innerHeight / 2 + 100
   );
 };
-export const drawRewardText = (ctx, moneybag, target_reward) => {
+export const drawRewardText = (ctx, moneybag, target_reward, x, y) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
   ctx.fillText(
-    `reward: ${target_reward} P!`,
-    window.innerWidth / 2,
-    window.innerHeight / 2
+    `Next reward: ${target_reward} P!`,
+    x,
+    y - 150
+    // window.innerWidth / 2,
+    // window.innerHeight / 2
   );
 
   if (target_reward > 40) {
     ctx.drawImage(
       moneybag,
-      window.innerWidth / 2 - 100,
-      window.innerHeight / 2 + 20,
+      x - 100,
+      y - 100,
+      // window.innerWidth / 2 - 100,
+      // window.innerHeight / 2 + 20,
       100,
       100
     );
     ctx.drawImage(
       moneybag,
-      window.innerWidth / 2,
-      window.innerHeight / 2 + 20,
+      x,
+      y - 100,
+      // window.innerWidth / 2,
+      // window.innerHeight / 2 + 20,
       100,
       100
     );
     ctx.drawImage(
       moneybag,
-      window.innerWidth / 2 - 50,
-      window.innerHeight / 2 + 20,
+      x - 50,
+      y - 100,
+      // window.innerWidth / 2 - 50,
+      // window.innerHeight / 2 + 20,
       100,
       100
     );
   } else if (target_reward > 5) {
     ctx.drawImage(
       moneybag,
-      window.innerWidth / 2 - 50,
-      window.innerHeight / 2 + 20,
+      x - 50,
+      y - 100,
+      // window.innerWidth / 2 - 50,
+      // window.innerHeight / 2 + 20,
       100,
       100
     );
@@ -294,15 +310,29 @@ export const drawStartButton2 = (ctx) => {
 export const drawText = (ctx, summary, remain) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
+  const boardInterval = window.innerWidth / 6;
   ctx.fillText(
-    `cnt: ${summary.fail + summary.success}`,
-    window.innerWidth - 200,
+    `Trials: ${summary.fail + summary.success} / ${remain}`,
+    boardInterval,
     50
   );
-  ctx.fillText(`success: ${summary.success}`, window.innerWidth - 200, 100);
-  ctx.fillText(`fail: ${summary.fail}`, window.innerWidth - 200, 150);
-  ctx.fillText(`point: ${summary.point}`, window.innerWidth - 200, 200);
-  ctx.fillText(`total: ${remain}`, window.innerWidth - 200, 250);
+  ctx.fillText(`✅: ${summary.success}`, boardInterval * 2, 50);
+  ctx.fillText(`you earn ${summary.point / 1000}€`, boardInterval * 3, 50);
+  ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
+
+  // ctx.fillText(
+  //   `Trials: ${summary.fail + summary.success}`,
+  //   window.innerWidth - 200,
+  //   50
+  // );
+  // ctx.fillText(`✅: ${summary.success}`, window.innerWidth - 200, 100);
+  // ctx.fillText(`❌: ${summary.fail}`, window.innerWidth - 200, 150);
+  // ctx.fillText(
+  //   `you earn ${summary.point / 1000}€`,
+  //   window.innerWidth - 200,
+  //   200
+  // );
+  // ctx.fillText(`Total: ${remain}`, window.innerWidth - 200, 250);
 };
 
 export const inch = (ppi, inch) => {
