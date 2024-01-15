@@ -151,7 +151,15 @@ const Measure = () => {
                   borderRadius: 10,
                 }}
               >
-                {x ? <p>Measuring.....</p> : <p>Click and hold here</p>}
+                {x ? (
+                  <p>Measuring.....</p>
+                ) : (
+                  <p>
+                    <span style={{ fontSize: 40 }}>🖱️</span>
+                    <br />
+                    Click and hold here
+                  </p>
+                )}
               </div>
               {/* <img
               style={{

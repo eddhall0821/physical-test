@@ -62,6 +62,7 @@ function App() {
         path: "main-guidelines",
         element: <MainGuideLines />,
       },
+      {},
     ],
     {
       basename: process.env.PUBLIC_URL,

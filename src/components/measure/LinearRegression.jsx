@@ -38,6 +38,7 @@ import { db } from "../../firebaseConfig";
 import TextArea from "antd/es/input/TextArea";
 import { FrownOutlined, MehOutlined, SmileOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
+import TaskSteps from "../TaskSteps";
 
 ChartJS.register(...registerables);
 ChartJS.register(
@@ -177,7 +178,7 @@ const LinearRegression = () => {
   useEffect(() => {
     if (finish) {
       navigate(
-        `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+        `/main-guidelines?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
       );
     }
   }, [finish]);
@@ -191,16 +192,8 @@ const LinearRegression = () => {
         alignItems: "center",
       }}
     >
+      <TaskSteps current={3} />
       <h1>User Survey</h1>
-      {/* <p>PROLIFIC_ID : {prolificUser.PROLIFIC_PID}</p> */}
-      {/* <TextArea
-        rows={2}
-        style={{ width: 300 }}
-        value={comment1}
-        onChange={(e) => setComment1(e.target.value)}
-        disabled={loading || finish}
-      ></TextArea> */}
-
       <Content>
         <Form
           disabled={loading || finish}
@@ -300,22 +293,30 @@ const LinearRegression = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
+            <div style={{ textAlign: "center" }}>
+              <Button
+                type="primary"
+                size="large"
+                loading={loading || finish}
+                style={{ margin: 10, textAlign: "center" }}
+                htmlType="submit"
+              >
+                Submit Survey
+              </Button>
+            </div>
           </Form.Item>
         </Form>
       </Content>
 
-      <Button
+      {/* <Button
         type="primary"
         size="large"
         onClick={() => handleCreateAccount()}
-        disabled={loading || finish}
+        loading={loading || finish}
         style={{ margin: 10 }}
       >
         create profile
-      </Button>
+      </Button> */}
       {/* <Link
         to={`/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >

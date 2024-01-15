@@ -189,7 +189,7 @@ export const drawClickResultText = (
     // window.innerHeight / 2 + 50
   );
   ctx.fillText(
-    `You got ${reward} points`,
+    `You got ${reward} points.`,
     adjX,
     adY - 50
     // window.innerWidth / 2,
@@ -316,12 +316,12 @@ export const drawStartButton = (ctx) => {
   );
 
   ctx.fillText(
-    "Click on the blue ball that appears on the screen as quickly and accurately as possible.",
+    "Click within the blue highlighted target circle as quickly and accurately as possible.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
   ctx.fillText(
-    "If the ball does not appear on the screen, click anywhere.",
+    "If the target does not appear on the screen, click anywhere.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 150
   );
@@ -345,31 +345,9 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "From now on, for each trial, the screen will display the amount of rewards you can earn.",
-    window.innerWidth / 2,
-    window.innerHeight / 2
-  );
-  ctx.fillText(
-    "Click on the blue ball in the game to receive a reward. ",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 50
-  );
-
-  ctx.fillText(
-    "After every attempt, you will receive a bonus based on the total reward amount.",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 100
-  );
-
-  ctx.fillText(
-    "Rewards are given in points, with 1000 points equivalent to 1 euro.",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 150
-  );
-  ctx.fillText(
     "When you're ready, click to start.",
     window.innerWidth / 2,
-    window.innerHeight / 2 + 200
+    window.innerHeight / 2
   );
 };
 
@@ -390,7 +368,7 @@ export const drawText = (ctx, summary, remain) => {
   ctx.fillText(`✅: ${summary.success}`, boardInterval * 2, 50);
   ctx.fillText(`Earned Bonus: ${summary.point / 1000}€`, boardInterval * 3, 50);
   ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
-  ctx.fillText(`Current Bonus: 100p`, boardInterval * 5, 50);
+  ctx.fillText(`Current Bonus: -p`, boardInterval * 5, 50);
 
   // ctx.fillText(
   //   `Trials: ${summary.fail + summary.success}`,

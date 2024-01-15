@@ -409,6 +409,7 @@ const MTPCanvas = () => {
           show_reward_counter = performance.now();
           step();
         } else {
+          drawText(ctx, summary, TOTAL_TRIALS);
           drawStartButton2(ctx);
           requestAnimationFrame(pre_step);
         }

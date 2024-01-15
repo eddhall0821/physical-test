@@ -137,7 +137,7 @@ const MonitorMeasure = () => {
             style={{
               margin: 30,
               borderRadius: `${0.125 * monitor.scale}in`,
-              border: "5px dotted black",
+              // border: "5px dotted black",
               opacity: 0.7,
             }}
           >
@@ -157,7 +157,7 @@ const MonitorMeasure = () => {
       </div>
       <div
         style={{
-          border: "1px solid black",
+          border: "1px solid #aaa",
           borderRadius: 20,
           padding: 4,
           marginBottom: 16,
