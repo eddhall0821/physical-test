@@ -1,6 +1,6 @@
 import { useRecoilValue } from "recoil";
 import { mointorBoundState, prolificUserState } from "../../recoil/atom";
-import { Button, Space, Tour } from "antd";
+import { Button, Space, Tour, Typography } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { toggleFullScreen } from "../../utils";
 import { Content } from "antd/es/layout/layout";
@@ -32,9 +32,9 @@ const MainGuideLines = () => {
 
     if (document.fullscreenElement) {
       // document.exitFullscreen();
-      // navigate(
-      //   `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
-      // );
+      navigate(
+        `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+      );
     }
   }, [open]);
 
@@ -113,13 +113,18 @@ const MainGuideLines = () => {
           <TaskSteps current={4} />
           <Content>
             <Space direction="vertical" style={{ width: 1000 }}>
-              <h2>
-                From now on, the screen will show the amount of rewards you can
-                earn for each trial. In the game, click on the target to collect
-                rewards. After each attempt, you'll receive a bonus calculated
-                from the total rewards earned. Rewards are issued in points,
-                with 1000 points equaling 1 euro.
-              </h2>
+              <Typography>
+                <Typography.Title>Guidelines</Typography.Title>
+                <Typography.Paragraph>
+                  From now on, the screen will show the amount of rewards you
+                  can earn for each trial.
+                  <br /> In the game, click on the target to collect rewards.
+                  After each attempt, you'll receive a bonus calculated from the
+                  total rewards earned.
+                  <br />
+                  <br /> 1000 points is equivalent to 1 euro.
+                </Typography.Paragraph>
+              </Typography>
               <Button
                 size="large"
                 type="primary"
