@@ -32,9 +32,9 @@ const MainGuideLines = () => {
 
     if (document.fullscreenElement) {
       // document.exitFullscreen();
-      // navigate(
-      //   `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
-      // );
+      navigate(
+        `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+      );
     }
   }, [open]);
 
@@ -52,57 +52,51 @@ const MainGuideLines = () => {
   const steps = [
     {
       title: <StepTitle>Next Reward</StepTitle>,
-      description: (
-        <StepContent>Points value of the upcoming reward.</StepContent>
-      ),
+      description: <StepContent>The value of the upcoming reward</StepContent>,
       target: () => ref6.current,
     },
     {
-      title: <StepTitle>Blue Highlighted Target Circle</StepTitle>,
+      title: <StepTitle>Blue Circular Target</StepTitle>,
       description: (
         <StepContent>
           <b style={{ color: "red" }}>
-            Click within the blue highlighted target circle as quickly and
-            accurately as possible.
+            Click on the blue circular target as quickly and accurately as
+            possible.
           </b>
           <br />
-          If there is no activity for 3 seconds, the trial is skipped.
+          If there is no mouse movement or clicks for 3 seconds, the trial will
+          be skipped.
         </StepContent>
       ),
       target: () => ref7.current,
     },
     {
-      title: <StepTitle>Click results</StepTitle>,
+      title: <StepTitle>Trial Results</StepTitle>,
       description: (
         <StepContent>
-          When you click on a target, you'll see a short display of success/time
-          taken/points earned.
+          success/failure of each trial and bonuses earned for each click
         </StepContent>
       ),
       target: () => ref8.current,
     },
     {
       title: <StepTitle>Trials</StepTitle>,
-      description: <StepContent>Current trial and total trials.</StepContent>,
+      description: <StepContent>Current trial and total trials</StepContent>,
       target: () => ref1.current,
     },
     {
-      title: <StepTitle>Successful Clicks</StepTitle>,
-      description: (
-        <StepContent>Number of clicks resulting in success.</StepContent>
-      ),
-      target: () => ref2.current,
-    },
-    {
-      title: <StepTitle>Earned Bonus</StepTitle>,
-      description: <StepContent>Total bonus earned.</StepContent>,
+      title: <StepTitle>Total Bonus</StepTitle>,
+      description: <StepContent>Total bonuses you earned</StepContent>,
       target: () => ref3.current,
     },
     {
+      title: <StepTitle>Successful Clicks</StepTitle>,
+      description: <StepContent>The number of successful clicks</StepContent>,
+      target: () => ref2.current,
+    },
+    {
       title: <StepTitle>Failed Clicks</StepTitle>,
-      description: (
-        <StepContent>Number of clicks resulting in failure.</StepContent>
-      ),
+      description: <StepContent>The number of unsuccessful clicks</StepContent>,
       target: () => ref4.current,
     },
   ];
@@ -116,11 +110,11 @@ const MainGuideLines = () => {
               <Typography>
                 <Typography.Title level={3}>Main Tasks</Typography.Title>
                 <Typography.Paragraph>
-                  From now on, the screen will show the amount of rewards you
-                  can earn for each trial.
-                  <br /> In the game, click on the target to collect rewards.
-                  After each attempt, you'll receive a bonus calculated from the
-                  total rewards earned.
+                  Before the blue circular target appears on the screen, the
+                  bonus for each trial is displayed.
+                  <br />
+                  If you successfully click on the target, you will get that
+                  bonus.
                 </Typography.Paragraph>
               </Typography>
               <Button
@@ -174,8 +168,8 @@ const MainGuideLines = () => {
           }}
         >
           <div ref={ref1}>Trials: 12 / 900</div>
-          <div ref={ref2}>✅: 10</div>
           <div ref={ref3}>Earned Bonus: 1€</div>
+          <div ref={ref2}>✅: 10</div>
           <div ref={ref4}>❌: 2</div>
           <div></div>
         </div>
@@ -221,7 +215,6 @@ const MainGuideLines = () => {
           <MainTaskFont>✅</MainTaskFont>
           {/* <p>It took 0.5 seconds.</p> */}
           <MainTaskFont>You got 1 pence.</MainTaskFont>
-          <MainTaskFont>Next Reward is 1 pence.</MainTaskFont>
         </div>
       </div>
       <Tour

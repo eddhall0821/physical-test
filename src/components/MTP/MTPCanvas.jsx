@@ -272,8 +272,10 @@ const MTPCanvas = () => {
         );
         const snapshot = await uploadBytes(storageRef, blob);
 
-        console.log(summarySnapshot);
-        console.log(snapshot);
+        // console.log(summarySnapshot);
+        // console.log(snapshot);
+
+        navigate("/");
       }
       // let weight = 0.0575;
       function updatePosition(e) {

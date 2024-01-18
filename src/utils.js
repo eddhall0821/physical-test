@@ -323,43 +323,42 @@ export const drawStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Before the main experiment, let's start with a simple inspection.",
+    "Before starting the main task, you will conduct a Pre-task.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
+  ctx.fillText(
+    "Mouse sensitivity was adjusted for the experiment.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+  // ctx.fillText(
+  //   "the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
+  //   window.innerWidth / 2,
+  //   window.innerHeight / 2 + 100
+  // );
 
   // ctx.fillText(
-  //   "You may not be familiar with mouse sensitivity, ",
+  //   "If the target does not appear on the screen, click anywhere.",
   //   window.innerWidth / 2,
-  //   window.innerHeight / 2
+  //   window.innerHeight / 2 + 150
   // );
+
   ctx.fillText(
-    "the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
+    "If it does not automatically switch to fullscreen mode or if the fullscreen mode is exited during test, press Enter. ",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
 
   ctx.fillText(
-    "If the target does not appear on the screen, click anywhere.",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 150
-  );
-
-  ctx.fillText(
-    "If it does not automatically go to full screen, or if full screen is released during operation, press the enter key.",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 200
-  );
-
-  ctx.fillText(
-    "When you're ready, click to start.",
+    "When you are ready, click anywhere to start.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 250
   );
   ctx.font = "bold 35px serif";
   ctx.fillStyle = "#ff0000";
   ctx.fillText(
-    "Click within the blue highlighted target circle as quickly and accurately as possible.",
+    "Click on the blue circular target as quickly and accurately as possible.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 50
   );
@@ -371,7 +370,7 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "When you're ready, click to start.",
+    "When you're ready, click anywhere to start.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );

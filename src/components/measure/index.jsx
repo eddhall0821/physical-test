@@ -92,14 +92,23 @@ const Measure = () => {
       <TaskSteps current={1} />
       <Content style={{ padding: "0px 20px", textAlign: "left" }}>
         <Typography.Title level={3}>
-          Measuring mouse sensitivity is essential for accurate experiments.
-          Please follow the steps.
+          Mouse Sensitivity Measurement
         </Typography.Title>
+        <Typography.Paragraph>
+          It is important to accurately measure mouse sensitivity in
+          experiments.
+          <br />
+          The measured mouse sensitivity will influence future experimental
+          procedures.
+          <br />
+          Please carefully follow the steps.
+        </Typography.Paragraph>
         <Collapse accordion defaultActiveKey={["1"]}>
           <Collapse.Panel
             header={
               <span>
-                <b>Step 1.</b> Turn off enhance pointer precision on windows PC.
+                <b>Step 1.</b> Disable 'Enhance Pointer Precision' option in
+                your PC settings.
               </span>
             }
             key="1"
@@ -109,7 +118,7 @@ const Measure = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Turn Off Enhance Pointer Precision on Windows 10 PC
+              How to Disable Enhance Pointer Precision on Windows 10?
             </Link>
             <br />
             <br />
@@ -118,21 +127,25 @@ const Measure = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Turn Off Enhance Pointer Precision on Windows 11 PC
+              How to Disable Enhance Pointer Precision on Windows 11?
             </Link>
           </Collapse.Panel>
           <Collapse.Panel
             header={
               <span>
-                <b>Step 2.</b> Measuring DPI.
+                <b>Step 2.</b> Measure mouse sensitivity.
               </span>
             }
             key="2"
           >
             <p>
-              Click and hold the <b style={{ color: "#da2c4d" }}>red box</b>{" "}
-              below and <b>slowly</b> move your mouse horizontally the size of
-              the card (3.37 inches/8.56 cm).
+              Left-click on the <b style={{ color: "#da2c4d" }}>red box</b>and
+              hold the mouse left-click button down.
+              <br />
+              Slowly move the mouse from left to right along the width of the
+              card. (3.37 inches/8.56 cm).
+              <br />
+              Release the left-click button.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div
@@ -157,7 +170,7 @@ const Measure = () => {
                   <p>
                     <span style={{ fontSize: 40 }}>🖱️</span>
                     <br />
-                    Start Measuring By Clicking Here
+                    Start Measuring by Clicking Here
                   </p>
                 )}
               </div>
@@ -206,6 +219,9 @@ const Measure = () => {
         <div style={{ textAlign: "center" }}>
           <Typography.Title level={4}>
             Do not refresh or close the web page during the experiment.
+            <br />
+            If you refresh or close the web page, the experiment will start
+            again from the beginning.
           </Typography.Title>
           <Link
             to={`/pointing?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
@@ -216,7 +232,7 @@ const Measure = () => {
               disabled={dpi.measurement === 0}
             >
               {dpi.measurement === 0 && "You have to measure."}
-              {dpi.measurement !== 0 && "Start"}
+              {dpi.measurement !== 0 && "Start Pre-task"}
             </Button>
           </Link>
         </div>

@@ -92,13 +92,15 @@ const MonitorMeasure = () => {
       }}
     >
       <TaskSteps current={0} />
+      <Typography.Title level={3}>Monitor Size Measurement</Typography.Title>
       <Paragraph level={2}>
-        Place a physical credit card against the image of the card on the screen
-        and adjust its size until they match.
+        place a physical credit card against the image of the card below and
+        increase or decrease its size until it matches the size of the physical
+        card exactly. <br />
+        You can also use a library card or standard ID.
         <br />
-        You can also use a debit card, library card, standard ID or ruler.
-        <br />
-        If using multiple monitors, don't switch monitors after measuring.
+        If you have multiple displays, please conduct the experiment only on the
+        main monitor.
         <br />
       </Paragraph>
 
@@ -184,6 +186,9 @@ const MonitorMeasure = () => {
       </div>
       <Typography.Title level={4}>
         Do not refresh or close the web page during the experiment.
+        <br />
+        If you refresh or close the web page, the experiment will start again
+        from the beginning.
       </Typography.Title>
       <Link
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
