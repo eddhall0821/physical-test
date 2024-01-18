@@ -52,7 +52,7 @@ const MainGuideLines = () => {
   const steps = [
     {
       title: <StepTitle>Next Reward</StepTitle>,
-      description: <StepContent>The value of the upcoming reward</StepContent>,
+      description: <StepContent>The value of the next reward</StepContent>,
       target: () => ref6.current,
     },
     {
@@ -74,7 +74,7 @@ const MainGuideLines = () => {
       title: <StepTitle>Trial Results</StepTitle>,
       description: (
         <StepContent>
-          success/failure of each trial and bonuses earned for each click
+          Success/Failure of each trial and bonuses earned for each click
         </StepContent>
       ),
       target: () => ref8.current,
@@ -96,7 +96,7 @@ const MainGuideLines = () => {
     },
     {
       title: <StepTitle>Failed Clicks</StepTitle>,
-      description: <StepContent>The number of unsuccessful clicks</StepContent>,
+      description: <StepContent>The number of failed clicks</StepContent>,
       target: () => ref4.current,
     },
   ];
@@ -108,7 +108,7 @@ const MainGuideLines = () => {
           <Content>
             <Space direction="vertical" style={{ width: 1000 }}>
               <Typography>
-                <Typography.Title level={3}>Main Tasks</Typography.Title>
+                <Typography.Title level={3}>Main Task</Typography.Title>
                 <Typography.Paragraph>
                   Before the blue circular target appears on the screen, the
                   bonus for each trial is displayed.
@@ -168,7 +168,7 @@ const MainGuideLines = () => {
           }}
         >
           <div ref={ref1}>Trials: 12 / 900</div>
-          <div ref={ref3}>Earned Bonus: 1€</div>
+          <div ref={ref3}>Total Bonus: 1£</div>
           <div ref={ref2}>✅: 10</div>
           <div ref={ref4}>❌: 2</div>
           <div></div>

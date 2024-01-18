@@ -94,7 +94,7 @@ const MonitorMeasure = () => {
       <TaskSteps current={0} />
       <Typography.Title level={3}>Monitor Size Measurement</Typography.Title>
       <Paragraph level={2}>
-        place a physical credit card against the image of the card below and
+        Place a physical credit card against the image of the card below and
         increase or decrease its size until it matches the size of the physical
         card exactly. <br />
         You can also use a library card or standard ID.

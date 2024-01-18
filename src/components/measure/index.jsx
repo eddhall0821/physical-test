@@ -139,7 +139,7 @@ const Measure = () => {
             key="2"
           >
             <p>
-              Left-click on the <b style={{ color: "#da2c4d" }}>red box</b>and
+              Left-click on the <b style={{ color: "#da2c4d" }}>red box</b> and
               hold the mouse left-click button down.
               <br />
               Slowly move the mouse from left to right along the width of the

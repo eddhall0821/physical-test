@@ -391,7 +391,7 @@ export const drawText = (ctx, summary, remain) => {
   // ctx.fillRect(boardInterval * 2, 25, 50, 50);
   // ctx.fillStyle = "#fff";
   ctx.fillText(`✅: ${summary.success}`, boardInterval * 3, 50);
-  ctx.fillText(`Earned Bonus: ${summary.point / 1000}£`, boardInterval * 2, 50);
+  ctx.fillText(`Total Bonus: ${summary.point / 1000}£`, boardInterval * 2, 50);
   ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
 
   // ctx.fillText(
@@ -402,7 +402,7 @@ export const drawText = (ctx, summary, remain) => {
   // ctx.fillText(`✅: ${summary.success}`, window.innerWidth - 200, 100);
   // ctx.fillText(`❌: ${summary.fail}`, window.innerWidth - 200, 150);
   // ctx.fillText(
-  //   `you earn ${summary.point / 1000}€`,
+  //   `you earn ${summary.point / 1000}£`,
   //   window.innerWidth - 200,
   //   200
   // );
