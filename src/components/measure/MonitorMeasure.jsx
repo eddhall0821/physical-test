@@ -1,4 +1,4 @@
-import { Button, Slider } from "antd";
+import { Button, Slider, Typography } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
@@ -18,6 +18,7 @@ import Card from "../../images/card.png";
 import Arrow from "../../images/arrow.png";
 import QueryString from "qs";
 import TaskSteps from "../TaskSteps";
+import Paragraph from "antd/es/typography/Paragraph";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
@@ -91,7 +92,7 @@ const MonitorMeasure = () => {
       }}
     >
       <TaskSteps current={0} />
-      <p style={{ width: 1000, fontSize: 20 }}>
+      <Paragraph level={2}>
         Place a physical credit card against the image of the card on the screen
         and adjust its size until they match.
         <br />
@@ -99,7 +100,7 @@ const MonitorMeasure = () => {
         <br />
         If using multiple monitors, don't switch monitors after measuring.
         <br />
-      </p>
+      </Paragraph>
 
       {/* {`${diagonal_in} inch ${ppi}`} */}
       <div style={{ width: 300 }}>
@@ -163,8 +164,10 @@ const MonitorMeasure = () => {
           marginBottom: 16,
         }}
       >
-        <h3>Examples</h3>
-        <div style={{ display: "flex", gap: 50, margin: 10 }}>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          Examples
+        </Typography.Title>
+        <div style={{ display: "flex", gap: 50, margin: 16 }}>
           <img
             style={{
               width: 250,
@@ -179,7 +182,9 @@ const MonitorMeasure = () => {
           />
         </div>
       </div>
-      <h2>Do not refresh or close the web page during the experiment.</h2>
+      <Typography.Title level={4}>
+        Do not refresh or close the web page during the experiment.
+      </Typography.Title>
       <Link
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >

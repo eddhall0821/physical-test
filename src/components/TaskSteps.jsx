@@ -1,5 +1,4 @@
-import { Space, Steps } from "antd";
-import { Content, Header } from "antd/es/layout/layout";
+import { Steps } from "antd";
 
 const TaskSteps = ({ children, current }) => {
   return (
@@ -8,13 +7,14 @@ const TaskSteps = ({ children, current }) => {
         paddingLeft: 30,
         paddingRight: 30,
         paddingTop: 30,
+        paddingBottom: 30,
       }}
       current={current}
       items={[
         { title: "Monitor Measure" },
         { title: "Mouse Measure" },
         { title: "Pre-Tasks" },
-        { title: "User Survey" },
+        { title: "Preliminary Survey" },
         { title: "Main Tasks" },
       ]}
     >

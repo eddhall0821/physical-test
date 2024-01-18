@@ -90,12 +90,12 @@ const Measure = () => {
   return (
     <>
       <TaskSteps current={1} />
-      <Content style={{ padding: "20px 20px", textAlign: "left" }}>
-        <h1>
+      <Content style={{ padding: "0px 20px", textAlign: "left" }}>
+        <Typography.Title level={3}>
           Measuring mouse sensitivity is essential for accurate experiments.
           Please follow the steps.
-        </h1>
-        <Collapse accordion defaultActiveKey={["1"]} style={{ fontSize: 20 }}>
+        </Typography.Title>
+        <Collapse accordion defaultActiveKey={["1"]}>
           <Collapse.Panel
             header={
               <span>
@@ -152,12 +152,12 @@ const Measure = () => {
                 }}
               >
                 {x ? (
-                  <p>Measuring.....</p>
+                  <p>Now Slowly Move Your Mouse Horizontally</p>
                 ) : (
                   <p>
                     <span style={{ fontSize: 40 }}>🖱️</span>
                     <br />
-                    Click and hold here
+                    Start Measuring By Clicking Here
                   </p>
                 )}
               </div>
@@ -203,8 +203,10 @@ const Measure = () => {
             </Space>
           </Collapse.Panel>
         </Collapse>
-        <Footer style={{ textAlign: "center" }}>
-          <h2>Do not refresh or close the web page during the experiment.</h2>
+        <div style={{ textAlign: "center" }}>
+          <Typography.Title level={4}>
+            Do not refresh or close the web page during the experiment.
+          </Typography.Title>
           <Link
             to={`/pointing?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
           >
@@ -217,7 +219,7 @@ const Measure = () => {
               {dpi.measurement !== 0 && "Start"}
             </Button>
           </Link>
-        </Footer>
+        </div>
       </Content>
     </>
   );

@@ -74,6 +74,9 @@ function App() {
       <div className="App">
         <ConfigProvider
           theme={{
+            token: {
+              fontSize: 14,
+            },
             components: {
               Slider: {
                 railSize: 10,

@@ -32,9 +32,9 @@ const MainGuideLines = () => {
 
     if (document.fullscreenElement) {
       // document.exitFullscreen();
-      navigate(
-        `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
-      );
+      // navigate(
+      //   `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+      // );
     }
   }, [open]);
 
@@ -44,6 +44,9 @@ const MainGuideLines = () => {
 
   const StepContent = ({ children }) => {
     return <p style={{ fontSize: 16, margin: 0 }}>{children}</p>;
+  };
+  const MainTaskFont = ({ children }) => {
+    return <p style={{ fontSize: 30, margin: 10 }}>{children}</p>;
   };
 
   const steps = [
@@ -58,8 +61,12 @@ const MainGuideLines = () => {
       title: <StepTitle>Blue Highlighted Target Circle</StepTitle>,
       description: (
         <StepContent>
-          Click the blue highlighted target Circle. If there is no activity for
-          3 seconds, the trial is skipped.
+          <b style={{ color: "red" }}>
+            Click within the blue highlighted target circle as quickly and
+            accurately as possible.
+          </b>
+          <br />
+          If there is no activity for 3 seconds, the trial is skipped.
         </StepContent>
       ),
       target: () => ref7.current,
@@ -98,13 +105,6 @@ const MainGuideLines = () => {
       ),
       target: () => ref4.current,
     },
-    {
-      title: <StepTitle>Current Bonus</StepTitle>,
-      description: (
-        <StepContent>The bonus for the current trial is displayed.</StepContent>
-      ),
-      target: () => ref5.current,
-    },
   ];
   return (
     <>
@@ -114,15 +114,13 @@ const MainGuideLines = () => {
           <Content>
             <Space direction="vertical" style={{ width: 1000 }}>
               <Typography>
-                <Typography.Title>Guidelines</Typography.Title>
+                <Typography.Title level={3}>Main Tasks</Typography.Title>
                 <Typography.Paragraph>
                   From now on, the screen will show the amount of rewards you
                   can earn for each trial.
                   <br /> In the game, click on the target to collect rewards.
                   After each attempt, you'll receive a bonus calculated from the
                   total rewards earned.
-                  <br />
-                  <br /> 1000 points is equivalent to 1 euro.
                 </Typography.Paragraph>
               </Typography>
               <Button
@@ -179,7 +177,7 @@ const MainGuideLines = () => {
           <div ref={ref2}>✅: 10</div>
           <div ref={ref3}>Earned Bonus: 1€</div>
           <div ref={ref4}>❌: 2</div>
-          <div ref={ref5}>Current Bonus: 10p</div>
+          <div></div>
         </div>
         <div
           style={{
@@ -191,7 +189,7 @@ const MainGuideLines = () => {
           }}
           ref={ref6}
         >
-          <p>Next reward: 10p!</p>
+          <MainTaskFont>Next reward is 1 pence.</MainTaskFont>
           <img alt="money" src={moneybag} width={100} />
         </div>
 
@@ -220,9 +218,10 @@ const MainGuideLines = () => {
           }}
           ref={ref8}
         >
-          <p>✅</p>
-          <p>It took 0.5 seconds.</p>
-          <p>You got 10 points.</p>
+          <MainTaskFont>✅</MainTaskFont>
+          {/* <p>It took 0.5 seconds.</p> */}
+          <MainTaskFont>You got 1 pence.</MainTaskFont>
+          <MainTaskFont>Next Reward is 1 pence.</MainTaskFont>
         </div>
       </div>
       <Tour

@@ -32,8 +32,8 @@ import { Balls } from "./Balls";
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
-const SHOW_REWARD_TIME = 1200; //ms
-const SHOW_RESULT_TIME = 1200; //ms
+const SHOW_REWARD_TIME = 1800; //ms
+const SHOW_RESULT_TIME = 600; //ms
 const TOTAL_TRIALS = 1 * 9;
 const STOP_TIME = 3000 * 1000; //배포전에 수정;
 
@@ -194,6 +194,7 @@ const MTPCanvas = () => {
               //실패시 이펙트 추가
               summary.fail++;
               lastClickResult.success = false;
+              lastClickResult.point = 0;
             }
 
             summaryLogArr.push(summaryLogRow);
@@ -339,6 +340,16 @@ const MTPCanvas = () => {
         if (!end) {
           resetCanvas(canvas, monitorBound);
           drawText(ctx, summary, TOTAL_TRIALS);
+          drawClickResultText(
+            ctx,
+            lastClickResult.success,
+            fastRound3(lastClickResult.time / 1000),
+            lastClickResult.point,
+            x,
+            y,
+            monitorBound
+          );
+          drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
 
           //움직임 감지되지 않음
           if (

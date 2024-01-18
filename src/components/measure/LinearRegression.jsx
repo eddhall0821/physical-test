@@ -22,6 +22,7 @@ import {
   Rate,
   Select,
   Space,
+  Typography,
 } from "antd";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
@@ -136,6 +137,15 @@ const LinearRegression = () => {
     }
   }, [state?.result]);
 
+  useEffect(() => {
+    const d1 = 2.75 * linearModel.m + linearModel.b;
+    const d2 = 4.25 * linearModel.m + linearModel.b;
+    const d3 = 5.75 * linearModel.m + linearModel.b;
+    const PNCTime = ((d1 + d2 + d3) * 300) / 1000 / 60;
+    const RewardTime = (2.4 * 900) / 60;
+    console.log(PNCTime + RewardTime);
+  }, [linearModel]);
+
   const onFinish = async (e) => {
     const user = { ...e.user, age: e.user.age.year() };
     await handleCreateAccount(user);
@@ -193,8 +203,8 @@ const LinearRegression = () => {
       }}
     >
       <TaskSteps current={3} />
-      <h1>User Survey</h1>
       <Content>
+        <Typography.Title level={3}>Preliminary Survey</Typography.Title>
         <Form
           disabled={loading || finish}
           size="large"

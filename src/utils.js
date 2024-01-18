@@ -181,17 +181,16 @@ export const drawClickResultText = (
   );
   ctx.fillStyle = "#fff";
 
+  // ctx.fillText(
+  //   `It took ${time} seconds.`,
+  //   adjX,
+  //   adY - 50
+  // );
+
   ctx.fillText(
-    `It took ${time} seconds.`,
+    `You got ${reward / 10} pence.`,
     adjX,
     adY - 100
-    // window.innerWidth / 2,
-    // window.innerHeight / 2 + 50
-  );
-  ctx.fillText(
-    `You got ${reward} points.`,
-    adjX,
-    adY - 50
     // window.innerWidth / 2,
     // window.innerHeight / 2 + 100
   );
@@ -244,9 +243,10 @@ export const drawRewardText = (
   ctx.textBaseline = "middle";
 
   ctx.fillText(
-    `Next reward: ${target_reward} P!`,
+    `Next reward is ${target_reward / 10} pence.`,
     adjX,
-    adY - 150
+    adY - 50
+    // adY - 150
     // window.innerWidth / 2,
     // window.innerHeight / 2
   );
@@ -254,8 +254,9 @@ export const drawRewardText = (
   if (target_reward > 40) {
     ctx.drawImage(
       moneybag,
-      adjX - 100,
-      adY - 100,
+      adjX - 150,
+      adY,
+      // adY - 100,
       // window.innerWidth / 2 - 100,
       // window.innerHeight / 2 + 20,
       100,
@@ -263,8 +264,29 @@ export const drawRewardText = (
     );
     ctx.drawImage(
       moneybag,
+      adjX - 100,
+      adY,
+      // adY - 100,
+      // window.innerWidth / 2 - 100,
+      // window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+    ctx.drawImage(
+      moneybag,
+      adjX + 50,
+      adY,
+      // adY - 100,
+      // window.innerWidth / 2,
+      // window.innerHeight / 2 + 20,
+      100,
+      100
+    );
+    ctx.drawImage(
+      moneybag,
       adjX,
-      adY - 100,
+      adY,
+      // adY - 100,
       // window.innerWidth / 2,
       // window.innerHeight / 2 + 20,
       100,
@@ -273,7 +295,8 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 50,
-      adY - 100,
+      adY,
+      // adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
       100,
@@ -283,7 +306,8 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 50,
-      adY - 100,
+      adY,
+      // adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
       100,
@@ -312,14 +336,9 @@ export const drawStartButton = (ctx) => {
   ctx.fillText(
     "the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
     window.innerWidth / 2,
-    window.innerHeight / 2 + 50
-  );
-
-  ctx.fillText(
-    "Click within the blue highlighted target circle as quickly and accurately as possible.",
-    window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
+
   ctx.fillText(
     "If the target does not appear on the screen, click anywhere.",
     window.innerWidth / 2,
@@ -336,6 +355,13 @@ export const drawStartButton = (ctx) => {
     "When you're ready, click to start.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 250
+  );
+  ctx.font = "bold 35px serif";
+  ctx.fillStyle = "#ff0000";
+  ctx.fillText(
+    "Click within the blue highlighted target circle as quickly and accurately as possible.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
   );
 };
 
@@ -365,10 +391,9 @@ export const drawText = (ctx, summary, remain) => {
   // ctx.fillStyle = "#da2c4d";
   // ctx.fillRect(boardInterval * 2, 25, 50, 50);
   // ctx.fillStyle = "#fff";
-  ctx.fillText(`✅: ${summary.success}`, boardInterval * 2, 50);
-  ctx.fillText(`Earned Bonus: ${summary.point / 1000}€`, boardInterval * 3, 50);
+  ctx.fillText(`✅: ${summary.success}`, boardInterval * 3, 50);
+  ctx.fillText(`Earned Bonus: ${summary.point / 1000}£`, boardInterval * 2, 50);
   ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
-  ctx.fillText(`Current Bonus: -p`, boardInterval * 5, 50);
 
   // ctx.fillText(
   //   `Trials: ${summary.fail + summary.success}`,
