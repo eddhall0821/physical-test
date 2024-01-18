@@ -184,7 +184,7 @@ const MonitorMeasure = () => {
           />
         </div>
       </div>
-      <Typography.Title level={4}>
+      <Typography.Title level={5}>
         Do not refresh or close the web page during the experiment.
         <br />
         If you refresh or close the web page, the experiment will start again

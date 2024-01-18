@@ -75,7 +75,7 @@ function App() {
         <ConfigProvider
           theme={{
             token: {
-              fontSize: 14,
+              fontSize: 16,
             },
             components: {
               Slider: {

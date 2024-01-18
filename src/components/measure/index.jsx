@@ -139,13 +139,13 @@ const Measure = () => {
             key="2"
           >
             <p>
-              Left-click on the <b style={{ color: "#da2c4d" }}>red box</b> and
-              hold the mouse left-click button down.
+              1. Left-click on the <b style={{ color: "#da2c4d" }}>red box</b>{" "}
+              and hold the mouse left-click button down.
               <br />
-              Slowly move the mouse from left to right along the width of the
+              2. Slowly move the mouse from left to right along the width of the
               card. (3.37 inches/8.56 cm).
               <br />
-              Release the left-click button.
+              3. Release the left-click button.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div
@@ -217,7 +217,7 @@ const Measure = () => {
           </Collapse.Panel>
         </Collapse>
         <div style={{ textAlign: "center" }}>
-          <Typography.Title level={4}>
+          <Typography.Title level={5}>
             Do not refresh or close the web page during the experiment.
             <br />
             If you refresh or close the web page, the experiment will start
