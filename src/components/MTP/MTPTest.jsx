@@ -17,6 +17,7 @@ import {
   ppiState,
   skillTestState,
 } from "../../recoil/atom";
+import usePreventRefresh from "../PreventRefresh";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
@@ -28,6 +29,7 @@ const MTPTest = () => {
   const { ball_distance } = skillTest;
   const monitorBound = useRecoilValue(mointorBoundState);
   const navigate = useNavigate();
+  const preventRefresh = usePreventRefresh();
 
   // const monitor_check_target_array = [
   //   {

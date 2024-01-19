@@ -15,10 +15,10 @@ import {
 import Right from "../../images/right.png";
 import Wrong from "../../images/wrong.png";
 import Card from "../../images/card.png";
-import Arrow from "../../images/arrow.png";
 import QueryString from "qs";
 import TaskSteps from "../TaskSteps";
 import Paragraph from "antd/es/typography/Paragraph";
+import usePreventRefresh from "../PreventRefresh";
 
 const MonitorMeasure = () => {
   const [monitor, setMonitor] = useRecoilState(monitorState);
@@ -29,6 +29,7 @@ const MonitorMeasure = () => {
   const [zoom, setZoom] = useState(window.devicePixelRatio);
   const [prolificUser, setProlificUser] = useRecoilState(prolificUserState);
   const location = useLocation();
+  const preventRefresh = usePreventRefresh();
 
   useEffect(() => {
     const qs = QueryString.parse(location.search, { ignoreQueryPrefix: true });
@@ -191,7 +192,7 @@ const MonitorMeasure = () => {
         from the beginning.
       </Typography.Title>
       <Link
-        state={{ prolificUser }}
+        // state={{ prolificUser }}
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >
         <Button type="primary" size="large" disabled={zoom !== 1}>

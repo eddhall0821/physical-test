@@ -40,6 +40,7 @@ import TextArea from "antd/es/input/TextArea";
 import { FrownOutlined, MehOutlined, SmileOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import TaskSteps from "../TaskSteps";
+import usePreventRefresh from "../PreventRefresh";
 
 ChartJS.register(...registerables);
 ChartJS.register(
@@ -81,6 +82,7 @@ const LinearRegression = () => {
   const [finish, setFinish] = useState(false);
   const [docId, setDocId] = useRecoilState(docIdState);
   const prolificUser = useRecoilValue(prolificUserState);
+  const preventRefresh = usePreventRefresh();
   const navigate = useNavigate();
 
   const validateMessages = {

@@ -17,6 +17,7 @@ import {
   prolificUserState,
 } from "../../recoil/atom";
 import { useNavigate } from "react-router-dom";
+import usePreventRefresh from "../PreventRefresh";
 
 let cnt = 0;
 let summary = {
@@ -50,6 +51,7 @@ const PointingTest = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
   const ppi = useRecoilValue(ppiState);
   const prolificUser = useRecoilValue(prolificUserState);
+  const preventRefresh = usePreventRefresh();
 
   const combination = shuffle([
     {

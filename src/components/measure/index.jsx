@@ -3,22 +3,11 @@ import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { ENUM, dpiState, prolificUserState } from "../../recoil/atom";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-  Button,
-  Card,
-  Checkbox,
-  Collapse,
-  Input,
-  InputNumber,
-  Radio,
-  Space,
-  Switch,
-  Typography,
-} from "antd";
-import Guide from "../../images/mouse_guide.png";
+import { Button, Checkbox, Collapse, Input, Space, Typography } from "antd";
 import { Content, Footer } from "antd/es/layout/layout";
 import GuideGif from "../../images/mouse_guide.gif";
 import TaskSteps from "../TaskSteps";
+import usePreventRefresh from "../PreventRefresh";
 
 const Measure = () => {
   const [x, setX] = useState(0);
@@ -26,8 +15,7 @@ const Measure = () => {
   const [isChanged, setIsChanged] = useState(false);
   const [unit, setUnit] = useState("cm");
   const prolificUser = useRecoilValue(prolificUserState);
-  const { state } = useLocation();
-  console.log(state);
+  const preventRefresh = usePreventRefresh();
 
   useEffect(() => {
     if (isChanged) {
@@ -211,6 +199,7 @@ const Measure = () => {
                 onChange={(e) => setDpiState(ENUM.USER_INPUT, e.target.value)}
               />
               <Checkbox
+                checked={!dpi.isUserKnow}
                 onChange={() => setDpiState(ENUM.IS_USER_KNOW, !dpi.isUserKnow)}
               >
                 I don't know my mouse DPI.

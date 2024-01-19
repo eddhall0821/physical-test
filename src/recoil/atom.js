@@ -52,7 +52,7 @@ export const ENUM = {
 export const dpiState = atom({
   key: "dpiState",
   default: {
-    isUserKnow: true,
+    isUserKnow: false,
     userInput: 0,
     measurement: 0,
     // measurement: 1000,

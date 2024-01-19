@@ -28,6 +28,7 @@ import {
   prolificUserState,
 } from "../../recoil/atom";
 import { Balls } from "./Balls";
+import usePreventRefresh from "../PreventRefresh";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
@@ -51,6 +52,7 @@ const MTPCanvas = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
   const docId = useRecoilValue(docIdState);
   const prolificUser = useRecoilValue(prolificUserState);
+  const preventRefresh = usePreventRefresh();
 
   const navigate = useNavigate();
   const logArr = [
