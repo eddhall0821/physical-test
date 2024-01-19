@@ -39,11 +39,11 @@ const MainGuideLines = () => {
   }, [open]);
 
   const StepTitle = ({ children }) => {
-    return <p style={{ fontSize: 20, margin: 0 }}>{children}</p>;
+    return <p style={{ fontSize: 22, margin: 0 }}>{children}</p>;
   };
 
   const StepContent = ({ children }) => {
-    return <p style={{ fontSize: 16, margin: 0 }}>{children}</p>;
+    return <p style={{ fontSize: 18, margin: 0 }}>{children}</p>;
   };
   const MainTaskFont = ({ children }) => {
     return <p style={{ fontSize: 30, margin: 10 }}>{children}</p>;
@@ -52,20 +52,22 @@ const MainGuideLines = () => {
   const steps = [
     {
       title: <StepTitle>Next Reward</StepTitle>,
-      description: <StepContent>The value of the next reward</StepContent>,
+      description: (
+        <StepContent>Display the value of the next reward.</StepContent>
+      ),
       target: () => ref6.current,
     },
     {
       title: <StepTitle>Blue Circular Target</StepTitle>,
       description: (
         <StepContent>
-          <b style={{ color: "red" }}>
-            Click on the blue circular target as quickly and accurately as
-            possible.
-          </b>
+          Click on the blue circular target as quickly and accurately as
+          possible.
           <br />
-          If there is no mouse movement or clicks for 3 seconds, the trial will
-          be skipped.
+          <b style={{ color: "red" }}>
+            If there is no mouse movement or clicks for 3 seconds, the trial
+            will be skipped.
+          </b>
         </StepContent>
       ),
       target: () => ref7.current,
@@ -74,29 +76,36 @@ const MainGuideLines = () => {
       title: <StepTitle>Trial Results</StepTitle>,
       description: (
         <StepContent>
-          Success/Failure of each trial and bonuses earned for each click
+          Display success/failure of each trial and rewards earned for each
+          click.
         </StepContent>
       ),
       target: () => ref8.current,
     },
     {
       title: <StepTitle>Trials</StepTitle>,
-      description: <StepContent>Current trial and total trials</StepContent>,
+      description: (
+        <StepContent>Display current trial and total trials.</StepContent>
+      ),
       target: () => ref1.current,
     },
     {
-      title: <StepTitle>Total Bonus</StepTitle>,
-      description: <StepContent>Total bonuses you earned</StepContent>,
+      title: <StepTitle>Total Rewards</StepTitle>,
+      description: <StepContent>Display total rewards you earned.</StepContent>,
       target: () => ref3.current,
     },
     {
       title: <StepTitle>Successful Clicks</StepTitle>,
-      description: <StepContent>The number of successful clicks</StepContent>,
+      description: (
+        <StepContent>Display the number of successful clicks.</StepContent>
+      ),
       target: () => ref2.current,
     },
     {
       title: <StepTitle>Failed Clicks</StepTitle>,
-      description: <StepContent>The number of failed clicks</StepContent>,
+      description: (
+        <StepContent>Display the number of failed clicks.</StepContent>
+      ),
       target: () => ref4.current,
     },
   ];
@@ -124,7 +133,7 @@ const MainGuideLines = () => {
                   setOpen(true);
                 }}
               >
-                Start Tutorial
+                Start
               </Button>
             </Space>
           </Content>

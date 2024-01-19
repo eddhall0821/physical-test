@@ -61,7 +61,7 @@ const customIcons = {
 
 const suffixSelector = (
   <Form.Item name={["user", "suffix"]} noStyle>
-    <Select style={{ width: 80 }}>
+    <Select style={{ width: 100 }}>
       <Select.Option value="inch">inch</Select.Option>
       <Select.Option value="cm">cm</Select.Option>
     </Select>
@@ -222,13 +222,13 @@ const LinearRegression = () => {
           </Form.Item>
           <Form.Item
             name={["user", "age"]}
-            label="Age of birth"
+            label="Year of birth"
             rules={[{ required: true }]}
           >
             <DatePicker picker="year" format={"YYYY"} />
           </Form.Item>
           <Form.Item
-            name={["user", "Sex"]}
+            name={["user", "sex"]}
             label="What is your gender?"
             rules={[{ required: true }]}
           >
@@ -264,6 +264,7 @@ const LinearRegression = () => {
               <Radio value={5}>Bachelor's Degree</Radio>
               <Radio value={6}>Master's Degree</Radio>
               <Radio value={7}>Doctorate Degree</Radio>
+              <Radio value={8}>Other</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item
@@ -297,7 +298,8 @@ const LinearRegression = () => {
           </Form.Item>
           <Form.Item
             name={["user", "comment"]}
-            label="If you have any comments, please write them down. (optional)"
+            label="Please write any comments."
+            rules={[{ required: true }]}
           >
             <TextArea />
           </Form.Item>
@@ -311,7 +313,7 @@ const LinearRegression = () => {
                 style={{ margin: 10, textAlign: "center" }}
                 htmlType="submit"
               >
-                Submit Survey
+                Submit
               </Button>
             </div>
           </Form.Item>

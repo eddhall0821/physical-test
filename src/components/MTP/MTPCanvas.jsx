@@ -34,7 +34,7 @@ export const INCH_24_HEIGHT = 11.77;
 
 const SHOW_REWARD_TIME = 1800; //ms
 const SHOW_RESULT_TIME = 600; //ms
-const TOTAL_TRIALS = 1 * 9;
+const TOTAL_TRIALS = `${process.env.REACT_APP_TOTAL_TRIALS}`;
 const STOP_TIME = 3000 * 1000; //배포전에 수정;
 
 const MTPCanvas = () => {
@@ -272,10 +272,8 @@ const MTPCanvas = () => {
         );
         const snapshot = await uploadBytes(storageRef, blob);
 
-        // console.log(summarySnapshot);
-        // console.log(snapshot);
-
-        navigate("/");
+        console.log(summarySnapshot);
+        console.log(snapshot);
       }
       // let weight = 0.0575;
       function updatePosition(e) {
@@ -342,16 +340,16 @@ const MTPCanvas = () => {
         if (!end) {
           resetCanvas(canvas, monitorBound);
           drawText(ctx, summary, TOTAL_TRIALS);
-          drawClickResultText(
-            ctx,
-            lastClickResult.success,
-            fastRound3(lastClickResult.time / 1000),
-            lastClickResult.point,
-            x,
-            y,
-            monitorBound
-          );
-          drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
+          // drawClickResultText(
+          //   ctx,
+          //   lastClickResult.success,
+          //   fastRound3(lastClickResult.time / 1000),
+          //   lastClickResult.point,
+          //   x,
+          //   y,
+          //   monitorBound
+          // );
+          // drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
 
           //움직임 감지되지 않음
           if (

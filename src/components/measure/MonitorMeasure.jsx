@@ -100,7 +100,7 @@ const MonitorMeasure = () => {
         You can also use a library card or standard ID.
         <br />
         If you have multiple displays, please conduct the experiment only on the
-        main monitor.
+        main display.
         <br />
       </Paragraph>
 
@@ -184,7 +184,7 @@ const MonitorMeasure = () => {
           />
         </div>
       </div>
-      <Typography.Title level={5}>
+      <Typography.Title level={4}>
         Do not refresh or close the web page during the experiment.
         <br />
         If you refresh or close the web page, the experiment will start again
@@ -194,7 +194,7 @@ const MonitorMeasure = () => {
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >
         <Button type="primary" size="large" disabled={zoom !== 1}>
-          {zoom === 1 ? "Next step" : "Please adjust the screen zoom to 100%."}
+          {zoom === 1 ? "Next" : "Please adjust the screen zoom to 100%."}
         </Button>
       </Link>
     </div>

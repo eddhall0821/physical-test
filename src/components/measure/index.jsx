@@ -101,7 +101,7 @@ const Measure = () => {
           The measured mouse sensitivity will influence future experimental
           procedures.
           <br />
-          Please carefully follow the steps.
+          Please follow the steps carefully.
         </Typography.Paragraph>
         <Collapse accordion defaultActiveKey={["1"]}>
           <Collapse.Panel
@@ -118,7 +118,7 @@ const Measure = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Disable Enhance Pointer Precision on Windows 10?
+              How to Disable 'Enhance Pointer Precision' on Windows 10
             </Link>
             <br />
             <br />
@@ -127,7 +127,7 @@ const Measure = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              How to Disable Enhance Pointer Precision on Windows 11?
+              How to Disable 'Enhance Pointer Precision' on Windows 11
             </Link>
           </Collapse.Panel>
           <Collapse.Panel
@@ -216,8 +216,8 @@ const Measure = () => {
             </Space>
           </Collapse.Panel>
         </Collapse>
-        <div style={{ textAlign: "center" }}>
-          <Typography.Title level={5}>
+        <div style={{ textAlign: "center", marginTop: 12 }}>
+          <Typography.Title level={4}>
             Do not refresh or close the web page during the experiment.
             <br />
             If you refresh or close the web page, the experiment will start

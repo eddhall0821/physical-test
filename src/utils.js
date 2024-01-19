@@ -323,12 +323,12 @@ export const drawStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Before starting the main task, you will conduct a Pre-task.",
+    "Before starting the main task, you will conduct a simple test.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
   ctx.fillText(
-    "Mouse sensitivity was adjusted for the experiment.",
+    "Mouse sensitivity will be adjusted for the experiment.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -345,13 +345,14 @@ export const drawStartButton = (ctx) => {
   // );
 
   ctx.fillText(
-    "If it does not automatically switch to fullscreen mode or if the fullscreen mode is exited during test, press Enter. ",
+    // "If it does not automatically switch to fullscreen mode or if the fullscreen mode is exited during test, press Enter. ",
+    "If the fullscreen mode is exited during test, press Enter.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
 
   ctx.fillText(
-    "When you are ready, click anywhere to start.",
+    "Click anywhere to start.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 250
   );
@@ -370,7 +371,7 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "When you're ready, click anywhere to start.",
+    "Click anywhere to start.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );

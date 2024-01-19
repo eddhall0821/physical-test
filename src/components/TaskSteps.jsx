@@ -13,7 +13,7 @@ const TaskSteps = ({ children, current }) => {
       items={[
         { title: "Monitor Size Measurement" },
         { title: "Mouse Sensitivity Measurement" },
-        { title: "Pre-Task" },
+        { title: "Pre-task" },
         { title: "Preliminary Survey" },
         { title: "Main Task" },
       ]}
