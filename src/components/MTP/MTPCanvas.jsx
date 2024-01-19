@@ -274,6 +274,7 @@ const MTPCanvas = () => {
 
         console.log(summarySnapshot);
         console.log(snapshot);
+        navigate("/done");
       }
       // let weight = 0.0575;
       function updatePosition(e) {

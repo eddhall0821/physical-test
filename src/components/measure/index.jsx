@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { ENUM, dpiState, prolificUserState } from "../../recoil/atom";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Button,
   Card,
@@ -26,6 +26,8 @@ const Measure = () => {
   const [isChanged, setIsChanged] = useState(false);
   const [unit, setUnit] = useState("cm");
   const prolificUser = useRecoilValue(prolificUserState);
+  const { state } = useLocation();
+  console.log(state);
 
   useEffect(() => {
     if (isChanged) {

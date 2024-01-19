@@ -14,6 +14,7 @@ import PointingTest from "./components/MTP/PointingTest";
 import Simulator from "./components/simulator/Simulator";
 import { ConfigProvider } from "antd";
 import MainGuideLines from "./components/MTP/MainGuideLines";
+import Done from "./components/MTP/Done";
 
 function App() {
   const router = createBrowserRouter(
@@ -62,7 +63,10 @@ function App() {
         path: "main-guidelines",
         element: <MainGuideLines />,
       },
-      {},
+      {
+        path: "done",
+        element: <Done />,
+      },
     ],
     {
       basename: process.env.PUBLIC_URL,

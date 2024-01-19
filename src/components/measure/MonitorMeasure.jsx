@@ -191,6 +191,7 @@ const MonitorMeasure = () => {
         from the beginning.
       </Typography.Title>
       <Link
+        state={{ prolificUser }}
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
       >
         <Button type="primary" size="large" disabled={zoom !== 1}>
