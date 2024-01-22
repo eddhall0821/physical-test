@@ -23,7 +23,7 @@ function App() {
     {
       path: "",
       element: <Home />,
-      withAuth: false,
+      withAuth: true,
     },
     {
       path: "pnc",
