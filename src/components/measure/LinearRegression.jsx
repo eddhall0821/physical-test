@@ -26,6 +26,7 @@ import {
 } from "antd";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
+  behaviorLogState,
   docIdState,
   dpiState,
   mointorBoundState,
@@ -82,6 +83,7 @@ const LinearRegression = () => {
   const [finish, setFinish] = useState(false);
   const [docId, setDocId] = useRecoilState(docIdState);
   const prolificUser = useRecoilValue(prolificUserState);
+  const behaviorLog = useRecoilValue(behaviorLogState);
   const preventRefresh = usePreventRefresh();
   const navigate = useNavigate();
 
@@ -168,6 +170,7 @@ const LinearRegression = () => {
       a: linearModel.m.toFixed(2),
       b: linearModel.b.toFixed(2),
       user,
+      behaviorLog: behaviorLog,
     };
     setLoading(true);
     console.log(docData);

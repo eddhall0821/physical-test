@@ -36,7 +36,7 @@ export const INCH_24_HEIGHT = 11.77;
 const SHOW_REWARD_TIME = 1800; //ms
 const SHOW_RESULT_TIME = 600; //ms
 const TOTAL_TRIALS = `${process.env.REACT_APP_TOTAL_TRIALS}`;
-const STOP_TIME = 3000 * 1000; //배포전에 수정;
+const STOP_TIME = 3000;
 
 const MTPCanvas = () => {
   const [settings, setSettings] = useState({

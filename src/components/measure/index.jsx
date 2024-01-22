@@ -130,10 +130,10 @@ const Measure = () => {
           >
             <p>
               1. Left-click on the <b style={{ color: "#da2c4d" }}>red box</b>{" "}
-              and hold the mouse left-click button down.
+              and <b>hold</b> the mouse left-click button down.
               <br />
-              2. Slowly move the mouse from left to right along the width of the
-              card. (3.37 inches/8.56 cm).
+              2. <b>Slowly</b> move the mouse from left to right along the width
+              of the card. (3.37 inches/8.56 cm).
               <br />
               3. Release the left-click button.
             </p>
@@ -223,7 +223,7 @@ const Measure = () => {
               disabled={dpi.measurement === 0}
             >
               {dpi.measurement === 0 && "You have to measure."}
-              {dpi.measurement !== 0 && "Start Pre-task"}
+              {dpi.measurement !== 0 && "Next"}
             </Button>
           </Link>
         </div>

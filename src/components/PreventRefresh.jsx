@@ -13,12 +13,16 @@ const usePreventRefresh = () => {
     e.returnValue = "";
   };
 
+  const onPopState = () => {};
+
   useEffect(() => {
     (() => {
+      window.addEventListener("onpopstate ", onPopState);
       window.addEventListener("beforeunload", preventClose);
     })();
 
     return () => {
+      window.addEventListener("onpopstate ", onPopState);
       window.removeEventListener("beforeunload", preventClose);
     };
   });

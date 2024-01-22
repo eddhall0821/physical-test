@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  NavigationType,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 import MTPCanvas from "./components/MTP/MTPCanvas";
@@ -100,6 +105,14 @@ function App() {
       basename: process.env.PUBLIC_URL,
     }
   );
+
+  useEffect(() => {
+    router.subscribe((state) => {
+      if (state.historyAction === NavigationType.Pop) {
+        window.history.go(1);
+      }
+    });
+  }, []);
 
   return (
     <RecoilRoot>
