@@ -116,6 +116,12 @@ const MTPTest = () => {
       x += e.movementX * weight * 10;
       y += e.movementY * weight * 10;
 
+      if (window.innerHeight == window.screen.height) {
+        console.log("full");
+      } else {
+        console.log("no full");
+      }
+
       //마우스 가두기
       if (x > window.screen.width - monitorBound.left) {
         x = window.screen.width - monitorBound.left;

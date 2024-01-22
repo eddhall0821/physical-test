@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {
   distanceBetweenTwoPoint,
   drawClickResultText,
+  drawFullscreenAlertText,
   drawMTPTarget,
   drawPointer,
   drawRewardText,
@@ -75,6 +76,7 @@ const MTPCanvas = () => {
       "d",
       "target_p",
       "total_p",
+      "fullscreen",
     ],
   ];
   const summaryLogArr = [
@@ -93,6 +95,7 @@ const MTPCanvas = () => {
       let movementX = 0;
       let movementY = 0;
       let buttons = 0;
+      let isFullscreen = false;
 
       let x = window.innerWidth / 2;
       let y = window.innerHeight / 2;
@@ -309,6 +312,15 @@ const MTPCanvas = () => {
         }
       }
 
+      const drawFullscreenText = () => {
+        if (window.innerHeight !== window.screen.height) {
+          isFullscreen = false;
+          drawFullscreenAlertText(ctx);
+        } else {
+          isFullscreen = true;
+        }
+      };
+
       const logging = () => {
         // console.log("log log");
         const tempRow = [
@@ -331,6 +343,7 @@ const MTPCanvas = () => {
           fastRound3(currentDesign.d),
           target_reward,
           summary.point,
+          isFullscreen ? 1 : 0,
         ];
         logArr.push(tempRow);
         if (buttons !== 0) buttons = 0;
@@ -343,6 +356,7 @@ const MTPCanvas = () => {
         if (!end) {
           resetCanvas(canvas, monitorBound);
           drawText(ctx, summary, TOTAL_TRIALS);
+          drawFullscreenText();
           // drawClickResultText(
           //   ctx,
           //   lastClickResult.success,
@@ -367,6 +381,7 @@ const MTPCanvas = () => {
             console.log("stop.");
             summary.fail++;
             lastClickResult.success = false;
+            lastClickResult.point = 0;
             if (balls.getRandomDesignArray().length === 0 && !end) {
               alert("done!!");
               end = true;

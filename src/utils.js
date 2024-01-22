@@ -376,6 +376,17 @@ export const drawStartButton2 = (ctx) => {
     window.innerHeight / 2
   );
 };
+export const drawFullscreenAlertText = (ctx) => {
+  ctx.font = "30px  serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "Press Enter to Fullscreen!",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+};
 
 export const drawText = (ctx, summary, remain) => {
   ctx.font = "30px sans-serif";
@@ -393,7 +404,7 @@ export const drawText = (ctx, summary, remain) => {
   // ctx.fillStyle = "#fff";
   ctx.fillText(`✅: ${summary.success}`, boardInterval * 3, 50);
   ctx.fillText(
-    `Total Bonus: ${summary.point / 1000 / 10}£`,
+    `Total Bonus: ${(summary.point / 10000).toFixed(3)}£`,
     boardInterval * 2,
     50
   );

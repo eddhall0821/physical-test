@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
   distanceBetweenTwoPoint,
+  drawFullscreenAlertText,
   drawPointer,
   drawStartButton,
   fittsLaw,
@@ -95,6 +96,8 @@ const PointingTest = () => {
     let start_time = performance.now();
     let end_time = performance.now();
     let start;
+
+    let isFullscreen = false;
 
     document.addEventListener("pointerlockchange", lockChangeAlert, false);
     function lockChangeAlert() {
@@ -206,6 +209,15 @@ const PointingTest = () => {
       }
     };
 
+    const drawFullscreenText = () => {
+      if (window.innerHeight !== window.screen.height) {
+        isFullscreen = false;
+        drawFullscreenAlertText(ctx);
+      } else {
+        isFullscreen = true;
+      }
+    };
+
     const drawTarget = (x, y, target_radius, color) => {
       ctx.beginPath();
       ctx.arc(x, y, target_radius, 0, degToRad(360), true);
@@ -253,6 +265,7 @@ const PointingTest = () => {
       generateTarget();
       drawPointer(ctx, x, y);
       requestAnimationFrame(step);
+      drawFullscreenText();
     }
 
     function pre_step() {
