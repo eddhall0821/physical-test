@@ -58,35 +58,40 @@ export const initCanvas = async (canvas) => {
   window.addEventListener("keypress", async (e) => {
     if (e.key === "Enter") {
       toggleFullScreen(canvas);
+      if (!document.pointerLockElement) {
+        await canvas.requestPointerLock({
+          unadjustedMovement: true,
+        });
+      }
+    }
+
+    if (e.key === "s") {
+      toggleFullScreen(canvas);
+      if (!document.pointerLockElement) {
+        await canvas.requestPointerLock({
+          unadjustedMovement: true,
+        });
+      }
     }
   });
 
-  canvas.addEventListener("click", async () => {
-    if (!document.pointerLockElement) {
-      await canvas.requestPointerLock({
-        unadjustedMovement: true,
-      });
-    }
-  });
+  // canvas.addEventListener("click", async (e) => {
+  //   if (!document.pointerLockElement) {
+  //     await canvas.requestPointerLock({
+  //       unadjustedMovement: true,
+  //     });
+  //   }
+  // });
 
-  canvas.addEventListener(
-    "click",
-    (e) => {
-      canvas.requestPointerLock({
-        unadjustedMovement: true,
-      });
-    },
-    false
-  );
-
-  canvas.addEventListener("click", async () => {
-    if (!document.pointerLockElement) {
-      await canvas.requestPointerLock({
-        //To disable OS-level mouse acceleration and access raw mouse input, you can set the unadjustedMovement to true:
-        unadjustedMovement: true,
-      });
-    }
-  });
+  // canvas.addEventListener(
+  //   "click",
+  //   (e) => {
+  //     canvas.requestPointerLock({
+  //       unadjustedMovement: true,
+  //     });
+  //   },
+  //   false
+  // );
 };
 
 export const drawMTPTarget = (ctx, x, y, speed, radius) => {
@@ -135,7 +140,6 @@ export const random_point_between_circles = ({
     }
   }
 
-  console.log("Err");
   return { x: window.screen.width / 2, y: window.screen.height / 2 };
 };
 
@@ -323,7 +327,7 @@ export const drawStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Before starting the main task, you will conduct a simple test.",
+    "Before starting the main study, you will conduct a calibration study.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
@@ -352,7 +356,7 @@ export const drawStartButton = (ctx) => {
   );
 
   ctx.fillText(
-    "Click anywhere to start.",
+    "Press Enter to start.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 250
   );
@@ -371,7 +375,7 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Click anywhere to start.",
+    "Press Enter to start.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -382,7 +386,7 @@ export const drawFullscreenAlertText = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Press Enter to Fullscreen!",
+    "Press Enter twice!",
     window.innerWidth / 2,
     window.innerHeight / 2
   );

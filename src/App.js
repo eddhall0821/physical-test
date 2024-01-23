@@ -22,6 +22,7 @@ import MainGuideLines from "./components/MTP/MainGuideLines";
 import Done from "./components/MTP/Done";
 import { useEffect } from "react";
 import PrivateRoute from "./components/PrivateRoute";
+import ErrorPage from "./components/MTP/ErrorPage";
 
 function App() {
   const routerData = [
@@ -85,6 +86,11 @@ function App() {
       element: <Done />,
       withAuth: true,
     },
+    {
+      path: "error",
+      element: <ErrorPage />,
+      withAuth: true,
+    },
   ];
   const router = createBrowserRouter(
     routerData.map((router) => {
@@ -120,7 +126,7 @@ function App() {
         <ConfigProvider
           theme={{
             token: {
-              // fontSize: 16,
+              fontSize: 16,
             },
             components: {
               Slider: {

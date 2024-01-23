@@ -30,6 +30,7 @@ import {
 } from "../../recoil/atom";
 import { Balls } from "./Balls";
 import usePreventRefresh from "../PreventRefresh";
+import { Spin, Typography } from "antd";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
@@ -47,7 +48,7 @@ const MTPCanvas = () => {
     trial: 20,
   });
 
-  const [isSettingMode, setIsSettingMode] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
   const ppi = useRecoilValue(ppiState);
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -84,7 +85,7 @@ const MTPCanvas = () => {
   ];
 
   useEffect(() => {
-    if (!isSettingMode) {
+    if (!isUploading) {
       let moneybag = new Image();
       moneybag.src = Moneybag;
       let show_reward_counter = performance.now();
@@ -96,6 +97,7 @@ const MTPCanvas = () => {
       let movementY = 0;
       let buttons = 0;
       let isFullscreen = false;
+      let isPointerLock = false;
 
       let x = window.innerWidth / 2;
       let y = window.innerHeight / 2;
@@ -157,10 +159,12 @@ const MTPCanvas = () => {
       document.addEventListener("pointerlockchange", lockChangeAlert, false);
       function lockChangeAlert() {
         if (document.pointerLockElement === canvas) {
+          isPointerLock = true;
           start = true;
           document.addEventListener("mousemove", updatePosition, false);
           document.addEventListener("mousedown", mouseDown);
         } else {
+          isPointerLock = false;
           document.removeEventListener("mousemove", updatePosition, false);
           document.removeEventListener("mousedown", mouseDown);
         }
@@ -207,6 +211,7 @@ const MTPCanvas = () => {
               alert("done!!");
               end = true;
               uploadCSV();
+              setIsUploading(true);
             } else {
               currentDesign = balls.popStack();
               targetInit(currentDesign.d, currentDesign.w);
@@ -218,6 +223,8 @@ const MTPCanvas = () => {
       };
 
       async function uploadCSV() {
+        console.log("upload csv");
+
         if (document.fullscreenElement) {
           document
             .exitFullscreen()
@@ -251,35 +258,62 @@ const MTPCanvas = () => {
           })
           .join("\n");
 
-        //---download in local pc---
-        // var summaryEncodedUri = encodeURI(
-        //   `data:text/csv;charset=utf-8,${summaryContent}`
-        // );
-        // var encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
-
-        // var link = document.createElement("a");
-        // link.setAttribute("href", encodedUri);
-        // link.setAttribute("download", "pnc.csv");
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
-        //---download in local pc---
-
         const summaryBlob = new Blob([summaryContent], {
           type: "text/csv;charset=utf-8;",
         });
         const blob = new Blob([csvContent], {
           type: "text/csv;charset=utf-8;",
         });
-        const summarySnapshot = await uploadBytes(
-          summaryStorageRef,
-          summaryBlob
-        );
-        const snapshot = await uploadBytes(storageRef, blob);
+        try {
+          const summarySnapshot = await uploadBytes(
+            summaryStorageRef,
+            summaryBlob
+          );
+          const snapshot = await uploadBytes(storageRef, blob);
+          console.log(summarySnapshot);
+          console.log(snapshot);
+          navigate("/done");
+        } catch {
+          alert(
+            "An error occurred during the upload. I will download the files directly to your PC, please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them."
+          );
+          //---download in local pc---
+          var summaryEncodedUri = encodeURI(
+            `data:text/csv;charset=utf-8,${summaryContent}`
+          );
+          var encodedUri = encodeURI(
+            `data:text/csv;charset=utf-8,${csvContent}`
+          );
 
-        console.log(summarySnapshot);
-        console.log(snapshot);
-        navigate("/done");
+          var link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute(
+            "download",
+            `trajectory/${prolificUser.PROLIFIC_PID}_${
+              prolificUser.SESSION_ID
+            }_${Date.now()}.csv`
+          );
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          var link = document.createElement("a");
+          link.setAttribute("href", summaryEncodedUri);
+          link.setAttribute(
+            "download",
+            `summary/${prolificUser.PROLIFIC_PID}_${
+              prolificUser.SESSION_ID
+            }_${Date.now()}.csv`
+          );
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          //---download in local pc---
+          navigate("/error");
+        }
       }
       // let weight = 0.0575;
       function updatePosition(e) {
@@ -313,7 +347,7 @@ const MTPCanvas = () => {
       }
 
       const drawFullscreenText = () => {
-        if (window.innerHeight !== window.screen.height) {
+        if (window.innerHeight !== window.screen.height || !isPointerLock) {
           isFullscreen = false;
           drawFullscreenAlertText(ctx);
         } else {
@@ -386,6 +420,7 @@ const MTPCanvas = () => {
               alert("done!!");
               end = true;
               uploadCSV();
+              setIsUploading(true);
             } else {
               currentDesign = balls.popStack();
               targetInit(currentDesign.d, currentDesign.w);
@@ -448,20 +483,28 @@ const MTPCanvas = () => {
       initCanvas(canvas);
       requestAnimationFrame(pre_step);
     }
-  }, [isSettingMode]);
+  }, [isUploading]);
 
   return (
     <>
-      <Description
-        setSettings={setSettings}
-        setIsSettingMode={setIsSettingMode}
-        isSettingMode={isSettingMode}
-      />
-      <canvas
-        id="canvas"
-        width={window.innerWidth}
-        height={window.innerHeight}
-      />
+      {!isUploading && (
+        <canvas
+          id="canvas"
+          width={window.innerWidth}
+          height={window.innerHeight}
+        />
+      )}
+      {isUploading && (
+        <div>
+          <Typography.Title>
+            <Spin size="large" />
+            <br />
+            Uploading
+            <br />
+            Never close the screen...
+          </Typography.Title>
+        </div>
+      )}
     </>
   );
 };

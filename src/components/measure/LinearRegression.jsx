@@ -54,11 +54,11 @@ ChartJS.register(
 );
 
 const customIcons = {
-  1: <FrownOutlined />,
-  2: <FrownOutlined />,
-  3: <MehOutlined />,
-  4: <SmileOutlined />,
-  5: <SmileOutlined />,
+  1: <FrownOutlined style={{ fontSize: 48 }} />,
+  2: <FrownOutlined style={{ fontSize: 48 }} />,
+  3: <MehOutlined style={{ fontSize: 48 }} />,
+  4: <SmileOutlined style={{ fontSize: 48 }} />,
+  5: <SmileOutlined style={{ fontSize: 48 }} />,
 };
 
 const suffixSelector = (
@@ -171,6 +171,7 @@ const LinearRegression = () => {
       b: linearModel.b.toFixed(2),
       user,
       behaviorLog: behaviorLog,
+      browser: window.navigator.userAgent.toLowerCase(),
     };
     setLoading(true);
     console.log(docData);

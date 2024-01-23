@@ -98,14 +98,17 @@ const PointingTest = () => {
     let start;
 
     let isFullscreen = false;
+    let isPointerLock = false;
 
     document.addEventListener("pointerlockchange", lockChangeAlert, false);
     function lockChangeAlert() {
       if (document.pointerLockElement === canvas) {
+        isPointerLock = true;
         start = true;
         document.addEventListener("mousemove", updatePosition, false);
         document.addEventListener("mousedown", mouseDown);
       } else {
+        isPointerLock = false;
         document.removeEventListener("mousemove", updatePosition, false);
         document.removeEventListener("mousedown", mouseDown);
       }
@@ -210,7 +213,7 @@ const PointingTest = () => {
     };
 
     const drawFullscreenText = () => {
-      if (window.innerHeight !== window.screen.height) {
+      if (window.innerHeight !== window.screen.height || !isPointerLock) {
         isFullscreen = false;
         drawFullscreenAlertText(ctx);
       } else {

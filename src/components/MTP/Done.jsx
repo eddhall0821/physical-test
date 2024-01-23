@@ -3,11 +3,11 @@ import { useEffect } from "react";
 
 const Done = () => {
   useEffect(() => {
-    // setTimeout(() => {
-    // window.location.replace(
-    //   "https://app.prolific.com/submissions/complete?cc=CSE63DRO"
-    // );
-    // }, 5000);
+    setTimeout(() => {
+      window.location.replace(
+        "https://app.prolific.com/submissions/complete?cc=CSE63DRO"
+      );
+    }, 5000);
   }, []);
   return (
     <Result

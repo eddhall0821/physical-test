@@ -12,7 +12,6 @@ const PrivateRoute = ({ children }) => {
     return <>{children}</>;
   } else {
     const qs = QueryString.parse(location.search, { ignoreQueryPrefix: true });
-    console.log(qs);
     return (
       <Navigate
         to={`/monitor?PROLIFIC_PID=${qs.PROLIFIC_PID}&STUDY_ID=${qs.STUDY_ID}&SESSION_ID=${qs.SESSION_ID}`}

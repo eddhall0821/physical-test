@@ -17,7 +17,6 @@ import Wrong from "../../images/wrong.png";
 import Card from "../../images/card.png";
 import QueryString from "qs";
 import TaskSteps from "../TaskSteps";
-import Paragraph from "antd/es/typography/Paragraph";
 import usePreventRefresh from "../PreventRefresh";
 
 const MonitorMeasure = () => {
@@ -94,7 +93,7 @@ const MonitorMeasure = () => {
     >
       <TaskSteps current={0} />
       <Typography.Title level={3}>Monitor Size Measurement</Typography.Title>
-      <Paragraph level={2}>
+      <Typography.Paragraph>
         Place a physical credit card against the image of the card below and
         increase or decrease its size until it matches the size of the physical
         card exactly. <br />
@@ -103,7 +102,7 @@ const MonitorMeasure = () => {
         If you have multiple displays, please conduct the experiment only on the
         main display.
         <br />
-      </Paragraph>
+      </Typography.Paragraph>
 
       {/* {`${diagonal_in} inch ${ppi}`} */}
       <div style={{ width: 300 }}>

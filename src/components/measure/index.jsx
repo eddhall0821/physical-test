@@ -139,7 +139,11 @@ const Measure = () => {
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div
-                onMouseDown={() => document.body.requestPointerLock()}
+                onMouseDown={() =>
+                  document.body.requestPointerLock({
+                    unadjustedMovement: true,
+                  })
+                }
                 style={{
                   color: "white",
                   textAlign: "center",
