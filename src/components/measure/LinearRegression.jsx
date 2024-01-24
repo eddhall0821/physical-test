@@ -172,7 +172,10 @@ const LinearRegression = () => {
       user,
       behaviorLog: behaviorLog,
       browser: window.navigator.userAgent.toLowerCase(),
+      date: new Date(),
+      timestamp: Date.now(),
     };
+
     setLoading(true);
     console.log(docData);
     if (docData.prolific_id && docData.session_id) {

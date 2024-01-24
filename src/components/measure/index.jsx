@@ -129,13 +129,16 @@ const Measure = () => {
             key="2"
           >
             <p>
-              1. Left-click on the <b style={{ color: "#da2c4d" }}>red box</b>{" "}
-              and <b>hold</b> the mouse left-click button down.
+              1. Prepare the card you used to measure the monitor screen.
               <br />
-              2. <b>Slowly</b> move the mouse from left to right along the width
+              2. Left-click anywhere on the{" "}
+              <b style={{ color: "#da2c4d" }}>red box</b> and <b>hold</b> the
+              mouse left-click button down.
+              <br />
+              3. <b>Slowly</b> move the mouse from left to right along the width
               of the card. (3.37 inches/8.56 cm).
               <br />
-              3. Release the left-click button.
+              4. Release the left-click button.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div

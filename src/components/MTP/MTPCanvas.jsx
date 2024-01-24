@@ -72,16 +72,26 @@ const MTPCanvas = () => {
       "buttons",
       "timestamp",
       "dpr",
-      "id",
-      "w",
-      "d",
-      "target_p",
-      "total_p",
+      // "id",
+      // "w",
+      // "d",
+      // "target_p",
+      // "total_p",
       "fullscreen",
     ],
   ];
   const summaryLogArr = [
-    ["trial", "success", "reaction_time", "target_p", "total_p"],
+    [
+      "trial",
+      "success",
+      "reaction_time",
+      "target_p",
+      "total_p",
+      "target_radius",
+      "id",
+      "w",
+      "d",
+    ],
   ];
 
   useEffect(() => {
@@ -185,13 +195,17 @@ const MTPCanvas = () => {
             delay = p;
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
             const current_target_success = target_radius - distance > 0 ? 1 : 0;
-            const summaryLogRow = [
-              summary.fail + summary.success,
-              current_target_success,
-              lastClickResult.time,
-              target_reward,
-              summary.point,
-            ];
+            // const summaryLogRow = [
+            //   summary.fail + summary.success,
+            //   current_target_success,
+            //   lastClickResult.time,
+            //   target_reward,
+            //   summary.point,
+            //   fastRound3(target_radius),
+            //   fastRound3(currentDesign.id),
+            //   fastRound3(currentDesign.w),
+            //   fastRound3(currentDesign.d),
+            // ];
 
             if (target_radius - distance > 0) {
               //성공시 이펙트 추가
@@ -205,8 +219,8 @@ const MTPCanvas = () => {
               lastClickResult.success = false;
               lastClickResult.point = 0;
             }
-
-            summaryLogArr.push(summaryLogRow);
+            pushSummaryLog(current_target_success);
+            // summaryLogArr.push(summaryLogRow);
             if (balls.getRandomDesignArray().length === 0 && !end) {
               alert("done!!");
               end = true;
@@ -216,10 +230,24 @@ const MTPCanvas = () => {
               currentDesign = balls.popStack();
               targetInit(currentDesign.d, currentDesign.w);
             }
-
-            console.log(summaryLogArr);
           }
         }
+      };
+
+      const pushSummaryLog = (current_target_success) => {
+        console.log("log log sum");
+        const summaryLogRow = [
+          summary.fail + summary.success - 1,
+          current_target_success,
+          lastClickResult.time,
+          target_reward,
+          summary.point,
+          fastRound3(target_radius),
+          fastRound3(currentDesign.id),
+          fastRound3(currentDesign.w),
+          fastRound3(currentDesign.d),
+        ];
+        summaryLogArr.push(summaryLogRow);
       };
 
       async function uploadCSV() {
@@ -235,13 +263,13 @@ const MTPCanvas = () => {
 
         const summaryStorageRef = ref(
           storage,
-          `summary/${prolificUser.PROLIFIC_PID}_${
+          `summary/s${prolificUser.PROLIFIC_PID}_${
             prolificUser.SESSION_ID
           }_${Date.now()}.csv`
         );
         const storageRef = ref(
           storage,
-          `trajectory/${prolificUser.PROLIFIC_PID}_${
+          `trajectory/t${prolificUser.PROLIFIC_PID}_${
             prolificUser.SESSION_ID
           }_${Date.now()}.csv`
         );
@@ -275,7 +303,7 @@ const MTPCanvas = () => {
           navigate("/done");
         } catch {
           alert(
-            "An error occurred during the upload. I will download the files directly to your PC, please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them."
+            "An error occurred during the upload. The data file will be downloaded directly to your PC. please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them. your completion code is CSE63DRO."
           );
           //---download in local pc---
           var summaryEncodedUri = encodeURI(
@@ -359,7 +387,7 @@ const MTPCanvas = () => {
         // console.log("log log");
         const tempRow = [
           summary.fail + summary.success,
-          fastRound3(target_radius),
+          target_radius,
           fastRound3(target_x - monitorBound.left),
           fastRound3(target_y - monitorBound.top),
           fastRound3(x - monitorBound.left),
@@ -372,11 +400,6 @@ const MTPCanvas = () => {
           // lastClickResult.time,
           Date.now() / 1000,
           window.devicePixelRatio,
-          fastRound3(currentDesign.id),
-          fastRound3(currentDesign.w),
-          fastRound3(currentDesign.d),
-          target_reward,
-          summary.point,
           isFullscreen ? 1 : 0,
         ];
         logArr.push(tempRow);
@@ -416,6 +439,8 @@ const MTPCanvas = () => {
             summary.fail++;
             lastClickResult.success = false;
             lastClickResult.point = 0;
+            pushSummaryLog(0);
+
             if (balls.getRandomDesignArray().length === 0 && !end) {
               alert("done!!");
               end = true;

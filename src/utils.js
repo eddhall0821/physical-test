@@ -332,31 +332,24 @@ export const drawStartButton = (ctx) => {
     window.innerHeight / 2 - 50
   );
   ctx.fillText(
-    "Mouse sensitivity will be adjusted for the experiment.",
+    "In this study, we would like to measure the level of your mouse control skills.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );
-  // ctx.fillText(
-  //   "the mouse sensitivity has been adjusted based on the mouse sensitivity you just measured.",
-  //   window.innerWidth / 2,
-  //   window.innerHeight / 2 + 100
-  // );
-
-  // ctx.fillText(
-  //   "If the target does not appear on the screen, click anywhere.",
-  //   window.innerWidth / 2,
-  //   window.innerHeight / 2 + 150
-  // );
+  ctx.fillText(
+    "Mouse sensitivity will be adjusted for the experiment.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
+  );
 
   ctx.fillText(
-    // "If it does not automatically switch to fullscreen mode or if the fullscreen mode is exited during test, press Enter. ",
-    "If the fullscreen mode is exited during test, press Enter.",
+    "If the fullscreen mode is exited during study, press Enter key.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
 
   ctx.fillText(
-    "Press Enter to start.",
+    "Press Enter key to start.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 250
   );
@@ -365,7 +358,7 @@ export const drawStartButton = (ctx) => {
   ctx.fillText(
     "Click on the blue circular target as quickly and accurately as possible.",
     window.innerWidth / 2,
-    window.innerHeight / 2 + 50
+    window.innerHeight / 2 + 150
   );
 };
 
@@ -375,7 +368,7 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Press Enter to start.",
+    "Press Enter key to start.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );

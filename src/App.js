@@ -39,7 +39,7 @@ function App() {
     {
       path: "replay",
       element: <MTPReplay />,
-      withAuth: true,
+      withAuth: false,
     },
     {
       path: "measure",
