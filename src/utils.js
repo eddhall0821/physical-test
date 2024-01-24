@@ -75,13 +75,14 @@ export const initCanvas = async (canvas) => {
     }
   });
 
-  // canvas.addEventListener("click", async (e) => {
-  //   if (!document.pointerLockElement) {
-  //     await canvas.requestPointerLock({
-  //       unadjustedMovement: true,
-  //     });
-  //   }
-  // });
+  canvas.addEventListener("click", async (e) => {
+    toggleFullScreen(canvas);
+    // if (!document.pointerLockElement) {
+    //   await canvas.requestPointerLock({
+    //     unadjustedMovement: true,
+    //   });
+    // }
+  });
 
   // canvas.addEventListener(
   //   "click",
