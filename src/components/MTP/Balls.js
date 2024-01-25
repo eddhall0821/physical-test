@@ -1,6 +1,7 @@
 import { getWdithByIDAndDistance, shuffle } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
+export const BALL_POINTS = [0, 50, 100];
 export class Balls {
   designs = [];
   randomDesignArray = [];
@@ -47,13 +48,13 @@ export class Balls {
     for (let i = 0; i < n; i++) {
       switch (i % 3) {
         case 0:
-          resultArray.push(0);
+          resultArray.push(BALL_POINTS[0]);
           break;
         case 1:
-          resultArray.push(10);
+          resultArray.push(BALL_POINTS[1]);
           break;
         case 2:
-          resultArray.push(50);
+          resultArray.push(BALL_POINTS[2]);
           break;
       }
     }

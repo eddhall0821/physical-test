@@ -1,3 +1,5 @@
+import { BALL_POINTS } from "./components/MTP/Balls";
+
 export const shuffle = (array) => {
   return array.sort(() => Math.random() - 0.5);
 };
@@ -256,7 +258,7 @@ export const drawRewardText = (
     // window.innerHeight / 2
   );
 
-  if (target_reward > 40) {
+  if (target_reward === BALL_POINTS[2]) {
     ctx.drawImage(
       moneybag,
       adjX - 150,
@@ -307,7 +309,7 @@ export const drawRewardText = (
       100,
       100
     );
-  } else if (target_reward > 5) {
+  } else if (target_reward === BALL_POINTS[1]) {
     ctx.drawImage(
       moneybag,
       adjX - 50,

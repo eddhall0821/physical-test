@@ -20,15 +20,19 @@ const Measure = () => {
   useEffect(() => {
     if (isChanged) {
       const current_dpi = Math.round(Math.abs(x) / 3.375);
-      if (current_dpi > 3200) {
-        alert("extreme high DPI");
-      }
-      if (current_dpi < 400) {
-        alert("extreme low DPI");
-      }
-
       setDpiState(ENUM.MEASUREMENT, current_dpi);
       setX(0);
+
+      if (current_dpi > 3200) {
+        alert(
+          "A mouse sensitivity was detected that is much higher than the average human mouse sensitivity, and it is possible that the mouse sensitivity was measured incorrectly. It is important to accurately measure mouse sensitivity in experiments. The measured mouse sensitivity will influence future experimental procedures. We recommend that you re-measure your mouse sensitivity."
+        );
+      }
+      if (current_dpi < 400) {
+        alert(
+          "A mouse sensitivity was detected that is much lower than the average human mouse sensitivity, and it is possible that the mouse sensitivity was measured incorrectly. It is important to accurately measure mouse sensitivity in experiments. The measured mouse sensitivity will influence future experimental procedures. We recommend that you re-measure your mouse sensitivity."
+        );
+      }
     }
   }, [isChanged]);
 
