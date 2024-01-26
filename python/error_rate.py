@@ -39,38 +39,39 @@ error_rates_by_target_p = df.groupby("target_p_scaled")["success"].apply(
 )
 
 # Bin the 'id' values
-bin_size = 1  # Set the bin size as per your requirement
+bin_size = 1  # Adjust the bin size as needed
 df["id_bin"] = pd.cut(
     df["id"], bins=np.arange(0, df["id"].max() + bin_size, bin_size), right=False
 )
 
-# Calculate the error rate for each bin
-error_rates_by_id_bin = df.groupby("id_bin")["success"].apply(lambda x: 1 - x.mean())
-
-# Create subplots
-fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 10))
+# Plotting
+plt.figure(figsize=(12, 6))
 
 # Plotting the error rate by target_p_scaled
-axes[0].bar(error_rates_by_target_p.index, error_rates_by_target_p.values)
-axes[0].set_title("Error Rate by Target Reward")
-axes[0].set_xlabel("Target Reward")
-axes[0].set_ylabel("Error Rate")
-# Annotating the first graph
-# for i, v in enumerate(error_rates_by_target_p.values):
-#     axes[0].text(i, v, f"{v:.2f}", ha="center", va="bottom")
+# plt.bar(
+#     error_rates_by_target_p.index,
+#     error_rates_by_target_p.values,
+#     alpha=0.6,
+#     label="All target_p",
+# )
+plt.xlabel("ID")
+plt.ylabel("Error Rate")
 
-# Plotting the error rate by binned id with a line plot
-axes[1].plot(
-    error_rates_by_id_bin.index.categories.mid, error_rates_by_id_bin.values, marker="o"
-)
-axes[1].set_title("Error Rate by Binned ID")
-axes[1].set_xlabel("Binned ID")
-axes[1].set_ylabel("Error Rate")
-# Annotating the second graph
-for i, v in zip(
-    error_rates_by_id_bin.index.categories.mid, error_rates_by_id_bin.values
-):
-    axes[1].text(i, v, f"{v:.2f}", ha="center", va="bottom")
+# Error rates by binned id for specific target_p values
+for target_p_val in [0, 10, 50]:
+    error_rates_by_id_bin = (
+        df[df["target_p"] == target_p_val]
+        .groupby("id_bin")["success"]
+        .apply(lambda x: 1 - x.mean())
+    )
+    plt.plot(
+        error_rates_by_id_bin.index.categories.mid,
+        error_rates_by_id_bin.values,
+        marker="o",
+        label=f"target reward = {target_p_val / 10}",
+    )
 
+plt.title("")
+plt.legend()
 plt.tight_layout()
 plt.show()
