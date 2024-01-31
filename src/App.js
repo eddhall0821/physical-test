@@ -34,8 +34,8 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      withAuth: false,
-      // withAuth: true,
+      // withAuth: false,
+      withAuth: true,
     },
     {
       path: "replay",

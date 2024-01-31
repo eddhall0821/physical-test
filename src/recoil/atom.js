@@ -54,8 +54,8 @@ export const dpiState = atom({
   default: {
     isUserKnow: false,
     userInput: 0,
-    // measurement: 0,
-    measurement: 1000,
+    measurement: 0,
+    // measurement: 1000,
   },
 });
 
