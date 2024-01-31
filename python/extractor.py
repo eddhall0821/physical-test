@@ -1,6 +1,7 @@
 import csv
 import os
 import re
+import pandas as pd
 
 # file_pattern = r"s[a-zA-Z0-9]+_[a-zA-Z0-9]+_\d+\.csv"
 file_pattern = r"s([a-zA-Z0-9]+)_[a-zA-Z0-9]+_\d+\.csv"
@@ -27,7 +28,9 @@ def extract_last_total_p_no_pandas(folder_path, file_pattern):
                         last_row = row
                     if last_row:
                         total_p = last_row[total_p_index]
-                        results.append(f"{user_id}, {int(total_p) / 10000}, {success}")
+                        results.append(
+                            [f"{user_id}, {int(total_p) / 10000}, {success}"]
+                        )
             except Exception as e:
                 print(f"Error processing file {filename}: {e}")
     print(results)
@@ -35,4 +38,7 @@ def extract_last_total_p_no_pandas(folder_path, file_pattern):
 
 
 path = r"C:\Users\soomin\AppData\Local\Google\Cloud SDK\point-and-click-20d4c.appspot.com\summary"
-extract_last_total_p_no_pandas(path, file_pattern)
+arr = extract_last_total_p_no_pandas(path, file_pattern)
+
+df = pd.DataFrame(arr)
+df.to_csv("sample.csv", index=False)

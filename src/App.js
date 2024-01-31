@@ -34,7 +34,8 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      withAuth: true,
+      withAuth: false,
+      // withAuth: true,
     },
     {
       path: "replay",
@@ -131,8 +132,9 @@ function App() {
             components: {
               Slider: {
                 railSize: 10,
-                handleSize: 15,
-                handleSizeHover: 17,
+                handleSize: 17,
+                dotSize: 12,
+                handleSizeHover: 15,
               },
               Form: {
                 labelFontSize: 20,

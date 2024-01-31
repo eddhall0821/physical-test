@@ -25,6 +25,47 @@ export const resetCanvas = (canvas, monitorBound) => {
   );
 };
 
+export const drawPauseText = (ctx) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "The experiment paused because it looks like you're away right now.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+  ctx.fillText(
+    "Press Enter key to start.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+};
+
+export const drawLateClickText = (ctx) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "The trial took too long time, so trial will be restarted.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+};
+
+export const drawRoughClickText = (ctx) => {
+  ctx.font = "30px serif";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "The click was too inaccurate in this trial, so trial will be restarted.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+};
+
 export const drawPointer = (ctx, x, y) => {
   ctx.lineWidth = 3;
   ctx.strokeStyle = "white";
@@ -252,7 +293,7 @@ export const drawRewardText = (
   ctx.fillText(
     `Next reward is ${target_reward / 10} pence.`,
     adjX,
-    adY - 50
+    adY - 25
     // adY - 150
     // window.innerWidth / 2,
     // window.innerHeight / 2
@@ -262,7 +303,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 150,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2 - 100,
       // window.innerHeight / 2 + 20,
@@ -272,7 +313,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 100,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2 - 100,
       // window.innerHeight / 2 + 20,
@@ -282,7 +323,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX + 50,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2,
       // window.innerHeight / 2 + 20,
@@ -292,7 +333,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2,
       // window.innerHeight / 2 + 20,
@@ -302,7 +343,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 50,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
@@ -313,7 +354,7 @@ export const drawRewardText = (
     ctx.drawImage(
       moneybag,
       adjX - 50,
-      adY,
+      adY + 20,
       // adY - 100,
       // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,

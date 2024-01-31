@@ -3,11 +3,13 @@ import {
   distanceBetweenTwoPoint,
   drawClickResultText,
   drawFullscreenAlertText,
+  drawLateClickText,
   drawMTPTarget,
+  drawPauseText,
   drawPointer,
   drawRewardText,
+  drawRoughClickText,
   drawStartButton2,
-  drawTest,
   drawText,
   fastRound3,
   inch,
@@ -15,7 +17,6 @@ import {
   random_point_between_circles,
   resetCanvas,
 } from "../../utils";
-import Description from "./Description";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -37,24 +38,20 @@ export const INCH_24_HEIGHT = 11.77;
 
 const SHOW_REWARD_TIME = 1800; //ms
 const SHOW_RESULT_TIME = 600; //ms
+const SHOW_ROUGH_TIME = 2400;
+const SHOW_LATE_TIME = 2400;
+
 const TOTAL_TRIALS = `${process.env.REACT_APP_TOTAL_TRIALS}`;
 const STOP_TIME = 3000;
 
 const MTPCanvas = () => {
-  const [settings, setSettings] = useState({
-    name: "player",
-    lowerBound: 30,
-    upperBound: 70,
-    trial: 20,
-  });
-
   const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
   const ppi = useRecoilValue(ppiState);
   const monitorBound = useRecoilValue(mointorBoundState);
-  const docId = useRecoilValue(docIdState);
   const prolificUser = useRecoilValue(prolificUserState);
   const preventRefresh = usePreventRefresh();
+  const MAXIMUM_ERROR_STREAK = 3;
 
   const navigate = useNavigate();
   const logArr = [
@@ -91,17 +88,25 @@ const MTPCanvas = () => {
       "id",
       "w",
       "d",
+      "skipped",
+      "inaccurate",
     ],
   ];
 
   useEffect(() => {
+    let isPaused = false;
+    let movement_stop_time = 0;
+    let show_reward_counter = performance.now();
+    let show_rough_counter = -SHOW_ROUGH_TIME;
+    let show_late_counter = -SHOW_LATE_TIME;
+
+    let skipCnt = 0;
+    let roughClickCnt = 0;
+
     if (!isUploading) {
       let moneybag = new Image();
       moneybag.src = Moneybag;
-      let show_reward_counter = performance.now();
-
-      let name = settings.name;
-      let movement_stop_time = 0;
+      show_reward_counter = performance.now();
 
       let movementX = 0;
       let movementY = 0;
@@ -187,40 +192,46 @@ const MTPCanvas = () => {
 
       const mouseDown = (e) => {
         const p = performance.now();
-        if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
+        if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
           buttons = e.buttons;
           if (e.buttons === 1) {
             lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
             show_reward_counter = p;
             delay = p;
+            movement_stop_time = p;
+            skipCnt = 0;
+
             const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
             const current_target_success = target_radius - distance > 0 ? 1 : 0;
-            // const summaryLogRow = [
-            //   summary.fail + summary.success,
-            //   current_target_success,
-            //   lastClickResult.time,
-            //   target_reward,
-            //   summary.point,
-            //   fastRound3(target_radius),
-            //   fastRound3(currentDesign.id),
-            //   fastRound3(currentDesign.w),
-            //   fastRound3(currentDesign.d),
-            // ];
+            let inaccurate = 0;
 
-            if (target_radius - distance > 0) {
-              //성공시 이펙트 추가
+            if (target_radius * 5 - distance < 0) {
+              //대충 클릭
+              inaccurate = 1;
+              show_rough_counter = p;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              targetInit(currentDesign.d, currentDesign.w);
+
+              return;
+              // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
+              //   show_rough_counter = p;
+              //   roughClickCnt = 0;
+              // }
+            } else if (target_radius - distance > 0) {
+              //성공
               summary.point += target_reward;
-              summary.success++;
               lastClickResult.success = true;
               lastClickResult.point = target_reward;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              summary.success++;
             } else {
-              //실패시 이펙트 추가
-              summary.fail++;
+              //실패
               lastClickResult.success = false;
               lastClickResult.point = 0;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              summary.fail++;
             }
-            pushSummaryLog(current_target_success);
-            // summaryLogArr.push(summaryLogRow);
+
             if (balls.getRandomDesignArray().length === 0 && !end) {
               alert("done!!");
               end = true;
@@ -234,10 +245,14 @@ const MTPCanvas = () => {
         }
       };
 
-      const pushSummaryLog = (current_target_success) => {
+      const pushSummaryLog = (
+        current_target_success,
+        skipped = 0,
+        inaccurate = 0
+      ) => {
         console.log("log log sum");
         const summaryLogRow = [
-          summary.fail + summary.success - 1,
+          summary.fail + summary.success,
           current_target_success,
           lastClickResult.time,
           target_reward,
@@ -246,6 +261,8 @@ const MTPCanvas = () => {
           fastRound3(currentDesign.id),
           fastRound3(currentDesign.w),
           fastRound3(currentDesign.d),
+          skipped,
+          inaccurate,
         ];
         summaryLogArr.push(summaryLogRow);
       };
@@ -346,8 +363,6 @@ const MTPCanvas = () => {
       // let weight = 0.0575;
       function updatePosition(e) {
         mouse_cnt++;
-        const p = performance.now();
-        movement_stop_time = p;
         if (
           show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
           performance.now()
@@ -384,7 +399,7 @@ const MTPCanvas = () => {
       };
 
       const logging = () => {
-        // console.log("log log");
+        console.log("log log");
         const tempRow = [
           summary.fail + summary.success,
           target_radius,
@@ -407,86 +422,90 @@ const MTPCanvas = () => {
         if (lastClickResult.time !== 0) lastClickResult.time = 0;
       };
 
+      function update(timestamp) {
+        resetCanvas(canvas, monitorBound);
+        drawText(ctx, summary, TOTAL_TRIALS);
+        drawFullscreenText();
+
+        //움직임 감지되지 않음
+        if (
+          performance.now() - movement_stop_time >
+          STOP_TIME + SHOW_RESULT_TIME + SHOW_REWARD_TIME
+        ) {
+          const p = performance.now();
+          console.log(p);
+          lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
+          show_reward_counter = p;
+          show_late_counter = p;
+          movement_stop_time = p - STOP_TIME;
+
+          delay = p;
+          // summary.fail++;
+          lastClickResult.success = false;
+          lastClickResult.point = 0;
+          pushSummaryLog(0, 1, 0);
+          currentDesign = currentDesign;
+          targetInit(currentDesign.d, currentDesign.w);
+          // }
+          skipCnt++;
+          if (skipCnt >= MAXIMUM_ERROR_STREAK) {
+            isPaused = true;
+          }
+        }
+        //움직임 감지 끝
+        if (show_rough_counter + SHOW_ROUGH_TIME > timestamp) {
+          drawRoughClickText(ctx);
+          drawPointer(ctx, x, y);
+        } else if (show_late_counter + SHOW_LATE_TIME > timestamp) {
+          drawLateClickText(ctx);
+        } else if (
+          show_reward_counter + SHOW_RESULT_TIME > timestamp &&
+          summary.success + summary.fail > 0
+        ) {
+          drawClickResultText(
+            ctx,
+            lastClickResult.success,
+            fastRound3(lastClickResult.time / 1000),
+            lastClickResult.point,
+            x,
+            y,
+            monitorBound
+          );
+          drawPointer(ctx, x, y);
+        } else if (
+          show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME >
+            timestamp ||
+          !timestamp
+        ) {
+          drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
+          drawPointer(ctx, x, y);
+        } else if (show_late_counter + SHOW_LATE_TIME > timestamp) {
+          drawLateClickText(ctx);
+        }
+        if (
+          show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
+          timestamp
+        ) {
+          logging();
+          drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
+          drawPointer(ctx, x, y);
+        }
+
+        movementX = 0;
+        movementY = 0;
+      }
+
       //step function execute every frame
       function step(timestamp) {
         //TO-DO end 매번 검사 안할 방법
         if (!end) {
-          resetCanvas(canvas, monitorBound);
-          drawText(ctx, summary, TOTAL_TRIALS);
-          drawFullscreenText();
-          // drawClickResultText(
-          //   ctx,
-          //   lastClickResult.success,
-          //   fastRound3(lastClickResult.time / 1000),
-          //   lastClickResult.point,
-          //   x,
-          //   y,
-          //   monitorBound
-          // );
-          // drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
-
-          //움직임 감지되지 않음
-          if (
-            performance.now() - movement_stop_time >
-            STOP_TIME + SHOW_RESULT_TIME + SHOW_REWARD_TIME
-          ) {
-            const p = performance.now();
-            lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
-            show_reward_counter = p;
-            delay = p;
-
-            console.log("stop.");
-            summary.fail++;
-            lastClickResult.success = false;
-            lastClickResult.point = 0;
-            pushSummaryLog(0);
-
-            if (balls.getRandomDesignArray().length === 0 && !end) {
-              alert("done!!");
-              end = true;
-              uploadCSV();
-              setIsUploading(true);
-            } else {
-              currentDesign = balls.popStack();
-              targetInit(currentDesign.d, currentDesign.w);
-            }
-            movement_stop_time = p;
+          if (!isPaused) {
+            update(timestamp);
+          } else {
+            resetCanvas(canvas, monitorBound);
+            drawText(ctx, summary, TOTAL_TRIALS);
+            drawPauseText(ctx);
           }
-          //움직임 감지 끝
-          if (
-            show_reward_counter + SHOW_RESULT_TIME > timestamp &&
-            summary.success + summary.fail > 0
-          ) {
-            drawClickResultText(
-              ctx,
-              lastClickResult.success,
-              fastRound3(lastClickResult.time / 1000),
-              lastClickResult.point,
-              x,
-              y,
-              monitorBound
-            );
-            drawPointer(ctx, x, y);
-          } else if (
-            show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME >
-              timestamp ||
-            !timestamp
-          ) {
-            drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
-            drawPointer(ctx, x, y);
-          }
-          if (
-            show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
-            timestamp
-          ) {
-            logging();
-            drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
-            drawPointer(ctx, x, y);
-          }
-
-          movementX = 0;
-          movementY = 0;
-
           requestAnimationFrame(step);
         }
       }
@@ -508,6 +527,19 @@ const MTPCanvas = () => {
       initCanvas(canvas);
       requestAnimationFrame(pre_step);
     }
+
+    function handlePause(e) {
+      if (isPaused && e.key === "Enter") {
+        isPaused = false;
+        skipCnt = 0;
+        movement_stop_time = performance.now();
+        show_reward_counter = performance.now();
+      }
+    }
+    document.addEventListener("keypress", handlePause);
+    return () => {
+      document.removeEventListener("keypress", handlePause);
+    };
   }, [isUploading]);
 
   return (
