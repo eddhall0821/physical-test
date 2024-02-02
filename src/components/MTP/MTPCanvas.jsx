@@ -90,6 +90,7 @@ const MTPCanvas = () => {
       "d",
       "skipped",
       "inaccurate",
+      "gen",
     ],
   ];
 
@@ -131,7 +132,7 @@ const MTPCanvas = () => {
       let start;
       let end = false;
 
-      let target_radius, target_x, target_y;
+      let target_radius, target_x, target_y, target_gen_error;
       let target_reward;
       let currentDesign = null;
       let p1 = 0;
@@ -151,6 +152,7 @@ const MTPCanvas = () => {
         movement_stop_time = performance.now();
         p1 = performance.now();
         target_radius = inch(ppi, w);
+        console.log(ppi, target_radius);
         target_reward = currentDesign.reward;
 
         const target_location = random_point_between_circles({
@@ -166,6 +168,7 @@ const MTPCanvas = () => {
 
         target_x = target_location.x;
         target_y = target_location.y;
+        target_gen_error = target_location.gen;
       };
 
       const canvas = document.getElementById("canvas");
@@ -233,7 +236,6 @@ const MTPCanvas = () => {
             }
 
             if (balls.getRandomDesignArray().length === 0 && !end) {
-              alert("done!!");
               end = true;
               uploadCSV();
               setIsUploading(true);
@@ -263,7 +265,9 @@ const MTPCanvas = () => {
           fastRound3(currentDesign.d),
           skipped,
           inaccurate,
+          target_gen_error,
         ];
+        console.log(summaryLogRow);
         summaryLogArr.push(summaryLogRow);
       };
 

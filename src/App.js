@@ -23,6 +23,7 @@ import Done from "./components/MTP/Done";
 import { useEffect } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import ErrorPage from "./components/MTP/ErrorPage";
+import TargetSimulator from "./components/TargetSimulator";
 
 function App() {
   const routerData = [
@@ -75,7 +76,12 @@ function App() {
     {
       path: "simulator",
       element: <Simulator />,
-      withAuth: true,
+      withAuth: false,
+    },
+    {
+      path: "gen",
+      element: <TargetSimulator />,
+      withAuth: false,
     },
     {
       path: "main-guidelines",

@@ -1,4 +1,8 @@
-import { getWdithByIDAndDistance, shuffle } from "../../utils";
+import {
+  getDistanceByWidthAndId,
+  getWidthByIDAndDistance,
+  shuffle,
+} from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
 export const BALL_POINTS = [0, 50, 100];
@@ -14,13 +18,26 @@ export class Balls {
         const minDistance = 2;
         const maxDistance = INCH_24_HEIGHT / 2;
         const randId = random * design.idStep + design.idStart;
-        const distance = random * (maxDistance - minDistance) + minDistance;
-        const width = getWdithByIDAndDistance(randId, distance);
+        //2~3.5
+        //3.5~5
+        //5~6.5
+        let distance, width;
+        // distance = random * (maxDistance - minDistance) + minDistance;
+        // width = getWidthByIDAndDistance(randId, distance) / 2;
+
+        if (randId <= 3.5) {
+          width = 0.5;
+        } else if (randId <= 5) {
+          width = 0.3;
+        } else if (randId <= 6.5) {
+          width = 0.1;
+        }
+        distance = getDistanceByWidthAndId(randId, width);
         randomDesignArray.push({
           random: random,
           id: randId,
           d: distance,
-          w: width,
+          w: width / 2,
           reward: design.reward[i],
         });
       }

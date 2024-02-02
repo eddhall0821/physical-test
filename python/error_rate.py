@@ -16,11 +16,18 @@ filenames = [
     # "s63fe16762b4c19bea77a0904_65b35e5e8eb5426eaf325fa9_1706263232846",
     # "s65492662e16ad03ea732fd62_65b35f91ce60d65be69f50fd_1706259834523",
     ####3차####
-    "s5fd663588215d7567e027d5b_65ba0c1b87ba96dfb72fd127_1706695411009",
-    "s6473924c2cae5ee4db5082d2_65ba0e32888792af73001c22_1706696353716",
-    "s60a6a76aca6c98b970de90f2_65ba1150fdc9a9c61e3b8692_1706696471489",
-    "s5c0bac19796adb00017dffcf_65ba19d3c7eb2481a9ed51e2_1706700437984",
-    "s656851e04160e3d805b2abb5_65ba350f4bc6b2f1d6338dc9_1706707584794",
+    # "s5fd663588215d7567e027d5b_65ba0c1b87ba96dfb72fd127_1706695411009",
+    # "s6473924c2cae5ee4db5082d2_65ba0e32888792af73001c22_1706696353716",
+    # "s60a6a76aca6c98b970de90f2_65ba1150fdc9a9c61e3b8692_1706696471489",
+    # "s5c0bac19796adb00017dffcf_65ba19d3c7eb2481a9ed51e2_1706700437984",
+    # "s656851e04160e3d805b2abb5_65ba350f4bc6b2f1d6338dc9_1706707584794",
+    "s__1706841672031"
+    ####4차####
+    # "s607c5af095d4f618fc21a1d1_65bb6200e17a7058bbe51054_1706784263123",
+    # "s60fd093548ae24bc1a355bf7_65bb61e510406bc3436c2b58_1706784119718",
+    # "s5c00043a6d931200019bcb9b_65bb67b44c63047973dc8b39_1706786366634",
+    # "s628781515f29a0394e23b15b_65bb793c2b5746e34133d5d2_1706791605712",
+    # "s63ee65e3470c23cb401ca89a_65bb82703fe600bff8fe9981_1706791869657",
 ]
 
 
@@ -38,6 +45,7 @@ def makeFullFilePaths(filenames):
 
 
 full_file_paths = makeFullFilePaths(filenames)
+reward_array = [0, 50, 100]
 
 df = pd.concat([pd.read_csv(f) for f in full_file_paths], ignore_index=True)
 
@@ -45,10 +53,11 @@ df = pd.concat([pd.read_csv(f) for f in full_file_paths], ignore_index=True)
 # graph1 함수
 def plot_graph1(df):
     df = df[df["reaction_time"] < 3000]
-    df = df[(df["skipped"] != 1) | (df["inaccurate"] != 1)]
+    # df = df[(df["skipped"] != 1) | (df["inaccurate"] != 1)]
+    # df = df[(df["trial"] >= 0) & (df["trial"] <= 299)]
 
-    colors = {10: "blue", 50: "darkorange", 100: "green"}
-    for target_value in [10, 50, 100]:
+    colors = {0: "blue", 50: "darkorange", 100: "green"}
+    for target_value in reward_array:
         subset = df[df["target_p"] == target_value]
         plt.scatter(
             subset["id"],
@@ -71,7 +80,8 @@ def plot_graph1(df):
 # graph2 함수
 def plot_graph2(df):
     df["target_p_scaled"] = df["target_p"] / 10
-    df = df[(df["skipped"] != 1) | (df["inaccurate"] != 1)]
+    # df = df[(df["skipped"] != 1) | (df["inaccurate"] != 1)]
+    # df = df[(df["trial"] >= 0) & (df["trial"] <= 299)]
 
     error_rates_by_target_p = df.groupby("target_p_scaled")["success"].apply(
         lambda x: 1 - x.mean()
@@ -80,9 +90,10 @@ def plot_graph2(df):
     df["id_bin"] = pd.cut(
         df["id"], bins=np.arange(0, df["id"].max() + bin_size, bin_size), right=False
     )
+    plt.ylim(0, 1)
     plt.xlabel("ID")
     plt.ylabel("Error Rate")
-    for target_p_val in [10, 50, 100]:
+    for target_p_val in reward_array:
         error_rates_by_id_bin = (
             df[df["target_p"] == target_p_val]
             .groupby("id_bin")["success"]

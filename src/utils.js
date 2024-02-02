@@ -164,7 +164,7 @@ export const random_point_between_circles = ({
   left,
 }) => {
   for (let i = 0; i < 1000; i++) {
-    console.log("create....");
+    console.log("create target");
     const theta = getRandomArbitrary(0, 2 * Math.PI);
     const r = getRandomArbitrary(inner_radius, outer_radius);
 
@@ -175,16 +175,12 @@ export const random_point_between_circles = ({
       x <= left + screen_width - ball_radius &&
       top + ball_radius <= y &&
       y <= screen_height + top - ball_radius
-      // ball_radius <= x &&
-      // x <= screen_width - ball_radius &&
-      // ball_radius <= y &&
-      // y <= screen_height - ball_radius
     ) {
-      return { x: x, y: y };
+      return { x: x, y: y, gen: 1 };
     }
   }
 
-  return { x: window.screen.width / 2, y: window.screen.height / 2 };
+  return { x: window.screen.width / 2, y: window.screen.height / 2, gen: 0 };
 };
 
 export const drawClickResultText = (
@@ -474,8 +470,12 @@ export const fittsLaw = (w, d) => {
   return Math.log2(1 + d / w);
 };
 
-export const getWdithByIDAndDistance = (id, d) => {
+export const getWidthByIDAndDistance = (id, d) => {
   return d / (2 ** id - 1);
+};
+
+export const getDistanceByWidthAndId = (id, w) => {
+  return w * (2 ** id - 1);
 };
 
 export const findLargest16by9Rectangle = (x, y) => {
