@@ -7,6 +7,7 @@ import {
   drawMTPTarget,
   drawPauseText,
   drawPointer,
+  drawRewardProgressBar,
   drawRewardText,
   drawRoughClickText,
   drawStartButton2,
@@ -20,7 +21,7 @@ import {
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Moneybag from "../../images/moneybag.png";
+import Moneybag from "../../images/five_pence.png";
 import { useRecoilValue } from "recoil";
 import {
   docIdState,
@@ -35,14 +36,15 @@ import { Spin, Typography } from "antd";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
+export const MOUSE_GAIN = 4.16;
 
-const SHOW_REWARD_TIME = 1800; //ms
-const SHOW_RESULT_TIME = 600; //ms
+const SHOW_REWARD_TIME = 1400; //ms
+const SHOW_RESULT_TIME = 1000; //ms
 const SHOW_ROUGH_TIME = 2400;
 const SHOW_LATE_TIME = 2400;
-
 const TOTAL_TRIALS = `${process.env.REACT_APP_TOTAL_TRIALS}`;
 const STOP_TIME = 3000;
+const MAXIMUM_ERROR_STREAK = 3;
 
 const MTPCanvas = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -51,7 +53,6 @@ const MTPCanvas = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
   const prolificUser = useRecoilValue(prolificUserState);
   const preventRefresh = usePreventRefresh();
-  const MAXIMUM_ERROR_STREAK = 3;
 
   const navigate = useNavigate();
   const logArr = [
@@ -152,7 +153,6 @@ const MTPCanvas = () => {
         movement_stop_time = performance.now();
         p1 = performance.now();
         target_radius = inch(ppi, w);
-        console.log(ppi, target_radius);
         target_reward = currentDesign.reward;
 
         const target_location = random_point_between_circles({
@@ -174,75 +174,75 @@ const MTPCanvas = () => {
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
 
-      document.addEventListener("pointerlockchange", lockChangeAlert, false);
-      function lockChangeAlert() {
+      const lockChangeAlert = () => {
         if (document.pointerLockElement === canvas) {
           isPointerLock = true;
           start = true;
           document.addEventListener("mousemove", updatePosition, false);
-          document.addEventListener("mousedown", mouseDown);
         } else {
           isPointerLock = false;
           document.removeEventListener("mousemove", updatePosition, false);
-          document.removeEventListener("mousedown", mouseDown);
         }
-      }
+      };
+
+      document.addEventListener("pointerlockchange", lockChangeAlert, false);
+
       //test---
-      let mouse_cnt = 0;
-      let cnt = 0;
-      let tt = performance.now();
+      // let mouse_cnt = 0;
+      // let cnt = 0;
+      // let tt = performance.now();
       //test---
 
       const mouseDown = (e) => {
+        console.log(e.buttons);
         const p = performance.now();
         if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
           buttons = e.buttons;
-          if (e.buttons === 1) {
-            lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
-            show_reward_counter = p;
-            delay = p;
-            movement_stop_time = p;
-            skipCnt = 0;
 
-            const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-            const current_target_success = target_radius - distance > 0 ? 1 : 0;
-            let inaccurate = 0;
+          lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
+          show_reward_counter = p;
+          delay = p;
+          movement_stop_time = p;
+          skipCnt = 0;
 
-            if (target_radius * 5 - distance < 0) {
-              //대충 클릭
-              inaccurate = 1;
-              show_rough_counter = p;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              targetInit(currentDesign.d, currentDesign.w);
+          const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
+          const current_target_success = target_radius - distance > 0 ? 1 : 0;
+          let inaccurate = 0;
 
-              return;
-              // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
-              //   show_rough_counter = p;
-              //   roughClickCnt = 0;
-              // }
-            } else if (target_radius - distance > 0) {
-              //성공
-              summary.point += target_reward;
-              lastClickResult.success = true;
-              lastClickResult.point = target_reward;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              summary.success++;
-            } else {
-              //실패
-              lastClickResult.success = false;
-              lastClickResult.point = 0;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              summary.fail++;
-            }
+          if (target_radius * 5 - distance < 0) {
+            //대충 클릭
+            inaccurate = 1;
+            show_rough_counter = p;
+            pushSummaryLog(current_target_success, 0, inaccurate);
+            targetInit(currentDesign.d, currentDesign.w);
 
-            if (balls.getRandomDesignArray().length === 0 && !end) {
-              end = true;
-              uploadCSV();
-              setIsUploading(true);
-            } else {
-              currentDesign = balls.popStack();
-              targetInit(currentDesign.d, currentDesign.w);
-            }
+            return;
+            // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
+            //   show_rough_counter = p;
+            //   roughClickCnt = 0;
+            // }
+          } else if (target_radius - distance > 0) {
+            //성공
+            summary.point += target_reward;
+            lastClickResult.success = true;
+            lastClickResult.point = target_reward;
+            pushSummaryLog(current_target_success, 0, inaccurate);
+            summary.success++;
+          } else {
+            //실패
+            lastClickResult.success = false;
+            lastClickResult.point = 0;
+            pushSummaryLog(current_target_success, 0, inaccurate);
+            summary.fail++;
+          }
+
+          if (balls.getRandomDesignArray().length === 0 && !end) {
+            end = true;
+            uploadCSV();
+            setIsUploading(true);
+          } else {
+            currentDesign = balls.popStack();
+            targetInit(currentDesign.d, currentDesign.w);
           }
         }
       };
@@ -252,7 +252,7 @@ const MTPCanvas = () => {
         skipped = 0,
         inaccurate = 0
       ) => {
-        console.log("log log sum");
+        // console.log("log log sum");
         const summaryLogRow = [
           summary.fail + summary.success,
           current_target_success,
@@ -267,7 +267,6 @@ const MTPCanvas = () => {
           inaccurate,
           target_gen_error,
         ];
-        console.log(summaryLogRow);
         summaryLogArr.push(summaryLogRow);
       };
 
@@ -285,13 +284,13 @@ const MTPCanvas = () => {
         const summaryStorageRef = ref(
           storage,
           `summary/s${prolificUser.PROLIFIC_PID}_${
-            prolificUser.SESSION_ID
+            prolificUser.STUDY_ID
           }_${Date.now()}.csv`
         );
         const storageRef = ref(
           storage,
           `trajectory/t${prolificUser.PROLIFIC_PID}_${
-            prolificUser.SESSION_ID
+            prolificUser.STUDY_ID
           }_${Date.now()}.csv`
         );
 
@@ -339,7 +338,7 @@ const MTPCanvas = () => {
           link.setAttribute(
             "download",
             `trajectory/${prolificUser.PROLIFIC_PID}_${
-              prolificUser.SESSION_ID
+              prolificUser.STUDY_ID
             }_${Date.now()}.csv`
           );
 
@@ -352,7 +351,7 @@ const MTPCanvas = () => {
           link.setAttribute(
             "download",
             `summary/${prolificUser.PROLIFIC_PID}_${
-              prolificUser.SESSION_ID
+              prolificUser.STUDY_ID
             }_${Date.now()}.csv`
           );
 
@@ -366,30 +365,38 @@ const MTPCanvas = () => {
       }
       // let weight = 0.0575;
       function updatePosition(e) {
-        mouse_cnt++;
-        if (
-          show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
-          performance.now()
-        ) {
-          movementX += e.movementX;
-          movementY += e.movementY;
+        if (e.buttons === 1) {
+          mouseDown(e);
+        } else {
+          if (
+            show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
+            performance.now()
+          ) {
+            movementX += e.movementX;
+            movementY += e.movementY;
 
-          x += e.movementX * weight * 10;
-          y += e.movementY * weight * 10;
-        }
+            x += e.movementX * weight * MOUSE_GAIN; //4.16;
+            y += e.movementY * weight * MOUSE_GAIN; //4.16;
+          } else {
+            if (e.movementX > 2 || e.movementY > 2) {
+              show_reward_counter = performance.now() - SHOW_RESULT_TIME - 10;
+              movement_stop_time = performance.now() - SHOW_RESULT_TIME - 10;
+            }
+          }
 
-        //마우스 가두기
-        if (x > window.screen.width - monitorBound.left) {
-          x = window.screen.width - monitorBound.left;
-        }
-        if (y > window.screen.height - monitorBound.top) {
-          y = window.screen.height - monitorBound.top;
-        }
-        if (x < monitorBound.left) {
-          x = monitorBound.left;
-        }
-        if (y < monitorBound.top) {
-          y = monitorBound.top;
+          //마우스 가두기
+          if (x > window.screen.width - monitorBound.left) {
+            x = window.screen.width - monitorBound.left;
+          }
+          if (y > window.screen.height - monitorBound.top) {
+            y = window.screen.height - monitorBound.top;
+          }
+          if (x < monitorBound.left) {
+            x = monitorBound.left;
+          }
+          if (y < monitorBound.top) {
+            y = monitorBound.top;
+          }
         }
       }
 
@@ -403,7 +410,6 @@ const MTPCanvas = () => {
       };
 
       const logging = () => {
-        console.log("log log");
         const tempRow = [
           summary.fail + summary.success,
           target_radius,
@@ -437,7 +443,6 @@ const MTPCanvas = () => {
           STOP_TIME + SHOW_RESULT_TIME + SHOW_REWARD_TIME
         ) {
           const p = performance.now();
-          console.log(p);
           lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
           show_reward_counter = p;
           show_late_counter = p;
@@ -481,7 +486,21 @@ const MTPCanvas = () => {
             timestamp ||
           !timestamp
         ) {
-          drawRewardText(ctx, moneybag, target_reward, x, y, monitorBound);
+          drawRewardText(
+            ctx,
+            moneybag,
+            target_reward,
+            x,
+            y,
+            monitorBound,
+            show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME,
+            timestamp
+          );
+          // drawRewardProgressBar(
+          //   ctx,
+          //   show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME,
+          //   timestamp
+          // );
           drawPointer(ctx, x, y);
         } else if (show_late_counter + SHOW_LATE_TIME > timestamp) {
           drawLateClickText(ctx);

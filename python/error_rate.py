@@ -21,13 +21,26 @@ filenames = [
     # "s60a6a76aca6c98b970de90f2_65ba1150fdc9a9c61e3b8692_1706696471489",
     # "s5c0bac19796adb00017dffcf_65ba19d3c7eb2481a9ed51e2_1706700437984",
     # "s656851e04160e3d805b2abb5_65ba350f4bc6b2f1d6338dc9_1706707584794",
-    "s__1706841672031"
+    # "s__1706841672031"
     ####4차####
     # "s607c5af095d4f618fc21a1d1_65bb6200e17a7058bbe51054_1706784263123",
     # "s60fd093548ae24bc1a355bf7_65bb61e510406bc3436c2b58_1706784119718",
     # "s5c00043a6d931200019bcb9b_65bb67b44c63047973dc8b39_1706786366634",
     # "s628781515f29a0394e23b15b_65bb793c2b5746e34133d5d2_1706791605712",
     # "s63ee65e3470c23cb401ca89a_65bb82703fe600bff8fe9981_1706791869657",
+    ##5,6은 사실상 같은 실험인데 그 전은 아님(타겟 생성 조건이 좀 다름)##
+    ####5차####
+    "s63d3fbb8c9da3aa4f9302827_65bcae8f7ea5963401552d24_1706868972020",
+    "s6266ac01a2a15cce6ed5fba7_65bcaeb81c3f3a916ad42bc1_1706868839838",
+    "s5fbfd480aa43de2e41ef0e41_65bcaef9e7615038bbbf5b21_1706869187489",
+    "s654a2cd129403e4f45596b55_65bcade81a54952b3431e2fb_1706868608660",
+    "s63d79e8e6d3d2f2d2ffd694c_65bcb3754340997dc7cf1273_1706869631235",
+    ####6차####
+    "s657c0568573c24460b180d14_65c07f325247ddc10833da1b_1707119655182",
+    "s5c7dd8e0665aaa001230a6c7_65c07d65602dd61ab23410d8_1707119509880",
+    "s650764c3a197814ab15f8237_65c07d60a85ed9190a24d39e_1707117453686",
+    "s5dd311f27aa0d6327c0a2bdd_65c07cf4defe30b609615037_1707117887046",
+    "s63039f41fa5c21d483996be2_65c0bccc77963cfe49335381_1707134685521",
 ]
 
 
@@ -70,6 +83,7 @@ def plot_graph1(df):
         plt.plot(
             subset["id"], intercept + slope * subset["id"], color=colors[target_value]
         )
+        # plt.ylim(0, 1)
     plt.title("Trial Completion Time vs ID with Linear Regression by Target Reward")
     plt.xlabel("ID")
     plt.ylabel("Trial Completion Time")
@@ -90,7 +104,7 @@ def plot_graph2(df):
     df["id_bin"] = pd.cut(
         df["id"], bins=np.arange(0, df["id"].max() + bin_size, bin_size), right=False
     )
-    plt.ylim(0, 1)
+    # plt.ylim(0, 1)
     plt.xlabel("ID")
     plt.ylabel("Error Rate")
     for target_p_val in reward_array:

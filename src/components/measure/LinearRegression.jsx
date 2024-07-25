@@ -312,7 +312,7 @@ const LinearRegression = () => {
           >
             <TextArea />
           </Form.Item>
-
+          {/* SEVEN SCALE */}
           <Form.Item>
             <div style={{ textAlign: "center" }}>
               <Button

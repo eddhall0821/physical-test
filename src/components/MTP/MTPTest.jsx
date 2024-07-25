@@ -113,8 +113,8 @@ const MTPTest = () => {
       p1 = p;
       p2 = p;
 
-      x += e.movementX * weight * 10;
-      y += e.movementY * weight * 10;
+      x += e.movementX * weight;
+      y += e.movementY * weight;
 
       if (window.innerHeight == window.screen.height) {
         console.log("full");

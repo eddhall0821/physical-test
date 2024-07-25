@@ -24,6 +24,8 @@ import { useEffect } from "react";
 import PrivateRoute from "./components/PrivateRoute";
 import ErrorPage from "./components/MTP/ErrorPage";
 import TargetSimulator from "./components/TargetSimulator";
+import AdminPage from "./components/admin/AdminPage";
+import ReplayTimeinteval from "./components/MTP/ReplayTimeinterval";
 
 function App() {
   const routerData = [
@@ -35,12 +37,17 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      // withAuth: false,
-      withAuth: true,
+      withAuth: false,
+      // withAuth: true,
     },
     {
       path: "replay",
       element: <MTPReplay />,
+      withAuth: false,
+    },
+    {
+      path: "replay2",
+      element: <ReplayTimeinteval />,
       withAuth: false,
     },
     {
@@ -97,6 +104,11 @@ function App() {
       path: "error",
       element: <ErrorPage />,
       withAuth: true,
+    },
+    {
+      path: "admin",
+      element: <AdminPage />,
+      withAuth: false,
     },
   ];
   const router = createBrowserRouter(

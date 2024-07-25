@@ -6,7 +6,7 @@ import { toggleFullScreen } from "../../utils";
 import { Content } from "antd/es/layout/layout";
 import TaskSteps from "../TaskSteps";
 import { useNavigate } from "react-router-dom";
-import moneybag from "../../images/moneybag.png";
+import moneybag from "../../images/five_pence.png";
 
 const MainGuideLines = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -192,7 +192,7 @@ const MainGuideLines = () => {
           }}
           ref={ref6}
         >
-          <MainTaskFont>Next reward is 1 pence.</MainTaskFont>
+          <MainTaskFont>Next reward is 5 pence.</MainTaskFont>
           <img alt="money" src={moneybag} width={100} />
         </div>
 

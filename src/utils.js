@@ -25,6 +25,17 @@ export const resetCanvas = (canvas, monitorBound) => {
   );
 };
 
+export const drawRewardProgressBar = (ctx, total, current, x, y) => {
+  const a = 100;
+  const b = a - ((total - current) / 1400) * a;
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(x - a / 2, y, a, 20);
+
+  ctx.fillStyle = "green";
+  ctx.fillRect(x - a / 2, y, b, 20);
+};
+
 export const drawPauseText = (ctx) => {
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
@@ -38,7 +49,7 @@ export const drawPauseText = (ctx) => {
   ctx.fillText(
     "Press Enter key to start.",
     window.innerWidth / 2,
-    window.innerHeight / 2
+    window.innerHeight / 2 + 100
   );
 };
 
@@ -119,7 +130,7 @@ export const initCanvas = async (canvas) => {
   });
 
   canvas.addEventListener("click", async (e) => {
-    toggleFullScreen(canvas);
+    // toggleFullScreen(canvas);
     // if (!document.pointerLockElement) {
     //   await canvas.requestPointerLock({
     //     unadjustedMovement: true,
@@ -193,7 +204,7 @@ export const drawClickResultText = (
   monitorBound
 ) => {
   // const successText = success ? "Success" : "failed";
-  const successText = success ? "✅" : "❌";
+  const successText = success ? "✅ Success!" : "❌ Failed...";
   const successColor = success ? "green" : "red";
 
   let textY = 0;
@@ -213,13 +224,13 @@ export const drawClickResultText = (
   const adY = y - textY;
 
   ctx.font = "30px serif";
-  ctx.fillStyle = successColor;
+  // ctx.fillStyle = successColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
     `${successText}`,
     adjX,
-    adY - 150
+    adY - 50
     // window.innerWidth / 2,
     // window.innerHeight / 2
   );
@@ -231,13 +242,11 @@ export const drawClickResultText = (
   //   adY - 50
   // );
 
-  ctx.fillText(
-    `You got ${reward / 10} pence.`,
-    adjX,
-    adY - 100
-    // window.innerWidth / 2,
-    // window.innerHeight / 2 + 100
-  );
+  // ctx.fillText(
+  //   `You got ${reward / 10} pence.`,
+  //   adjX,
+  //   adY - 50
+  // );
 };
 
 export const drawTest = (ctx, x, y, monitorBound) => {
@@ -263,7 +272,9 @@ export const drawRewardText = (
   target_reward,
   x,
   y,
-  monitorBound
+  monitorBound,
+  progress_total,
+  progress_current
 ) => {
   let textY = 0;
   let textX = 0;
@@ -281,24 +292,24 @@ export const drawRewardText = (
   const adjX = x - textX;
   const adY = y - textY;
 
+  drawRewardProgressBar(ctx, progress_total, progress_current, adjX, adY - 80);
+
   ctx.font = "30px serif";
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.fillText(
-    `Next reward is ${target_reward / 10} pence.`,
-    adjX,
-    adY - 25
-    // adY - 150
-    // window.innerWidth / 2,
-    // window.innerHeight / 2
-  );
+  ctx.fillText(`Next reward is`, adjX - 85, adY - 25);
+
+  ctx.font = `${30 + target_reward / 8}px serif`;
+  ctx.fillText(`${target_reward / 10}`, adjX + 45, adY - 25);
+  ctx.font = "30px serif";
+  ctx.fillText(`pence.`, adjX + 120, adY - 25);
 
   if (target_reward === BALL_POINTS[2]) {
     ctx.drawImage(
       moneybag,
-      adjX - 150,
+      adjX - 105,
       adY + 20,
       // adY - 100,
       // window.innerWidth / 2 - 100,
@@ -308,40 +319,10 @@ export const drawRewardText = (
     );
     ctx.drawImage(
       moneybag,
-      adjX - 100,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2 - 100,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
-    ctx.drawImage(
-      moneybag,
-      adjX + 50,
+      adjX + 5,
       adY + 20,
       // adY - 100,
       // window.innerWidth / 2,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
-    ctx.drawImage(
-      moneybag,
-      adjX,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
-    ctx.drawImage(
-      moneybag,
-      adjX - 50,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2 - 50,
       // window.innerHeight / 2 + 20,
       100,
       100

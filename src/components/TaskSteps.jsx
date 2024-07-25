@@ -15,7 +15,7 @@ const TaskSteps = ({ children, current }) => {
         { title: "Mouse Sensitivity Measurement" },
         { title: "Calibration Study" },
         { title: "Preliminary Survey" },
-        { title: "Main Stidy" },
+        { title: "Main Study" },
       ]}
     >
       {children}

@@ -76,8 +76,6 @@ const MonitorMeasure = () => {
         ],
       };
     });
-
-    console.log(behaviorLog);
   }, [monitor]);
 
   return (
@@ -193,13 +191,9 @@ const MonitorMeasure = () => {
       <Link
         // state={{ prolificUser }}
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
+        style={{ marginBottom: 20 }}
       >
-        <Button
-          type="primary"
-          size="large"
-          disabled={zoom !== 1}
-          style={{ marginBottom: 20 }}
-        >
+        <Button type="primary" size="large" disabled={zoom !== 1}>
           {zoom === 1 ? "Next" : "Please adjust the screen zoom to 100%."}
         </Button>
       </Link>

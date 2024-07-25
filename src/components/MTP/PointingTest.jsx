@@ -19,6 +19,7 @@ import {
 } from "../../recoil/atom";
 import { useNavigate } from "react-router-dom";
 import usePreventRefresh from "../PreventRefresh";
+import { MOUSE_GAIN } from "./MTPCanvas";
 
 let cnt = 0;
 let summary = {
@@ -37,8 +38,7 @@ const centerX = window.screen.width / 2;
 const centerY = window.screen.height / 2;
 
 function degToRad(degrees) {
-  const result = (Math.PI / 180) * degrees;
-  return result;
+  return (Math.PI / 180) * degrees;
 }
 
 let p1 = 0;
@@ -240,8 +240,8 @@ const PointingTest = () => {
       const p = performance.now();
       p1 = p;
 
-      x += e.movementX * weight * 10;
-      y += e.movementY * weight * 10;
+      x += e.movementX * weight * MOUSE_GAIN;
+      y += e.movementY * weight * MOUSE_GAIN;
 
       //마우스 가두기
       if (x > window.screen.width - monitorBound.left) {
