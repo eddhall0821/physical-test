@@ -299,46 +299,14 @@ export const drawRewardText = (
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.fillText(`Next reward is`, adjX - 85, adY - 25);
-
-  ctx.font = `${30 + target_reward / 8}px serif`;
-  ctx.fillText(`${target_reward / 10}`, adjX + 45, adY - 25);
-  ctx.font = "30px serif";
-  ctx.fillText(`pence.`, adjX + 120, adY - 25);
-
+  const width = 420;
+  const height = 270;
   if (target_reward === BALL_POINTS[2]) {
-    ctx.drawImage(
-      moneybag,
-      adjX - 105,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2 - 100,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
-    ctx.drawImage(
-      moneybag,
-      adjX + 5,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
   } else if (target_reward === BALL_POINTS[1]) {
-    ctx.drawImage(
-      moneybag,
-      adjX - 50,
-      adY + 20,
-      // adY - 100,
-      // window.innerWidth / 2 - 50,
-      // window.innerHeight / 2 + 20,
-      100,
-      100
-    );
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
   } else {
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
   }
 };
 

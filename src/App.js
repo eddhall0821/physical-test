@@ -26,6 +26,7 @@ import ErrorPage from "./components/MTP/ErrorPage";
 import TargetSimulator from "./components/TargetSimulator";
 import AdminPage from "./components/admin/AdminPage";
 import ReplayTimeinteval from "./components/MTP/ReplayTimeinterval";
+import DemoPointing from "./components/pointing/Demo";
 
 function App() {
   const routerData = [
@@ -37,8 +38,8 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      withAuth: false,
-      // withAuth: true,
+      // withAuth: false,
+      withAuth: true,
     },
     {
       path: "replay",
@@ -108,6 +109,11 @@ function App() {
     {
       path: "admin",
       element: <AdminPage />,
+      withAuth: false,
+    },
+    {
+      path: "demo",
+      element: <DemoPointing />,
       withAuth: false,
     },
   ];

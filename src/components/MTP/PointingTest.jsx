@@ -19,7 +19,6 @@ import {
 } from "../../recoil/atom";
 import { useNavigate } from "react-router-dom";
 import usePreventRefresh from "../PreventRefresh";
-import { MOUSE_GAIN } from "./MTPCanvas";
 
 let cnt = 0;
 let summary = {
@@ -109,10 +108,11 @@ const PointingTest = () => {
         document.addEventListener("mousedown", mouseDown);
       } else {
         isPointerLock = false;
-        document.removeEventListener("mousemove", updatePosition, false);
-        document.removeEventListener("mousedown", mouseDown);
+        document.addEventListener("mousemove", updatePosition, false);
+        // document.removeEventListener("mousemove", updatePosition, false);
       }
     }
+
     const mouseDown = (e) => {
       if (e.buttons === 1) {
         const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
@@ -239,9 +239,8 @@ const PointingTest = () => {
     function updatePosition(e) {
       const p = performance.now();
       p1 = p;
-
-      x += e.movementX * weight * MOUSE_GAIN;
-      y += e.movementY * weight * MOUSE_GAIN;
+      x += e.movementX * weight;
+      y += e.movementY * weight;
 
       //마우스 가두기
       if (x > window.screen.width - monitorBound.left) {

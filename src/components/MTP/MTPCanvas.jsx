@@ -21,7 +21,11 @@ import {
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Moneybag from "../../images/five_pence.png";
+
+import Reward0 from "../../images/reward/reward0.png";
+import Reward5 from "../../images/reward/reward5.png";
+import Reward10 from "../../images/reward/reward10.png";
+
 import { useRecoilValue } from "recoil";
 import {
   docIdState,
@@ -36,14 +40,13 @@ import { Spin, Typography } from "antd";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
-export const MOUSE_GAIN = 4.16;
 
 const SHOW_REWARD_TIME = 1400; //ms
 const SHOW_RESULT_TIME = 1000; //ms
 const SHOW_ROUGH_TIME = 2400;
 const SHOW_LATE_TIME = 2400;
-const TOTAL_TRIALS = `${process.env.REACT_APP_TOTAL_TRIALS}`;
-const STOP_TIME = 3000;
+const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
+const STOP_TIME = 3000000;
 const MAXIMUM_ERROR_STREAK = 3;
 
 const MTPCanvas = () => {
@@ -106,8 +109,20 @@ const MTPCanvas = () => {
     let roughClickCnt = 0;
 
     if (!isUploading) {
-      let moneybag = new Image();
-      moneybag.src = Moneybag;
+      let reward0 = new Image({});
+      let reward5 = new Image({});
+      let reward10 = new Image({});
+
+      reward0.src = Reward0;
+      reward5.src = Reward5;
+      reward10.src = Reward10;
+
+      const rewardImages = {
+        0: reward0,
+        50: reward5,
+        100: reward10,
+      };
+
       show_reward_counter = performance.now();
 
       let movementX = 0;
@@ -375,8 +390,8 @@ const MTPCanvas = () => {
             movementX += e.movementX;
             movementY += e.movementY;
 
-            x += e.movementX * weight * MOUSE_GAIN; //4.16;
-            y += e.movementY * weight * MOUSE_GAIN; //4.16;
+            x += e.movementX * weight;
+            y += e.movementY * weight;
           } else {
             if (e.movementX > 2 || e.movementY > 2) {
               show_reward_counter = performance.now() - SHOW_RESULT_TIME - 10;
@@ -488,7 +503,7 @@ const MTPCanvas = () => {
         ) {
           drawRewardText(
             ctx,
-            moneybag,
+            rewardImages[target_reward],
             target_reward,
             x,
             y,

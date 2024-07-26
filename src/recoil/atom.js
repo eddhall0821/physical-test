@@ -18,6 +18,7 @@ export const monitorState = atom({
     ppi: 96,
   },
 });
+export const MOUSE_GAIN = 4.16;
 
 export const monitorWidthInState = selector({
   key: "monitorWidthInState",
@@ -54,8 +55,8 @@ export const dpiState = atom({
   default: {
     isUserKnow: false,
     userInput: 0,
-    // measurement: 0,
-    measurement: 1600,
+    measurement: process.env.REACT_APP_DPI_MEASUREMENT,
+    // measurement: 1600,
   },
 });
 
@@ -64,7 +65,10 @@ export const pointerWeightState = selector({
   get: ({ get }) => {
     const ppi = get(ppiState);
     const dpi = get(dpiState);
-    return ppi / dpi.measurement / window.devicePixelRatio;
+    return (
+      (ppi / dpi.measurement / window.devicePixelRatio) *
+      MOUSE_GAIN
+    ).toFixed(3);
   },
 });
 
