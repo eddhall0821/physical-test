@@ -4,6 +4,7 @@ import {
   drawFullscreenAlertText,
   drawPointer,
   drawStartButton,
+  fastRound3,
   fittsLaw,
   inch,
   initCanvas,
@@ -48,6 +49,7 @@ const reaction_time_arr = [];
 const PointingTest = () => {
   const navigate = useNavigate();
   const weight = useRecoilValue(pointerWeightState);
+  // const weight = 1;
   const monitorBound = useRecoilValue(mointorBoundState);
   const ppi = useRecoilValue(ppiState);
   const prolificUser = useRecoilValue(prolificUserState);
@@ -70,21 +72,23 @@ const PointingTest = () => {
       targetRadius: inch(ppi, 0.1),
     },
     {
-      //난이도 6.5
-      // targetZoneRadius: inch(ppi, 8.951),
-      // targetRadius: inch(ppi, 0.1),
       targetZoneRadius: inch(ppi, 6.266),
       targetRadius: inch(ppi, 0.07),
     },
   ]);
 
   useEffect(() => {
+    console.log(weight);
+  }, [weight]);
+
+  useEffect(() => {
     const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     ctx.scale(1, 1);
     let x = centerX;
     let y = centerY;
 
+    let isMouseDown = false;
     let target_x = 0;
     let target_y = 0;
     let miss_target_x = 0;
@@ -105,16 +109,16 @@ const PointingTest = () => {
         isPointerLock = true;
         start = true;
         document.addEventListener("mousemove", updatePosition, false);
-        document.addEventListener("mousedown", mouseDown);
+        document.addEventListener("mousedown", mouseDown, false);
       } else {
         isPointerLock = false;
-        document.addEventListener("mousemove", updatePosition, false);
-        // document.removeEventListener("mousemove", updatePosition, false);
+        document.removeEventListener("mousemove", updatePosition, false);
+        document.removeEventListener("mousedown", mouseDown, false);
       }
     }
-
     const mouseDown = (e) => {
       if (e.buttons === 1) {
+        cnt++;
         const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
         if (distance > target_radius) {
           show_miss = performance.now();
@@ -122,8 +126,6 @@ const PointingTest = () => {
           miss_target_y = target_y;
           miss_radius = target_radius;
         }
-
-        cnt++;
         end_time = performance.now();
         const reaction_time = end_time - start_time;
         reaction_time_arr.push({
@@ -132,7 +134,6 @@ const PointingTest = () => {
           reaction_time,
         });
         start_time = performance.now();
-
         if (cnt >= NUM_POINTS && trial + 1 === combination.length) {
           const result = calculateAverages(reaction_time_arr);
           navigate(
@@ -140,7 +141,6 @@ const PointingTest = () => {
             { state: { result } }
           );
         }
-
         if (cnt >= NUM_POINTS) {
           //다음 trial 이동
           cnt = 0;
@@ -202,6 +202,7 @@ const PointingTest = () => {
       const t_angle = sequence * angleBetweenPoints;
       const t_x = centerX + target_zone_radius * Math.cos(t_angle);
       const t_y = centerY + target_zone_radius * Math.sin(t_angle);
+
       target_x = t_x;
       target_y = t_y;
       drawTarget(t_x, t_y, target_radius, "#00BFFF");
@@ -235,43 +236,41 @@ const PointingTest = () => {
         return Math.floor(max / 2 + n / 2);
       }
     };
+    let animation;
 
     function updatePosition(e) {
       const p = performance.now();
       p1 = p;
       x += e.movementX * weight;
       y += e.movementY * weight;
-
-      //마우스 가두기
-      if (x > window.screen.width - monitorBound.left) {
-        x = window.screen.width - monitorBound.left;
-      }
-      if (y > window.screen.height - monitorBound.top) {
-        y = window.screen.height - monitorBound.top;
-      }
-      if (x < monitorBound.left) {
-        x = monitorBound.left;
-      }
-      if (y < monitorBound.top) {
-        y = monitorBound.top;
-      }
-      //마우스 가두기 끝
-
+      x = Math.max(
+        monitorBound.left,
+        Math.min(x, window.screen.width - monitorBound.left)
+      );
+      y = Math.max(
+        monitorBound.top,
+        Math.min(y, window.screen.height - monitorBound.top)
+      );
+      // requestAnimationFrame(step);
       p2 = p;
+
+      if (!animation) {
+        animation = requestAnimationFrame(function () {
+          animation = null;
+          resetCanvas(ctx, monitorBound);
+          generateTarget();
+          drawPointer(ctx, x, y);
+          drawFullscreenText();
+        });
+      }
     }
 
     setTarget();
 
-    function step() {
-      resetCanvas(canvas, monitorBound);
-      generateTarget();
-      drawPointer(ctx, x, y);
-      requestAnimationFrame(step);
-      drawFullscreenText();
-    }
+    function step() {}
 
     function pre_step() {
-      resetCanvas(canvas, monitorBound);
+      resetCanvas(ctx, monitorBound);
       if (start) {
         step();
       } else {
@@ -282,10 +281,10 @@ const PointingTest = () => {
 
     initCanvas(canvas);
     requestAnimationFrame(pre_step);
-  }, []);
+  }, [weight]);
 
   return (
-    <div>
+    <div id="div">
       <canvas
         id="canvas"
         width={window.screen.width}

@@ -38,19 +38,19 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      // withAuth: false,
-      withAuth: true,
-    },
-    {
-      path: "replay",
-      element: <MTPReplay />,
       withAuth: false,
+      // withAuth: true,
     },
-    {
-      path: "replay2",
-      element: <ReplayTimeinteval />,
-      withAuth: false,
-    },
+    // {
+    //   path: "replay",
+    //   element: <MTPReplay />,
+    //   withAuth: false,
+    // },
+    // {
+    //   path: "replay2",
+    //   element: <ReplayTimeinteval />,
+    //   withAuth: false,
+    // },
     {
       path: "measure",
       element: <Measure />,

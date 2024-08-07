@@ -5,7 +5,7 @@ import {
 } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
-export const BALL_POINTS = [0, 50, 100];
+export const BALL_POINTS = [0, 100, 200];
 export class Balls {
   designs = [];
   randomDesignArray = [];
@@ -77,6 +77,8 @@ export class Balls {
     }
     return resultArray;
   };
+
+  max_target_radius = 0.25;
 
   init = function ({ groupCount, stepSize, startStep, totalCount }) {
     this.designs = [];

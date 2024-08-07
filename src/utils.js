@@ -11,11 +11,17 @@ export const distanceBetweenTwoPoint = (x1, y1, x2, y2) => {
   return Math.sqrt(dist_x * dist_x + dist_y * dist_y);
 };
 
-export const resetCanvas = (canvas, monitorBound) => {
-  const ctx = canvas.getContext("2d");
+export const drawMaxDistance = (ctx, x, y, max_target_radius) => {
+  ctx.beginPath();
+  ctx.arc(x, y, max_target_radius, 0, degToRad(360), true);
+  ctx.fillStyle = "#grey";
+  ctx.fill();
+};
+
+export const resetCanvas = (ctx, monitorBound) => {
+  // ctx.clearRect(0, 0, window.screen.width, window.screen.height);
   ctx.fillStyle = "#1c1c1c";
   ctx.fillRect(0, 0, window.screen.width, window.screen.height);
-
   ctx.fillStyle = "#000";
   ctx.fillRect(
     monitorBound.left,
@@ -29,7 +35,7 @@ export const drawRewardProgressBar = (ctx, total, current, x, y) => {
   const a = 100;
   const b = a - ((total - current) / 1400) * a;
 
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "yellow";
   ctx.fillRect(x - a / 2, y, a, 20);
 
   ctx.fillStyle = "green";
@@ -76,7 +82,17 @@ export const drawRoughClickText = (ctx) => {
     window.innerHeight / 2
   );
 };
+export const drawRedBall = (ctx, x, y) => {
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(x - 50, y);
+  ctx.lineTo(x + 50, y);
+  ctx.moveTo(x, y - 50);
+  ctx.lineTo(x, y + 50);
 
+  ctx.stroke();
+};
 export const drawPointer = (ctx, x, y) => {
   ctx.lineWidth = 3;
   ctx.strokeStyle = "white";
@@ -102,41 +118,26 @@ export const initCanvas = async (canvas) => {
   window.onresize = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    //TODO demo
-    // const ctx = canvas.getContext("2d");
-    // ctx.setTransform(1, 0, 0, 1, 0, 0);
-    // ctx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
   };
-  toggleFullScreen(canvas);
+  // toggleFullScreen(canvas);
 
   window.addEventListener("keypress", async (e) => {
     if (e.key === "Enter") {
       toggleFullScreen(canvas);
       if (!document.pointerLockElement) {
-        await canvas.requestPointerLock({
-          unadjustedMovement: true,
-        });
-      }
-    }
-
-    if (e.key === "s") {
-      toggleFullScreen(canvas);
-      if (!document.pointerLockElement) {
-        await canvas.requestPointerLock({
-          unadjustedMovement: true,
-        });
+        await canvas.requestPointerLock();
       }
     }
   });
 
-  canvas.addEventListener("click", async (e) => {
-    // toggleFullScreen(canvas);
-    // if (!document.pointerLockElement) {
-    //   await canvas.requestPointerLock({
-    //     unadjustedMovement: true,
-    //   });
-    // }
-  });
+  // canvas.addEventListener("click", async (e) => {
+  // toggleFullScreen(canvas);
+  // if (!document.pointerLockElement) {
+  //   await canvas.requestPointerLock({
+  //     unadjustedMovement: true,
+  //   });
+  // }
+  // });
 
   // canvas.addEventListener(
   //   "click",
@@ -282,10 +283,13 @@ export const drawRewardText = (
   if (monitorBound.top + 200 > y) {
     textY = -200;
   }
-  if (monitorBound.left + 100 > x) {
+  if (monitorBound.top + monitorBound.height - 250 < y) {
+    textY = 250;
+  }
+  if (monitorBound.left + 150 > x) {
     textX = -200;
   }
-  if (monitorBound.left + monitorBound.width - 100 < x) {
+  if (monitorBound.left + monitorBound.width - 150 < x) {
     textX = 200;
   }
 
@@ -301,12 +305,14 @@ export const drawRewardText = (
 
   const width = 420;
   const height = 270;
+
   if (target_reward === BALL_POINTS[2]) {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 260);
   } else if (target_reward === BALL_POINTS[1]) {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 210);
   } else {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, height);
+    const w = width * 0.8;
+    ctx.drawImage(moneybag, adjX - w / 2, adY, w, 230 * 0.8);
   }
 };
 

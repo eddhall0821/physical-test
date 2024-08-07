@@ -161,7 +161,7 @@ const MTPTest = () => {
     //step function execute every frame
     function step(timestamp) {
       if (!end) {
-        resetCanvas(canvas, monitorBound);
+        resetCanvas(ctx, monitorBound);
         drawText(ctx, summary);
 
         drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
@@ -172,7 +172,7 @@ const MTPTest = () => {
     }
 
     function pre_step() {
-      resetCanvas(canvas, monitorBound);
+      resetCanvas(ctx, monitorBound);
       if (start) {
         targetInit();
         delay = performance.now();

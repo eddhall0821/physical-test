@@ -106,7 +106,7 @@ const ReplayTimeinteval = () => {
         animation = requestAnimationFrame(function () {
           animation = null;
           // drawTarget();
-          resetCanvas(canvas, {
+          resetCanvas(ctx, {
             width: screenX,
             height: screenY,
             top: 0,

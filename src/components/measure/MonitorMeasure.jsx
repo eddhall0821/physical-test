@@ -53,7 +53,7 @@ const MonitorMeasure = () => {
 
   const handleResize = () => {
     if (window.devicePixelRatio !== 1) {
-      alert("do not change device pixel ratio");
+      // alert("do not change device pixel ratio");
     }
     setZoom(window.devicePixelRatio);
   };
@@ -187,6 +187,15 @@ const MonitorMeasure = () => {
         <br />
         If you refresh or close the web page, the experiment will start again
         from the beginning.
+      </Typography.Title>
+      <Typography.Title
+        level={4}
+        style={{
+          display: zoom !== 1 ? "block" : "none",
+        }}
+      >
+        If the button is not activated even after adjusting the screen zoom to
+        100%, please return this study.
       </Typography.Title>
       <Link
         // state={{ prolificUser }}

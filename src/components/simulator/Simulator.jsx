@@ -37,7 +37,7 @@ const Simulator = () => {
         const currentPointerX = p1.x + (p2.x - p1.x) * progress;
         const currentPointerY = p1.y + (p2.y - p1.y) * progress;
 
-        resetCanvas(canvas, monitorBound);
+        resetCanvas(ctx, monitorBound);
         drawMTPTarget(
           ctx,
           monitorBound.left + currentBallX * monitorBound.width,

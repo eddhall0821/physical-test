@@ -261,7 +261,7 @@ const Measure = () => {
                 </Typography.Title>
               )}
               <Link
-                to={`/pointing?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
+                to={`/linear?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}
               >
                 <Button
                   type="primary"

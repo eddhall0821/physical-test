@@ -65,10 +65,7 @@ export const pointerWeightState = selector({
   get: ({ get }) => {
     const ppi = get(ppiState);
     const dpi = get(dpiState);
-    return (
-      (ppi / dpi.measurement / window.devicePixelRatio) *
-      MOUSE_GAIN
-    ).toFixed(3);
+    return (ppi / dpi.measurement / window.devicePixelRatio) * MOUSE_GAIN;
   },
 });
 

@@ -53,7 +53,13 @@ const MainGuideLines = () => {
     {
       title: <StepTitle>Next Reward</StepTitle>,
       description: (
-        <StepContent>Display the value of the next reward.</StepContent>
+        <StepContent>
+          Display the value of the next reward and progress bar. The progress
+          bar fills up if the mouse does not move. When the progress bar is
+          completely filled, the target will appear. Do not move the mouse
+          before the progress bar is completely filled. The progress bar will
+          reset.
+        </StepContent>
       ),
       target: () => ref6.current,
     },
@@ -184,14 +190,20 @@ const MainGuideLines = () => {
         </div>
         <div
           style={{
-            display: currentGuideIndex !== 0 && "none",
+            display: currentGuideIndex !== 0 ? "none" : "flex",
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
           }}
           ref={ref6}
         >
+          <div
+            style={{ width: 100, height: 20, backgroundColor: "yellow" }}
+          ></div>
           <MainTaskFont>Next reward is 5 pence.</MainTaskFont>
           <img alt="money" src={moneybag} width={100} />
         </div>
@@ -221,9 +233,8 @@ const MainGuideLines = () => {
           }}
           ref={ref8}
         >
-          <MainTaskFont>✅</MainTaskFont>
+          <MainTaskFont>✅ Success!</MainTaskFont>
           {/* <p>It took 0.5 seconds.</p> */}
-          <MainTaskFont>You got 1 pence.</MainTaskFont>
         </div>
       </div>
       <Tour

@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.1.7",
     "chart.js": "^4.4.0",
+    "comlink": "^4.4.1",
     "csv-writer": "^1.6.0",
     "firebase": "^10.5.0",
     "gh-pages": "^6.0.0",

@@ -4,10 +4,10 @@ import {
   drawClickResultText,
   drawFullscreenAlertText,
   drawLateClickText,
+  drawMaxDistance,
   drawMTPTarget,
   drawPauseText,
   drawPointer,
-  drawRewardProgressBar,
   drawRewardText,
   drawRoughClickText,
   drawStartButton2,
@@ -24,7 +24,8 @@ import { useState } from "react";
 
 import Reward0 from "../../images/reward/reward0.png";
 import Reward5 from "../../images/reward/reward5.png";
-import Reward10 from "../../images/reward/reward10.png";
+import Reward10 from "../../images/reward/reward-10.png";
+import Reward20 from "../../images/reward/reward-20.png";
 
 import { useRecoilValue } from "recoil";
 import {
@@ -37,6 +38,7 @@ import {
 import { Balls } from "./Balls";
 import usePreventRefresh from "../PreventRefresh";
 import { Spin, Typography } from "antd";
+import { wrap } from "comlink";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
@@ -46,12 +48,13 @@ const SHOW_RESULT_TIME = 1000; //ms
 const SHOW_ROUGH_TIME = 2400;
 const SHOW_LATE_TIME = 2400;
 const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
-const STOP_TIME = 3000000;
+const STOP_TIME = 3000;
 const MAXIMUM_ERROR_STREAK = 3;
 
 const MTPCanvas = () => {
   const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
+  // const weight = 1;
   const ppi = useRecoilValue(ppiState);
   const monitorBound = useRecoilValue(mointorBoundState);
   const prolificUser = useRecoilValue(prolificUserState);
@@ -108,19 +111,33 @@ const MTPCanvas = () => {
     let skipCnt = 0;
     let roughClickCnt = 0;
 
-    if (!isUploading) {
+    // const worker = new Worker(
+    //   new URL("../pointing/pointerWorker.js", import.meta.url),
+    //   {
+    //     type: "module",
+    //   }
+    // );
+    // const workerApi = wrap(worker);
+
+    // async function updateWorkerWeight() {
+    //   await workerApi.setWeight(weight);
+    // }
+
+    if (!isUploading && weight) {
       let reward0 = new Image({});
       let reward5 = new Image({});
       let reward10 = new Image({});
+      let reward20 = new Image({});
 
       reward0.src = Reward0;
       reward5.src = Reward5;
       reward10.src = Reward10;
+      reward20.src = Reward20;
 
       const rewardImages = {
         0: reward0,
-        50: reward5,
         100: reward10,
+        200: reward20,
       };
 
       show_reward_counter = performance.now();
@@ -187,16 +204,18 @@ const MTPCanvas = () => {
       };
 
       const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { alpha: false });
 
       const lockChangeAlert = () => {
         if (document.pointerLockElement === canvas) {
           isPointerLock = true;
           start = true;
           document.addEventListener("mousemove", updatePosition, false);
+          document.addEventListener("mousedown", mouseDown, false);
         } else {
           isPointerLock = false;
           document.removeEventListener("mousemove", updatePosition, false);
+          document.removeEventListener("mousedown", mouseDown, false);
         }
       };
 
@@ -209,55 +228,56 @@ const MTPCanvas = () => {
       //test---
 
       const mouseDown = (e) => {
-        console.log(e.buttons);
-        const p = performance.now();
-        if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
-          buttons = e.buttons;
+        if (e.buttons === 1) {
+          const p = performance.now();
+          if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
+            buttons = e.buttons;
 
-          lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
-          show_reward_counter = p;
-          delay = p;
-          movement_stop_time = p;
-          skipCnt = 0;
+            lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
+            show_reward_counter = p;
+            delay = p;
+            movement_stop_time = p;
+            skipCnt = 0;
 
-          const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-          const current_target_success = target_radius - distance > 0 ? 1 : 0;
-          let inaccurate = 0;
+            const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
+            const current_target_success = target_radius - distance > 0 ? 1 : 0;
+            let inaccurate = 0;
 
-          if (target_radius * 5 - distance < 0) {
-            //대충 클릭
-            inaccurate = 1;
-            show_rough_counter = p;
-            pushSummaryLog(current_target_success, 0, inaccurate);
-            targetInit(currentDesign.d, currentDesign.w);
+            if (inch(ppi, balls.max_target_radius) * 5 - distance < 0) {
+              // if (target_radius * 5 - distance < 0) {
+              inaccurate = 1;
+              show_rough_counter = p;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              targetInit(currentDesign.d, currentDesign.w);
 
-            return;
-            // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
-            //   show_rough_counter = p;
-            //   roughClickCnt = 0;
-            // }
-          } else if (target_radius - distance > 0) {
-            //성공
-            summary.point += target_reward;
-            lastClickResult.success = true;
-            lastClickResult.point = target_reward;
-            pushSummaryLog(current_target_success, 0, inaccurate);
-            summary.success++;
-          } else {
-            //실패
-            lastClickResult.success = false;
-            lastClickResult.point = 0;
-            pushSummaryLog(current_target_success, 0, inaccurate);
-            summary.fail++;
-          }
+              return;
+              // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
+              //   show_rough_counter = p;
+              //   roughClickCnt = 0;
+              // }
+            } else if (target_radius - distance > 0) {
+              //성공
+              summary.point += target_reward;
+              lastClickResult.success = true;
+              lastClickResult.point = target_reward;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              summary.success++;
+            } else {
+              //실패
+              lastClickResult.success = false;
+              lastClickResult.point = 0;
+              pushSummaryLog(current_target_success, 0, inaccurate);
+              summary.fail++;
+            }
 
-          if (balls.getRandomDesignArray().length === 0 && !end) {
-            end = true;
-            uploadCSV();
-            setIsUploading(true);
-          } else {
-            currentDesign = balls.popStack();
-            targetInit(currentDesign.d, currentDesign.w);
+            if (balls.getRandomDesignArray().length === 0 && !end) {
+              end = true;
+              uploadCSV();
+              setIsUploading(true);
+            } else {
+              currentDesign = balls.popStack();
+              targetInit(currentDesign.d, currentDesign.w);
+            }
           }
         }
       };
@@ -267,7 +287,6 @@ const MTPCanvas = () => {
         skipped = 0,
         inaccurate = 0
       ) => {
-        // console.log("log log sum");
         const summaryLogRow = [
           summary.fail + summary.success,
           current_target_success,
@@ -298,15 +317,11 @@ const MTPCanvas = () => {
 
         const summaryStorageRef = ref(
           storage,
-          `summary/s${prolificUser.PROLIFIC_PID}_${
-            prolificUser.STUDY_ID
-          }_${Date.now()}.csv`
+          `summary/${prolificUser.PROLIFIC_PID}_${prolificUser.STUDY_ID}.csv`
         );
         const storageRef = ref(
           storage,
-          `trajectory/t${prolificUser.PROLIFIC_PID}_${
-            prolificUser.STUDY_ID
-          }_${Date.now()}.csv`
+          `trajectory/${prolificUser.PROLIFIC_PID}_${prolificUser.STUDY_ID}.csv`
         );
 
         let summaryContent = summaryLogArr
@@ -378,41 +393,33 @@ const MTPCanvas = () => {
           navigate("/error");
         }
       }
-      // let weight = 0.0575;
+
       function updatePosition(e) {
-        if (e.buttons === 1) {
-          mouseDown(e);
+        const p = performance.now();
+        if (show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p) {
+          movementX += e.movementX;
+          movementY += e.movementY;
+
+          x += e.movementX * weight;
+          y += e.movementY * weight;
         } else {
           if (
-            show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
-            performance.now()
+            (e.movementX > 2 || e.movementY > 2) &&
+            show_reward_counter + SHOW_RESULT_TIME < p
           ) {
-            movementX += e.movementX;
-            movementY += e.movementY;
-
-            x += e.movementX * weight;
-            y += e.movementY * weight;
-          } else {
-            if (e.movementX > 2 || e.movementY > 2) {
-              show_reward_counter = performance.now() - SHOW_RESULT_TIME - 10;
-              movement_stop_time = performance.now() - SHOW_RESULT_TIME - 10;
-            }
-          }
-
-          //마우스 가두기
-          if (x > window.screen.width - monitorBound.left) {
-            x = window.screen.width - monitorBound.left;
-          }
-          if (y > window.screen.height - monitorBound.top) {
-            y = window.screen.height - monitorBound.top;
-          }
-          if (x < monitorBound.left) {
-            x = monitorBound.left;
-          }
-          if (y < monitorBound.top) {
-            y = monitorBound.top;
+            show_reward_counter = performance.now() - SHOW_RESULT_TIME - 10;
+            movement_stop_time = performance.now() - SHOW_RESULT_TIME - 10;
           }
         }
+
+        x = Math.max(
+          monitorBound.left,
+          Math.min(x, window.screen.width - monitorBound.left)
+        );
+        y = Math.max(
+          monitorBound.top,
+          Math.min(y, window.screen.height - monitorBound.top)
+        );
       }
 
       const drawFullscreenText = () => {
@@ -448,7 +455,7 @@ const MTPCanvas = () => {
       };
 
       function update(timestamp) {
-        resetCanvas(canvas, monitorBound);
+        resetCanvas(ctx, monitorBound);
         drawText(ctx, summary, TOTAL_TRIALS);
         drawFullscreenText();
 
@@ -476,6 +483,7 @@ const MTPCanvas = () => {
             isPaused = true;
           }
         }
+
         //움직임 감지 끝
         if (show_rough_counter + SHOW_ROUGH_TIME > timestamp) {
           drawRoughClickText(ctx);
@@ -525,6 +533,12 @@ const MTPCanvas = () => {
           timestamp
         ) {
           logging();
+          // drawMaxDistance(
+          //   ctx,
+          //   target_x,
+          //   target_y,
+          //   inch(ppi, balls.max_target_radius) * 5
+          // );
           drawMTPTarget(ctx, target_x, target_y, 0, target_radius);
           drawPointer(ctx, x, y);
         }
@@ -540,7 +554,7 @@ const MTPCanvas = () => {
           if (!isPaused) {
             update(timestamp);
           } else {
-            resetCanvas(canvas, monitorBound);
+            resetCanvas(ctx, monitorBound);
             drawText(ctx, summary, TOTAL_TRIALS);
             drawPauseText(ctx);
           }
@@ -549,7 +563,7 @@ const MTPCanvas = () => {
       }
 
       function pre_step() {
-        resetCanvas(canvas, monitorBound);
+        resetCanvas(ctx, monitorBound);
         if (start) {
           targetInit(currentDesign.d, currentDesign.w);
           show_reward_counter = performance.now();
@@ -578,16 +592,18 @@ const MTPCanvas = () => {
     return () => {
       document.removeEventListener("keypress", handlePause);
     };
-  }, [isUploading]);
+  }, [isUploading, weight]);
 
   return (
     <>
       {!isUploading && (
-        <canvas
-          id="canvas"
-          width={window.innerWidth}
-          height={window.innerHeight}
-        />
+        <>
+          <canvas
+            id="canvas"
+            width={window.innerWidth}
+            height={window.innerHeight}
+          />
+        </>
       )}
       {isUploading && (
         <div>
