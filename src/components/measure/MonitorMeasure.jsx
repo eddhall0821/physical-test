@@ -53,7 +53,7 @@ const MonitorMeasure = () => {
 
   const handleResize = () => {
     if (window.devicePixelRatio !== 1) {
-      // alert("do not change device pixel ratio");
+      alert("do not change device pixel ratio");
     }
     setZoom(window.devicePixelRatio);
   };
@@ -188,15 +188,36 @@ const MonitorMeasure = () => {
         If you refresh or close the web page, the experiment will start again
         from the beginning.
       </Typography.Title>
-      <Typography.Title
+      <Typography.Paragraph
         level={4}
         style={{
           display: zoom !== 1 ? "block" : "none",
         }}
       >
+        <b>
+          If the button does not activate, adjust the scale of the window and
+          browser to 100%.
+        </b>
+        <br />
+        <Link
+          to="https://support.google.com/chrome/answer/96810?hl=en&co=GENIE.Platform%3DDesktop"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          How to set Chrome browser zoom to 100%. (link)
+        </Link>
+        <br />
+        <Link
+          to="https://support.microsoft.com/en-us/windows/view-display-settings-in-windows-37f0e05e-98a9-474c-317a-e85422daa8bb"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          How to set Windows zoom to 100%. (link)
+        </Link>
+        <br />
         If the button is not activated even after adjusting the screen zoom to
         100%, please return this study.
-      </Typography.Title>
+      </Typography.Paragraph>
       <Link
         // state={{ prolificUser }}
         to={`/measure?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`}

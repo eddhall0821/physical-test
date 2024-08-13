@@ -22,10 +22,14 @@ import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-import Reward0 from "../../images/reward/reward0.png";
-import Reward5 from "../../images/reward/reward5.png";
-import Reward10 from "../../images/reward/reward-10.png";
-import Reward20 from "../../images/reward/reward-20.png";
+// import Reward0 from "../../images/reward/reward0.png";
+// import Reward5 from "../../images/reward/reward5.png";
+// import Reward10 from "../../images/reward/reward-10.png";
+// import Reward20 from "../../images/reward/reward-20.png";
+
+import Reward0 from "../../images/reward/cent/cent0.png";
+import Reward1 from "../../images/reward/cent/cent1.png";
+import Reward3 from "../../images/reward/cent/cent3.png";
 
 import { useRecoilValue } from "recoil";
 import {
@@ -125,19 +129,17 @@ const MTPCanvas = () => {
 
     if (!isUploading && weight) {
       let reward0 = new Image({});
-      let reward5 = new Image({});
-      let reward10 = new Image({});
-      let reward20 = new Image({});
+      let reward1 = new Image({});
+      let reward3 = new Image({});
 
       reward0.src = Reward0;
-      reward5.src = Reward5;
-      reward10.src = Reward10;
-      reward20.src = Reward20;
+      reward1.src = Reward1;
+      reward3.src = Reward3;
 
       const rewardImages = {
         0: reward0,
-        100: reward10,
-        200: reward20,
+        100: reward1,
+        300: reward3,
       };
 
       show_reward_counter = performance.now();

@@ -94,7 +94,8 @@ function App() {
     {
       path: "main-guidelines",
       element: <MainGuideLines />,
-      withAuth: true,
+      withAuth: false,
+      // withAuth: true,
     },
     {
       path: "done",

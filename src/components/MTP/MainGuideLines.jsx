@@ -2,11 +2,10 @@ import { useRecoilValue } from "recoil";
 import { mointorBoundState, prolificUserState } from "../../recoil/atom";
 import { Button, Space, Tour, Typography } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { toggleFullScreen } from "../../utils";
 import { Content } from "antd/es/layout/layout";
 import TaskSteps from "../TaskSteps";
 import { useNavigate } from "react-router-dom";
-import moneybag from "../../images/five_pence.png";
+import moneybag from "../../images/reward/cent/cent3.png";
 
 const MainGuideLines = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -182,8 +181,8 @@ const MainGuideLines = () => {
             zIndex: 1,
           }}
         >
-          <div ref={ref1}>Trials: 12 / 900</div>
-          <div ref={ref3}>Total Bonus: 1£</div>
+          <div ref={ref1}>Trials: 12 / 300</div>
+          <div ref={ref3}>Total Bonus: 1$</div>
           <div ref={ref2}>✅: 10</div>
           <div ref={ref4}>❌: 2</div>
           <div></div>
@@ -204,8 +203,7 @@ const MainGuideLines = () => {
           <div
             style={{ width: 100, height: 20, backgroundColor: "yellow" }}
           ></div>
-          <MainTaskFont>Next reward is 5 pence.</MainTaskFont>
-          <img alt="money" src={moneybag} width={100} />
+          <img alt="money" src={moneybag} width={350} height={220} />
         </div>
 
         <div

@@ -5,7 +5,7 @@ import {
 } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
-export const BALL_POINTS = [0, 100, 200];
+export const BALL_POINTS = [0, 100, 300];
 export class Balls {
   designs = [];
   randomDesignArray = [];
