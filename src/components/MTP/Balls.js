@@ -5,7 +5,7 @@ import {
 } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
-export const BALL_POINTS = [0, 100, 300];
+export const BALL_POINTS = [0, 4, 20];
 export class Balls {
   designs = [];
   randomDesignArray = [];
@@ -18,18 +18,16 @@ export class Balls {
         const minDistance = 2;
         const maxDistance = INCH_24_HEIGHT / 2;
         const randId = random * design.idStep + design.idStart;
-        //2~3.5
-        //3.5~5
-        //5~6.5
+
         let distance, width;
         // distance = random * (maxDistance - minDistance) + minDistance;
         // width = getWidthByIDAndDistance(randId, distance) / 2;
 
-        if (randId <= 3.5) {
+        if (randId <= this.startStep + this.stepSize) {
           width = 0.5;
-        } else if (randId <= 5) {
+        } else if (randId <= this.startStep + this.stepSize * 2) {
           width = 0.3;
-        } else if (randId <= 6.5) {
+        } else if (randId <= this.startStep + this.stepSize * 3) {
           width = 0.1;
         }
         distance = getDistanceByWidthAndId(randId, width);
@@ -47,7 +45,6 @@ export class Balls {
   };
 
   getRandomDesignArray = function () {
-    console.log(this.randomDesignArray);
     if (this.randomDesignArray.length !== 0) return this.randomDesignArray;
     else return [];
   };
@@ -82,6 +79,10 @@ export class Balls {
 
   init = function ({ groupCount, stepSize, startStep, totalCount }) {
     this.designs = [];
+    this.stepSize = stepSize;
+    this.startStep = startStep;
+    this.totalCount = totalCount;
+
     for (let i = 0; i < groupCount; i++) {
       const reward = this.createRewardArray(totalCount / groupCount);
       this.designs.push({

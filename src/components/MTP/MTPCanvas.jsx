@@ -17,19 +17,15 @@ import {
   initCanvas,
   random_point_between_circles,
   resetCanvas,
+  shuffle,
 } from "../../utils";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-// import Reward0 from "../../images/reward/reward0.png";
-// import Reward5 from "../../images/reward/reward5.png";
-// import Reward10 from "../../images/reward/reward-10.png";
-// import Reward20 from "../../images/reward/reward-20.png";
-
-import Reward0 from "../../images/reward/cent/cent0.png";
-import Reward1 from "../../images/reward/cent/cent1.png";
-import Reward3 from "../../images/reward/cent/cent3.png";
+import Reward0 from "../../images/max_reward/reward_0.png";
+import Reward4 from "../../images/max_reward/reward_4.png";
+import Reward20 from "../../images/max_reward/reward_20.png";
 
 import { useRecoilValue } from "recoil";
 import {
@@ -55,6 +51,19 @@ const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
 const STOP_TIME = 3000;
 const MAXIMUM_ERROR_STREAK = 3;
 
+// function quantile(arr, q) {
+//   const sorted = arr.slice().sort((a, b) => a - b);
+//   const pos = (sorted.length - 1) * q;
+//   const base = Math.floor(pos);
+//   const rest = pos - base;
+
+//   if (sorted[base + 1] !== undefined) {
+//     return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+//   } else {
+//     return sorted[base];
+//   }
+// }
+
 const MTPCanvas = () => {
   const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
@@ -73,18 +82,11 @@ const MTPCanvas = () => {
       "target_y",
       "cursor_x",
       "cursor_y",
-      "movementX",
-      "movementY",
       "screenX",
       "screenY",
       "buttons",
       "timestamp",
       "dpr",
-      // "id",
-      // "w",
-      // "d",
-      // "target_p",
-      // "total_p",
       "fullscreen",
     ],
   ];
@@ -92,8 +94,9 @@ const MTPCanvas = () => {
     [
       "trial",
       "success",
-      "reaction_time",
+      "trial_completion_time",
       "target_p",
+      "got_p",
       "total_p",
       "target_radius",
       "id",
@@ -111,35 +114,35 @@ const MTPCanvas = () => {
     let show_reward_counter = performance.now();
     let show_rough_counter = -SHOW_ROUGH_TIME;
     let show_late_counter = -SHOW_LATE_TIME;
+    let recent_20_trials_rt = [
+      300.2002, 414.27628, 531.35435, 645.43043, 762.50851, 876.58458,
+      993.6626600000001, 1107.73874, 1224.81682, 1338.8928899999999, 1455.97097,
+      1570.0470500000001, 1687.1251300000001, 1801.2012, 1918.27928, 2032.35536,
+      2149.43343, 2263.50951, 2380.58759, 2497.66567,
+    ];
+    let step = 3000 / 19;
+
+    let responseTime = null;
+    let loggingStartTime = null;
+    let current_reward = null;
+    shuffle(recent_20_trials_rt);
 
     let skipCnt = 0;
     let roughClickCnt = 0;
 
-    // const worker = new Worker(
-    //   new URL("../pointing/pointerWorker.js", import.meta.url),
-    //   {
-    //     type: "module",
-    //   }
-    // );
-    // const workerApi = wrap(worker);
-
-    // async function updateWorkerWeight() {
-    //   await workerApi.setWeight(weight);
-    // }
-
     if (!isUploading && weight) {
       let reward0 = new Image({});
-      let reward1 = new Image({});
-      let reward3 = new Image({});
+      let reward4 = new Image({});
+      let reward20 = new Image({});
 
       reward0.src = Reward0;
-      reward1.src = Reward1;
-      reward3.src = Reward3;
+      reward4.src = Reward4;
+      reward20.src = Reward20;
 
       const rewardImages = {
         0: reward0,
-        100: reward1,
-        300: reward3,
+        4: reward4,
+        20: reward20,
       };
 
       show_reward_counter = performance.now();
@@ -173,10 +176,17 @@ const MTPCanvas = () => {
       let p1 = 0;
 
       const balls = new Balls();
+      // balls.init({
+      //   groupCount: 3,
+      //   stepSize: 1.5,
+      //   startStep: 2,
+      //   totalCount: TOTAL_TRIALS,
+      // });
+
       balls.init({
         groupCount: 3,
-        stepSize: 1.5,
-        startStep: 2,
+        stepSize: 1.33333,
+        startStep: 3,
         totalCount: TOTAL_TRIALS,
       });
 
@@ -186,6 +196,8 @@ const MTPCanvas = () => {
       const targetInit = (d, w) => {
         movement_stop_time = performance.now();
         p1 = performance.now();
+        responseTime = null;
+        loggingStartTime = null;
         target_radius = inch(ppi, w);
         target_reward = currentDesign.reward;
 
@@ -233,9 +245,15 @@ const MTPCanvas = () => {
         if (e.buttons === 1) {
           const p = performance.now();
           if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
+            responseTime = p - loggingStartTime;
+            // let t0 = quantile(recent_20_trials_rt, 0.1);
+            // let t1 = quantile(recent_20_trials_rt, 0.9);
+            // console.log(t0, t1);
+            // recent_20_trials_rt.pop();
+            // recent_20_trials_rt.unshift(responseTime);
+
             buttons = e.buttons;
 
-            lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
             show_reward_counter = p;
             delay = p;
             movement_stop_time = p;
@@ -258,14 +276,25 @@ const MTPCanvas = () => {
               //   roughClickCnt = 0;
               // }
             } else if (target_radius - distance > 0) {
-              //성공
-              summary.point += target_reward;
+              let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
+              console.log(reward);
+
+              reward = Math.min(target_reward, reward);
+              reward = Math.max(reward, 0);
+              reward = Number(reward.toFixed(2));
+              current_reward = reward;
+
+              console.log(summary.point);
+              console.log(reward);
+
+              summary.point += reward;
               lastClickResult.success = true;
-              lastClickResult.point = target_reward;
+              lastClickResult.point = reward;
               pushSummaryLog(current_target_success, 0, inaccurate);
               summary.success++;
             } else {
               //실패
+              current_reward = 0;
               lastClickResult.success = false;
               lastClickResult.point = 0;
               pushSummaryLog(current_target_success, 0, inaccurate);
@@ -292,8 +321,9 @@ const MTPCanvas = () => {
         const summaryLogRow = [
           summary.fail + summary.success,
           current_target_success,
-          lastClickResult.time,
+          responseTime,
           target_reward,
+          current_reward,
           summary.point,
           fastRound3(target_radius),
           fastRound3(currentDesign.id),
@@ -398,9 +428,19 @@ const MTPCanvas = () => {
 
       function updatePosition(e) {
         const p = performance.now();
+
+        // if (
+        //   !responseTime &&
+        //   loggingStartTime &&
+        //   show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
+        // ) {
+        //   responseTime = (p - loggingStartTime) / 1000;
+        //   console.log(responseTime);
+        // }
+
         if (show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p) {
-          movementX += e.movementX;
-          movementY += e.movementY;
+          // movementX += e.movementX;
+          // movementY += e.movementY;
 
           x += e.movementX * weight;
           y += e.movementY * weight;
@@ -434,6 +474,11 @@ const MTPCanvas = () => {
       };
 
       const logging = () => {
+        if (!loggingStartTime) {
+          loggingStartTime = performance.now(); // Set the logging start time
+          console.log("START.");
+        }
+
         const tempRow = [
           summary.fail + summary.success,
           target_radius,
@@ -441,19 +486,17 @@ const MTPCanvas = () => {
           fastRound3(target_y - monitorBound.top),
           fastRound3(x - monitorBound.left),
           fastRound3(y - monitorBound.top),
-          movementX,
-          movementY,
+          // movementX,
+          // movementY,
           monitorBound.width,
           monitorBound.height,
           buttons,
-          // lastClickResult.time,
           Date.now() / 1000,
           window.devicePixelRatio,
           isFullscreen ? 1 : 0,
         ];
         logArr.push(tempRow);
         if (buttons !== 0) buttons = 0;
-        if (lastClickResult.time !== 0) lastClickResult.time = 0;
       };
 
       function update(timestamp) {
@@ -467,11 +510,11 @@ const MTPCanvas = () => {
           STOP_TIME + SHOW_RESULT_TIME + SHOW_REWARD_TIME
         ) {
           const p = performance.now();
-          lastClickResult.time = p - p1 - SHOW_RESULT_TIME - SHOW_REWARD_TIME;
+          responseTime = 0;
           show_reward_counter = p;
           show_late_counter = p;
           movement_stop_time = p - STOP_TIME;
-
+          current_reward = 0;
           delay = p;
           // summary.fail++;
           lastClickResult.success = false;
@@ -499,8 +542,8 @@ const MTPCanvas = () => {
           drawClickResultText(
             ctx,
             lastClickResult.success,
-            fastRound3(lastClickResult.time / 1000),
-            lastClickResult.point,
+            fastRound3(current_reward),
+            // lastClickResult.point,
             x,
             y,
             monitorBound

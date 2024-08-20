@@ -70,6 +70,11 @@ const MainGuideLines = () => {
           possible.
           <br />
           <b style={{ color: "red" }}>
+            The faster you click on the target, the closer you will get to the
+            maximum reward.
+          </b>
+          <br />
+          <b style={{ color: "red" }}>
             If there is no mouse movement or clicks for 3 seconds, the trial
             will be skipped.
           </b>
@@ -96,7 +101,12 @@ const MainGuideLines = () => {
     },
     {
       title: <StepTitle>Total Rewards</StepTitle>,
-      description: <StepContent>Display total rewards you earned.</StepContent>,
+      description: (
+        <StepContent>
+          Displays the total reward earned.{" "}
+          <b>This amount is paid as a Prolific bonus.</b>
+        </StepContent>
+      ),
       target: () => ref3.current,
     },
     {

@@ -29,6 +29,10 @@ import ReplayTimeinteval from "./components/MTP/ReplayTimeinterval";
 import DemoPointing from "./components/pointing/Demo";
 
 function App() {
+  {
+    console.log(!!process.env.REACT_APP_PNC_AUTH);
+  }
+
   const routerData = [
     {
       path: "",
@@ -38,8 +42,8 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      withAuth: false,
-      // withAuth: true,
+      // withAuth: false,
+      withAuth: process.env.REACT_APP_PNC_AUTH === "true",
     },
     // {
     //   path: "replay",

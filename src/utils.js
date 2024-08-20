@@ -198,7 +198,6 @@ export const random_point_between_circles = ({
 export const drawClickResultText = (
   ctx,
   success,
-  time,
   reward,
   x,
   y,
@@ -243,11 +242,7 @@ export const drawClickResultText = (
   //   adY - 50
   // );
 
-  // ctx.fillText(
-  //   `You got ${reward / 10} pence.`,
-  //   adjX,
-  //   adY - 50
-  // );
+  ctx.fillText(`You got ${reward} cent.`, adjX, adY - 100);
 };
 
 export const drawTest = (ctx, x, y, monitorBound) => {
@@ -307,7 +302,7 @@ export const drawRewardText = (
   const height = 270;
 
   if (target_reward === BALL_POINTS[2]) {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 260);
+    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 280);
   } else if (target_reward === BALL_POINTS[1]) {
     ctx.drawImage(moneybag, adjX - width / 2, adY, width, 210);
   } else {
@@ -389,32 +384,13 @@ export const drawText = (ctx, summary, remain) => {
     boardInterval,
     50
   );
-
-  // ctx.fillStyle = "#14e1df";
-  // ctx.fillStyle = "#da2c4d";
-  // ctx.fillRect(boardInterval * 2, 25, 50, 50);
-  // ctx.fillStyle = "#fff";
-  ctx.fillText(`✅: ${summary.success}`, boardInterval * 3, 50);
+  ctx.fillText(`Current Bonus: ${0} cents`, boardInterval * 4, 50);
   ctx.fillText(
-    `Total Bonus: ${(summary.point / 10000).toFixed(2)}$`,
-    boardInterval * 2,
+    `Total Bonus: ${(summary.point / 100).toFixed(3)}$`,
+    boardInterval * 3,
     50
   );
-  ctx.fillText(`❌: ${summary.fail}`, boardInterval * 4, 50);
-
-  // ctx.fillText(
-  //   `Trials: ${summary.fail + summary.success}`,
-  //   window.innerWidth - 200,
-  //   50
-  // );
-  // ctx.fillText(`✅: ${summary.success}`, window.innerWidth - 200, 100);
-  // ctx.fillText(`❌: ${summary.fail}`, window.innerWidth - 200, 150);
-  // ctx.fillText(
-  //   `you earn ${summary.point / 1000}£`,
-  //   window.innerWidth - 200,
-  //   200
-  // );
-  // ctx.fillText(`Total: ${remain}`, window.innerWidth - 200, 250);
+  ctx.fillText(`Sessions: ${0}/${6}`, boardInterval * 2, 50);
 };
 
 export const inch = (ppi, inch) => {
