@@ -1,4 +1,10 @@
 import { BALL_POINTS } from "./components/MTP/Balls";
+import { SHOW_REWARD_TIME } from "./components/MTP/MTPCanvas";
+
+export const GREEN_BALL = "#00ff00";
+export const BLUE_BALL = "#00bfff";
+export const BROWN_BALL = "#ff7f00";
+export const FONT_SIZE = 36;
 
 export const shuffle = (array) => {
   return array.sort(() => Math.random() - 0.5);
@@ -18,6 +24,23 @@ export const drawMaxDistance = (ctx, x, y, max_target_radius) => {
   ctx.fill();
 };
 
+export const drawRewardLevelText = (ctx, x, y) => {
+  ctx.beginPath();
+  ctx.arc(x, y, 10, 0, degToRad(360), true);
+  ctx.fillStyle = GREEN_BALL;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x - 100, y, 10, 0, degToRad(360), true);
+  ctx.fillStyle = GREEN_BALL;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(x + 100, y, 10, 0, degToRad(360), true);
+  ctx.fillStyle = GREEN_BALL;
+  ctx.fill();
+};
+
 export const resetCanvas = (ctx, monitorBound) => {
   // ctx.clearRect(0, 0, window.screen.width, window.screen.height);
   ctx.fillStyle = "#1c1c1c";
@@ -31,19 +54,43 @@ export const resetCanvas = (ctx, monitorBound) => {
   );
 };
 
+// export const drawRewardProgressBar = (ctx, total, current, x, y) => {
+//   const a = 100;
+//   const b = a - ((total - current) / 1400) * a;
+
+//   ctx.fillStyle = "yellow";
+//   ctx.fillRect(x - a / 2, y, a, 20);
+
+//   ctx.fillStyle = "green";
+//   ctx.fillRect(x - a / 2, y, b, 20);
+// };
+
 export const drawRewardProgressBar = (ctx, total, current, x, y) => {
   const a = 100;
-  const b = a - ((total - current) / 1400) * a;
+  const b = a - ((total - current) / SHOW_REWARD_TIME) * a;
 
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(x - a / 2, y, a, 20);
+  if (b > 0) {
+    const outerRadius = 30;
+    const innerRadius = 20;
+    const startAngle = -0.5 * Math.PI;
+    const endAngle = startAngle + (b / a) * 2 * Math.PI;
 
-  ctx.fillStyle = "green";
-  ctx.fillRect(x - a / 2, y, b, 20);
+    ctx.beginPath();
+    ctx.arc(x, y, outerRadius, 0, 2 * Math.PI);
+    ctx.arc(x, y, innerRadius, 2 * Math.PI, 0, true);
+    ctx.fillStyle = "black";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x, y, outerRadius, startAngle, endAngle);
+    ctx.arc(x, y, innerRadius, endAngle, startAngle, true);
+    ctx.fillStyle = "white";
+    ctx.fill();
+  }
 };
 
 export const drawPauseText = (ctx) => {
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -59,8 +106,25 @@ export const drawPauseText = (ctx) => {
   );
 };
 
+export const drawCurrentRewardText = (ctx, current_reward) => {
+  ctx.font = `${FONT_SIZE}px serif`;
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    `The Reward for this session is ${current_reward} cents for each trial.`,
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+  ctx.fillText(
+    "Press Enter key to start.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
+  );
+};
+
 export const drawLateClickText = (ctx) => {
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -72,7 +136,7 @@ export const drawLateClickText = (ctx) => {
 };
 
 export const drawRoughClickText = (ctx) => {
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -95,18 +159,25 @@ export const drawRedBall = (ctx, x, y) => {
 };
 export const drawPointer = (ctx, x, y) => {
   ctx.lineWidth = 3;
+  ctx.strokeStyle = "black";
+  ctx.beginPath();
+  ctx.moveTo(x - 10, y);
+  ctx.lineTo(x + 10, y);
+  ctx.moveTo(x, y - 10);
+  ctx.lineTo(x, y + 10);
+  ctx.stroke();
+  ctx.lineWidth = 2;
   ctx.strokeStyle = "white";
   ctx.beginPath();
   ctx.moveTo(x - 10, y);
   ctx.lineTo(x + 10, y);
   ctx.moveTo(x, y - 10);
   ctx.lineTo(x, y + 10);
-
   ctx.stroke();
 };
 
-export const toggleFullScreen = async (canvas) => {
-  canvas.requestFullscreen();
+export const toggleFullScreen = async (element) => {
+  element.requestFullscreen();
 };
 
 export const degToRad = (degrees) => {
@@ -129,31 +200,29 @@ export const initCanvas = async (canvas) => {
       }
     }
   });
-
-  // canvas.addEventListener("click", async (e) => {
-  // toggleFullScreen(canvas);
-  // if (!document.pointerLockElement) {
-  //   await canvas.requestPointerLock({
-  //     unadjustedMovement: true,
-  //   });
-  // }
-  // });
-
-  // canvas.addEventListener(
-  //   "click",
-  //   (e) => {
-  //     canvas.requestPointerLock({
-  //       unadjustedMovement: true,
-  //     });
-  //   },
-  //   false
-  // );
 };
 
-export const drawMTPTarget = (ctx, x, y, speed, radius) => {
+export const initMultipleCanvas = async (canvas1, container) => {
+  window.onresize = () => {
+    canvas1.width = window.innerWidth;
+    canvas1.height = window.innerHeight;
+  };
+
+  window.addEventListener("keypress", async (e) => {
+    if (e.key === "Enter") {
+      toggleFullScreen(container);
+      if (!document.pointerLockElement) {
+        await canvas1.requestPointerLock();
+      }
+    }
+  });
+};
+
+export const drawMTPTarget = (ctx, x, y, speed, radius, reward) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, degToRad(360), true);
-  ctx.fillStyle = "#00BFFF";
+  ctx.fillStyle = "#00bfff";
+
   ctx.fill();
 };
 
@@ -205,7 +274,16 @@ export const drawClickResultText = (
 ) => {
   // const successText = success ? "Success" : "failed";
   const successText = success ? "✅ Success!" : "❌ Failed...";
-  const successColor = success ? "green" : "red";
+  const successColor = success ? "white" : "red";
+  reward = Number(reward);
+
+  if (Math.abs(reward) === BALL_POINTS[0]) {
+    ctx.font = `${FONT_SIZE - 4}px san-serif bold`;
+  } else if (Math.abs(reward) == BALL_POINTS[1]) {
+    ctx.font = `${FONT_SIZE}px san-serif bold`;
+  } else {
+    ctx.font = `${FONT_SIZE + 4}px san-serif bold`;
+  }
 
   let textY = 0;
   let textX = 0;
@@ -223,30 +301,23 @@ export const drawClickResultText = (
   const adjX = x - textX;
   const adY = y - textY;
 
-  ctx.font = "30px serif";
-  // ctx.fillStyle = successColor;
+  ctx.fillStyle = successColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(
-    `${successText}`,
-    adjX,
-    adY - 50
-    // window.innerWidth / 2,
-    // window.innerHeight / 2
-  );
-  ctx.fillStyle = "#fff";
+  // ctx.fillText(`${successText}`, adjX, adY - 50);
 
   // ctx.fillText(
   //   `It took ${time} seconds.`,
   //   adjX,
   //   adY - 50
   // );
-
-  ctx.fillText(`You got ${reward} cent.`, adjX, adY - 100);
+  ctx.fillText(`${success ? "+" : "-"}${reward} cents`, adjX, adY - 100);
+  ctx.fillStyle = "#fff";
+  ctx.font = `${FONT_SIZE}px san-serif bold`;
 };
 
 export const drawTest = (ctx, x, y, monitorBound) => {
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -291,9 +362,9 @@ export const drawRewardText = (
   const adjX = x - textX;
   const adY = y - textY;
 
-  drawRewardProgressBar(ctx, progress_total, progress_current, adjX, adY - 80);
+  drawRewardProgressBar(ctx, progress_total, progress_current, x, y);
 
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -301,18 +372,18 @@ export const drawRewardText = (
   const width = 420;
   const height = 270;
 
-  if (target_reward === BALL_POINTS[2]) {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 280);
-  } else if (target_reward === BALL_POINTS[1]) {
-    ctx.drawImage(moneybag, adjX - width / 2, adY, width, 210);
-  } else {
-    const w = width * 0.8;
-    ctx.drawImage(moneybag, adjX - w / 2, adY, w, 230 * 0.8);
-  }
+  // if (target_reward === BALL_POINTS[2]) {
+  //   ctx.drawImage(moneybag, adjX - width / 2, adY, width, 280);
+  // } else if (target_reward === BALL_POINTS[1]) {
+  //   ctx.drawImage(moneybag, adjX - width / 2, adY, width, 210);
+  // } else {
+  //   const w = width * 0.8;
+  //   ctx.drawImage(moneybag, adjX - w / 2, adY, w, 230 * 0.8);
+  // }
 };
 
 export const drawStartButton = (ctx) => {
-  ctx.font = "30px serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -353,18 +424,60 @@ export const drawStartButton = (ctx) => {
 };
 
 export const drawStartButton2 = (ctx) => {
-  ctx.font = "30px  serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Press Enter key to start.",
+    "The practice session has ended.",
     window.innerWidth / 2,
-    window.innerHeight / 2
+    window.innerHeight / 2 - 50
+  );
+
+  // ctx.fillText(
+  //   "In the main session, you have 15 minutes.",
+  //   window.innerWidth / 2,
+  //   window.innerHeight / 2
+  // );
+
+  ctx.fillText(
+    "Press Enter key to start main session.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
   );
 };
+
+export function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
+
+export const drawPracticeStartButton = (ctx) => {
+  ctx.font = `${FONT_SIZE}px serif`;
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(
+    "Let's do practice session first.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 - 50
+  );
+  // ctx.fillText(
+  //   "Think about how you should do to earn as many bonuses as possible in limited time.",
+  //   window.innerWidth / 2,
+  //   window.innerHeight / 2
+  // );
+
+  ctx.fillText(
+    "Press Enter key to continue.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 100
+  );
+};
+
 export const drawFullscreenAlertText = (ctx) => {
-  ctx.font = "30px  serif";
+  ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -375,22 +488,49 @@ export const drawFullscreenAlertText = (ctx) => {
   );
 };
 
-export const drawText = (ctx, summary, remain) => {
-  ctx.font = "30px sans-serif";
+export const drawText = (
+  ctx,
+  summary,
+  remain,
+  session = { current: 0, total: 0 },
+  target_reward
+) => {
+  ctx.font = `${FONT_SIZE}px san-serif`;
   ctx.fillStyle = "#fff";
   const boardInterval = window.innerWidth / 6;
+  // ctx.fillText(
+  //   `Trials: ${summary.fail + summary.success} / ${remain}`,
+  //   boardInterval,
+  //   50
+  // );
   ctx.fillText(
-    `Trials: ${summary.fail + summary.success} / ${remain}`,
-    boardInterval,
+    `Trials: ${
+      summary.fail +
+      summary.success +
+      1 -
+      session.current * (summary.total / session.total)
+    }/${summary.total / session.total}`,
+    boardInterval * 1,
     50
   );
-  ctx.fillText(`Current Bonus: ${0} cents`, boardInterval * 4, 50);
+  ctx.fillText(
+    `Sessions: ${session.current + 1}/${session.total}`,
+    boardInterval * 2,
+    50
+  );
+
   ctx.fillText(
     `Total Bonus: ${(summary.point / 100).toFixed(3)}$`,
     boardInterval * 3,
     50
   );
-  ctx.fillText(`Sessions: ${0}/${6}`, boardInterval * 2, 50);
+  ctx.fillText(
+    `Current Bonus: ${
+      typeof target_reward === "number" ? target_reward : "-"
+    } cents`,
+    boardInterval * 4,
+    50
+  );
 };
 
 export const inch = (ppi, inch) => {
@@ -437,3 +577,7 @@ export const findLargest16by9Rectangle = (x, y) => {
 };
 
 export const fastRound3 = (x) => ((x * 1000 + 0.5) << 0) / 1000;
+
+export function financial(x) {
+  return Number(Number.parseFloat(x).toFixed(2));
+}

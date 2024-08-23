@@ -8,7 +8,7 @@ import {
   drawMTPTarget,
   drawPauseText,
   drawPointer,
-  drawRewardLevelText,
+  drawPracticeStartButton,
   drawRewardText,
   drawRoughClickText,
   drawStartButton2,
@@ -26,7 +26,7 @@ import {
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useTimer, useStopwatch } from "react-use-precision-timer";
+
 import reward_settings from "../../images/reward_setting.png";
 import Reward0 from "../../images/max_reward/reward_0.png";
 import Reward4 from "../../images/max_reward/reward_4.png";
@@ -42,27 +42,37 @@ import {
 import { Balls } from "./Balls";
 import usePreventRefresh from "../PreventRefresh";
 import { Spin, Typography } from "antd";
+import {
+  SHOW_REWARD_TIME,
+  SHOW_RESULT_TIME,
+  SHOW_ROUGH_TIME,
+  SHOW_LATE_TIME,
+} from "./MTPCanvas";
+import { useTimer } from "react-use-precision-timer";
 import { Subs } from "react-sub-unsub";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
+const TOTAL_TIME = 1.5 * 60 * 1000;
 
-const TOTAL_TIME = 15 * 60 * 1000;
+const TOTAL_TRIALS = 30;
 
-export const SHOW_REWARD_TIME = 800; //ms
-export const SHOW_RESULT_TIME = 0; //ms
-export const SHOW_ROUGH_TIME = 2400;
-export const SHOW_LATE_TIME = 2400;
+const STOP_TIME = 3000;
+const MAXIMUM_ERROR_STREAK = 3;
+let myReq;
 
-// const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
-const TOTAL_TRIALS = 300;
+const NUM_SESSIONS = 3;
+const NUM_SUB_SESSIONS_PER_SESSIONS = 2;
 
-export const STOP_TIME = 3000;
-export const MAXIMUM_ERROR_STREAK = 3;
+const MTPCanvasPractice = () => {
+  // const callback = useCallback(() => {
+  //   cancelAnimationFrame(myReq);
+  //   navigate(
+  //     `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+  //   );
+  //   // setIsUploading(true);
+  // }, []);
 
-const NUM_SESSIONS = 6;
-
-const MTPCanvas = () => {
   // useEffect(() => {
   //   if (timer.isStarted()) {
   //     const subs = new Subs();
@@ -71,15 +81,9 @@ const MTPCanvas = () => {
   //   }
   // }, [timer.isStarted()]);
 
-  // const callback = useCallback(() => {
-  //   end = true;
-  //   uploadCSV();
-  //   setIsUploading(true);
-  // }, []);
-  // const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
-
   let end = false;
 
+  // const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
   // const [remainTime, setRemainTime] = useState(0);
 
   const [isUploading, setIsUploading] = useState(false);
@@ -88,126 +92,8 @@ const MTPCanvas = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
   const prolificUser = useRecoilValue(prolificUserState);
   const preventRefresh = usePreventRefresh();
+
   const navigate = useNavigate();
-  const logArr = [
-    [
-      "trial",
-      "target_radius",
-      "target_x",
-      "target_y",
-      "cursor_x",
-      "cursor_y",
-      "screenX",
-      "screenY",
-      "buttons",
-      "timestamp",
-      "dpr",
-      "fullscreen",
-    ],
-  ];
-  const summaryLogArr = [
-    [
-      "trial",
-      "success",
-      "trial_completion_time",
-      "target_p",
-      "got_p",
-      "total_p",
-      "target_radius",
-      "id",
-      "w",
-      "d",
-      "skipped",
-      "inaccurate",
-      "gen",
-    ],
-  ];
-
-  async function uploadCSV() {
-    console.log("upload csv");
-
-    if (document.fullscreenElement) {
-      document
-        .exitFullscreen()
-        .then(() => console.log("Document Exited from Full screen mode"))
-        .catch((err) => console.error(err));
-    }
-    const storage = getStorage();
-
-    const summaryStorageRef = ref(
-      storage,
-      `summary/${prolificUser.PROLIFIC_PID}_${prolificUser.STUDY_ID}.csv`
-    );
-    const storageRef = ref(
-      storage,
-      `trajectory/${prolificUser.PROLIFIC_PID}_${prolificUser.STUDY_ID}.csv`
-    );
-
-    let summaryContent = summaryLogArr
-      .map((e) => {
-        return e.join(",");
-      })
-      .join("\n");
-
-    let csvContent = logArr
-      .map((e) => {
-        return e.join(",");
-      })
-      .join("\n");
-
-    const summaryBlob = new Blob([summaryContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const blob = new Blob([csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-    try {
-      const summarySnapshot = await uploadBytes(summaryStorageRef, summaryBlob);
-      const snapshot = await uploadBytes(storageRef, blob);
-      console.log(summarySnapshot);
-      console.log(snapshot);
-      navigate("/done");
-    } catch {
-      alert(
-        "An error occurred during the upload. The data file will be downloaded directly to your PC. please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them. your completion code is CSE63DRO."
-      );
-      //---download in local pc---
-      var summaryEncodedUri = encodeURI(
-        `data:text/csv;charset=utf-8,${summaryContent}`
-      );
-      var encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
-
-      var link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute(
-        "download",
-        `trajectory/${prolificUser.PROLIFIC_PID}_${
-          prolificUser.STUDY_ID
-        }_${Date.now()}.csv`
-      );
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      var link = document.createElement("a");
-      link.setAttribute("href", summaryEncodedUri);
-      link.setAttribute(
-        "download",
-        `summary/${prolificUser.PROLIFIC_PID}_${
-          prolificUser.STUDY_ID
-        }_${Date.now()}.csv`
-      );
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      //---download in local pc---
-      navigate("/error");
-    }
-  }
-
   useEffect(() => {
     let isPaused = false;
     let isSessionEnded = false;
@@ -220,10 +106,9 @@ const MTPCanvas = () => {
     let responseTime = null;
     let loggingStartTime = null;
     let current_reward = null;
+    let end = false;
 
     let skipCnt = 0;
-    let roughClickCnt = 0;
-    let myReq;
     let reward0 = new Image({});
     let reward4 = new Image({});
     let reward20 = new Image({});
@@ -284,29 +169,6 @@ const MTPCanvas = () => {
     });
     balls.generateRandomDesigns();
 
-    const pushSummaryLog = (
-      current_target_success,
-      skipped = 0,
-      inaccurate = 0
-    ) => {
-      const summaryLogRow = [
-        summary.fail + summary.success,
-        current_target_success,
-        responseTime,
-        target_reward,
-        current_reward,
-        summary.point,
-        fastRound3(target_radius),
-        fastRound3(currentDesign.id),
-        fastRound3(currentDesign.w),
-        fastRound3(currentDesign.d),
-        skipped,
-        inaccurate,
-        target_gen_error,
-      ];
-      summaryLogArr.push(summaryLogRow);
-    };
-
     const drawFullscreenText = () => {
       if (window.innerHeight !== window.screen.height || !isPointerLock) {
         isFullscreen = false;
@@ -316,30 +178,6 @@ const MTPCanvas = () => {
       }
     };
 
-    const logging = () => {
-      if (!loggingStartTime) {
-        loggingStartTime = performance.now(); // Set the logging start time
-      }
-
-      const tempRow = [
-        summary.fail + summary.success,
-        target_radius,
-        fastRound3(target_x - monitorBound.left),
-        fastRound3(target_y - monitorBound.top),
-        fastRound3(x - monitorBound.left),
-        fastRound3(y - monitorBound.top),
-        // movementX,
-        // movementY,
-        monitorBound.width,
-        monitorBound.height,
-        buttons,
-        Date.now() / 1000,
-        window.devicePixelRatio,
-        isFullscreen ? 1 : 0,
-      ];
-      logArr.push(tempRow);
-      if (buttons !== 0) buttons = 0;
-    };
     currentDesign = balls.popStack();
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d", { alpha: false });
@@ -358,8 +196,8 @@ const MTPCanvas = () => {
         outer_radius: inch(ppi, d),
         ball_radius: inch(ppi, w),
         screen_width: monitorBound.width,
-        screen_height: monitorBound.height - Math.max(monitorBound.top, 70),
-        top: Math.max(monitorBound.top, 70),
+        screen_height: monitorBound.height,
+        top: monitorBound.top,
         left: monitorBound.left,
       });
 
@@ -384,11 +222,18 @@ const MTPCanvas = () => {
 
       document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
+      //test---
+      // let mouse_cnt = 0;
+      // let cnt = 0;
+      // let tt = performance.now();
+      //test---
+
       const mouseDown = (e) => {
         if (e.buttons === 1 && !isSessionEnded) {
           const p = performance.now();
           if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
             responseTime = p - loggingStartTime;
+            console.log(responseTime);
             buttons = e.buttons;
 
             show_reward_counter = p;
@@ -407,7 +252,6 @@ const MTPCanvas = () => {
               // if (target_radius * 5 - distance < 0) {
               inaccurate = 1;
               show_rough_counter = p;
-              pushSummaryLog(current_target_success, 0, inaccurate);
               targetInit(currentDesign.d, currentDesign.w);
 
               return;
@@ -425,9 +269,9 @@ const MTPCanvas = () => {
               summary.point += reward;
               lastClickResult.success = true;
               lastClickResult.point = reward;
-              pushSummaryLog(current_target_success, 0, inaccurate);
               summary.success++;
             } else {
+              //실패
               let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
               reward = Math.min(target_reward, reward);
               reward = Math.max(reward, 0);
@@ -438,20 +282,20 @@ const MTPCanvas = () => {
 
               lastClickResult.success = false;
               lastClickResult.point = 0;
-              pushSummaryLog(current_target_success, 0, inaccurate);
               summary.fail++;
             }
 
             if (balls.getRandomDesignArray().length === 0 && !end) {
               end = true;
-              uploadCSV();
-              setIsUploading(true);
+              navigate(
+                `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+              );
             } else {
               currentDesign = balls.popStack();
               targetInit(currentDesign.d, currentDesign.w);
             }
           }
-          //세션 구분시 쓰는부분
+
           if (
             (summary.fail + summary.success) % (TOTAL_TRIALS / NUM_SESSIONS) ===
             0
@@ -498,7 +342,7 @@ const MTPCanvas = () => {
           Math.min(x, window.screen.width - monitorBound.left)
         );
         y = Math.max(
-          Math.max(monitorBound.top, 70),
+          monitorBound.top,
           Math.min(y, window.screen.height - monitorBound.top)
         );
       }
@@ -514,7 +358,6 @@ const MTPCanvas = () => {
         } else {
           // console.log("STEP");
           update(timestamp);
-
           myReq = requestAnimationFrame(step);
         }
       }
@@ -534,12 +377,13 @@ const MTPCanvas = () => {
         targetInit(currentDesign.d, currentDesign.w);
         show_reward_counter = performance.now();
         // timer.start();
+        // step();
         isSessionEnded = true;
         cancelAnimationFrame(myReq);
         requestAnimationFrame(session_show_step);
       } else {
         drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-        drawStartButton2(ctx);
+        drawPracticeStartButton(ctx);
         myReq = requestAnimationFrame(pre_step);
       }
     }
@@ -553,7 +397,6 @@ const MTPCanvas = () => {
     }
 
     function handlePause(e) {
-      console.log(isSessionEnded);
       if ((isPaused || isSessionEnded) && e.key === "Enter") {
         cancelAnimationFrame(myReq);
         isPaused = false;
@@ -585,7 +428,6 @@ const MTPCanvas = () => {
         // summary.fail++;
         lastClickResult.success = false;
         lastClickResult.point = 0;
-        pushSummaryLog(0, 1, 0);
         currentDesign = currentDesign;
         targetInit(currentDesign.d, currentDesign.w);
         // }
@@ -605,7 +447,6 @@ const MTPCanvas = () => {
         show_reward_counter + SHOW_RESULT_TIME > timestamp &&
         summary.success + summary.fail > 0
       ) {
-        //얻은 금액 표시 부분
         drawClickResultText(
           ctx,
           lastClickResult.success,
@@ -615,7 +456,6 @@ const MTPCanvas = () => {
           y,
           monitorBound
         );
-
         drawPointer(ctx, x, y);
       } else if (
         show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME > timestamp ||
@@ -644,7 +484,6 @@ const MTPCanvas = () => {
           timestamp
         );
         drawPointer(ctx, x, y);
-        // drawMTPTarget(ctx, target_x, target_y, 0, target_radius, target_reward);
       } else if (show_late_counter + SHOW_LATE_TIME > timestamp) {
         drawLateClickText(ctx);
       }
@@ -652,7 +491,10 @@ const MTPCanvas = () => {
         show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME <
         timestamp
       ) {
-        logging();
+        if (!loggingStartTime) {
+          loggingStartTime = performance.now(); // Set the logging start time
+        }
+
         // drawMaxDistance(
         //   ctx,
         //   target_x,
@@ -675,62 +517,56 @@ const MTPCanvas = () => {
   }, [isUploading, weight]);
 
   return (
-    <>
+    <div id="container">
       <div
-        id="container"
         style={{
-          display: !isUploading ? "block" : "none",
+          position: "fixed",
+          top: 20,
+          left: 0,
+          width: monitorBound.width,
+          height: 50,
+          fontSize: 36,
+          color: "white",
+          display: "flex",
+          justifyContent: "space-between",
+          marginLeft: monitorBound.left,
+          // paddingRight: monitorBound.left,
+        }}
+        id="text_canvas"
+      >
+        <div style={{ width: "33%" }}></div>
+        <div style={{ width: "33%" }}>
+          {/* Time:{" "}
+          {!!timer.isRunning()
+            ? millisToMinutesAndSeconds(remainTime)
+            : millisToMinutesAndSeconds(TOTAL_TIME)} */}
+        </div>
+        {/* <div style={{ width: "33%" }}>
+          <img src={reward_settings} width={300} />
+        </div> */}
+      </div>
+      <div
+        style={{
+          width: "100%",
+          textAlign: "center",
+          position: "absolute",
+          fontSize: 40,
+          color: "white",
+          bottom: 20,
+          left: 0,
         }}
       >
-        <div
-          style={{
-            position: "fixed",
-            top: 20,
-            left: 0,
-            width: monitorBound.width,
-            height: 50,
-            fontSize: 36,
-            color: "white",
-            display: "flex",
-            justifyContent: "space-between",
-            marginLeft: monitorBound.left,
-            // paddingRight: monitorBound.left,
-          }}
-          id="text_canvas"
-        >
-          <div style={{ width: "33%" }}></div>
-          <div style={{ width: "33%" }}>
-            {/* Time:{" "}
-            {!!timer.isRunning()
-              ? millisToMinutesAndSeconds(remainTime)
-              : millisToMinutesAndSeconds(TOTAL_TIME)} */}
-          </div>
-          {/* <div style={{ width: "33%" }}>
-            Current Bonus:
-            <img src={reward_settings} width={100} />
-          </div> */}
-        </div>
-
+        THIS IS PRACTICE SESSION.
+      </div>
+      <>
         <canvas
           id="canvas"
           width={window.innerWidth}
           height={window.innerHeight}
         />
-      </div>
-
-      {isUploading && (
-        <div>
-          <Typography.Title>
-            <Spin size="large" />
-            <br />
-            Uploading
-            <br />
-            Never close the screen...
-          </Typography.Title>
-        </div>
-      )}
-    </>
+      </>
+    </div>
   );
 };
 
-export default MTPCanvas;
+export default MTPCanvasPractice;

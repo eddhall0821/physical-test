@@ -43,7 +43,7 @@ const TargetSimulator = () => {
     link.setAttribute("download", `ttttaaaaaaddfsfasdffew.csv`);
 
     document.body.appendChild(link);
-    link.click();
+    // link.click();
   }, []);
 
   return <></>;

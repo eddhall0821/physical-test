@@ -27,12 +27,9 @@ import TargetSimulator from "./components/TargetSimulator";
 import AdminPage from "./components/admin/AdminPage";
 import ReplayTimeinteval from "./components/MTP/ReplayTimeinterval";
 import DemoPointing from "./components/pointing/Demo";
+import MTPCanvasPractice from "./components/MTP/MTPCanvasPractice";
 
 function App() {
-  {
-    console.log(!!process.env.REACT_APP_PNC_AUTH);
-  }
-
   const routerData = [
     {
       path: "",
@@ -42,7 +39,11 @@ function App() {
     {
       path: "pnc",
       element: <MTPCanvas />,
-      // withAuth: false,
+      withAuth: process.env.REACT_APP_PNC_AUTH === "true",
+    },
+    {
+      path: "practice",
+      element: <MTPCanvasPractice />,
       withAuth: process.env.REACT_APP_PNC_AUTH === "true",
     },
     // {
@@ -98,8 +99,7 @@ function App() {
     {
       path: "main-guidelines",
       element: <MainGuideLines />,
-      withAuth: false,
-      // withAuth: true,
+      withAuth: process.env.REACT_APP_PNC_AUTH === "true",
     },
     {
       path: "done",
