@@ -95,7 +95,7 @@ export const drawPauseText = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "The experiment paused because it looks like you're away right now.",
+    "The study paused because it looks like you're away right now.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -112,7 +112,7 @@ export const drawCurrentRewardText = (ctx, current_reward) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    `The Reward for this session is ${current_reward} cents for each trial.`,
+    `The Reward for this session is maximum ${current_reward} cents for each trial.`,
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -429,7 +429,7 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "The practice session has ended.",
+    "The practice study has ended.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
@@ -441,7 +441,7 @@ export const drawStartButton2 = (ctx) => {
   // );
 
   ctx.fillText(
-    "Press Enter key to start main session.",
+    "Press Enter key to start main study.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
@@ -459,7 +459,7 @@ export const drawPracticeStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Let's do practice session first.",
+    "Let's do practice first.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );

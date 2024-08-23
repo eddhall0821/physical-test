@@ -556,7 +556,7 @@ const MTPCanvasPractice = () => {
           left: 0,
         }}
       >
-        THIS IS PRACTICE SESSION.
+        THIS IS PRACTICE STUDY.
       </div>
       <>
         <canvas

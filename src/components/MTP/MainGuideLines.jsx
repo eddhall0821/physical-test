@@ -139,7 +139,7 @@ const MainGuideLines = () => {
         <StepContent>
           You will get a bonus if you successfully click the target. Click on
           the targets as quickly and accurately as possible. The faster you
-          click, the closer you will get to the maximum bonus.
+          click, the closer you will get to the current bonus.
         </StepContent>
       ),
       target: () => refSuccess.current,
@@ -170,7 +170,7 @@ const MainGuideLines = () => {
       description: (
         <StepContent>
           The number of trials remaining in this session and the total number of
-          trials.
+          trials in this session.
         </StepContent>
       ),
       target: () => refTrials.current,
@@ -178,7 +178,9 @@ const MainGuideLines = () => {
     {
       title: <StepTitle>Sessions</StepTitle>,
       description: (
-        <StepContent>The current session and all sessions.</StepContent>
+        <StepContent>
+          The current session and total number of sessions.
+        </StepContent>
       ),
       target: () => refSessions.current,
     },
@@ -404,9 +406,9 @@ const MainGuideLines = () => {
         >
           <div>
             <MainTaskFont>
-              The Reward for this session is 4 cents for each trial.
+              The Reward for this session is maximum 4 cents for each trial.
             </MainTaskFont>
-            <MainTaskFont>Press Enter key to start.</MainTaskFont>
+            {/* <MainTaskFont>Press Enter key to start.</MainTaskFont> */}
           </div>
         </div>
 
