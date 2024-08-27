@@ -32,6 +32,7 @@ const MainGuideLines = () => {
   const refBlue = useRef(null);
   const refGreen = useRef(null);
   const refSuccess = useRef(null);
+  const refSuccess2 = useRef(null);
   const refFail = useRef(null);
   const refRewardSettings = useRef(null);
   const refReward = useRef(null);
@@ -138,12 +139,21 @@ const MainGuideLines = () => {
       description: (
         <StepContent>
           You will get a bonus if you successfully click the target. Click on
-          the targets as quickly and accurately as possible. The faster you
-          click, the closer you will get to the current bonus.
+          the targets as quickly and accurately as possible.
         </StepContent>
       ),
       target: () => refSuccess.current,
     },
+    {
+      title: <StepTitle>Successful clicks</StepTitle>,
+      description: (
+        <StepContent>
+          The faster you click, the closer you will get to the current bonus.
+        </StepContent>
+      ),
+      target: () => refSuccess2.current,
+    },
+
     {
       title: <StepTitle>Failed clicks</StepTitle>,
       description: (
@@ -406,9 +416,11 @@ const MainGuideLines = () => {
         >
           <div>
             <MainTaskFont>
-              The Reward for this session is maximum 4 cents for each trial.
+              In this session, each target has 4 cents.
             </MainTaskFont>
-            {/* <MainTaskFont>Press Enter key to start.</MainTaskFont> */}
+            <MainTaskFont>
+              Successful click with shorter time will give you more bonuses.
+            </MainTaskFont>
           </div>
         </div>
 
@@ -426,7 +438,7 @@ const MainGuideLines = () => {
           ref={refSuccess}
         >
           <div>
-            <MainTaskFont>+1.6 Cents</MainTaskFont>
+            <MainTaskFont>1.6 Cents</MainTaskFont>
           </div>
           <img alt="money" src={click_success} />
         </div>
@@ -434,6 +446,25 @@ const MainGuideLines = () => {
         <div
           style={{
             display: currentGuideIndex !== 4 && "none",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(0%, -50%)",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          ref={refSuccess2}
+        >
+          <div>
+            <MainTaskFont>+2 Cents</MainTaskFont>
+          </div>
+          <img alt="money" src={click_success} />
+        </div>
+
+        <div
+          style={{
+            display: currentGuideIndex !== 5 && "none",
             position: "absolute",
             top: "50%",
             left: "50%",
@@ -468,7 +499,7 @@ const MainGuideLines = () => {
 
         <div
           style={{
-            display: currentGuideIndex !== 5 ? "none" : "flex",
+            display: currentGuideIndex !== 6 ? "none" : "flex",
             position: "absolute",
             top: "50%",
             left: "50%",

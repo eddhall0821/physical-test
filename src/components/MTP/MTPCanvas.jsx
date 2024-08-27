@@ -5,6 +5,7 @@ import {
   drawCurrentRewardText,
   drawFullscreenAlertText,
   drawLateClickText,
+  drawMaxDistance,
   drawMTPTarget,
   drawPauseText,
   drawPointer,
@@ -22,6 +23,7 @@ import {
   random_point_between_circles,
   resetCanvas,
   shuffle,
+  temporal_discounting_reward,
 } from "../../utils";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
@@ -277,10 +279,11 @@ const MTPCanvas = () => {
     const balls = new Balls();
     balls.init({
       groupCount: 3,
-      stepSize: 1.33333,
-      startStep: 3,
+      stepSize: 1,
+      startStep: 4,
       totalCount: TOTAL_TRIALS,
       num_sessions: NUM_SESSIONS,
+      monitorBound: monitorBound.width / ppi,
     });
     balls.generateRandomDesigns();
 
@@ -289,6 +292,7 @@ const MTPCanvas = () => {
       skipped = 0,
       inaccurate = 0
     ) => {
+      console.log("log_" + target_radius);
       const summaryLogRow = [
         summary.fail + summary.success,
         current_target_success,
@@ -351,7 +355,7 @@ const MTPCanvas = () => {
       loggingStartTime = null;
       target_radius = inch(ppi, w);
       target_reward = currentDesign.reward;
-
+      console.log(currentDesign);
       const target_location = random_point_between_circles({
         center: { x, y },
         inner_radius: inch(ppi, d),
@@ -387,80 +391,96 @@ const MTPCanvas = () => {
       const mouseDown = (e) => {
         if (e.buttons === 1 && !isSessionEnded) {
           const p = performance.now();
-          if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
-            responseTime = p - loggingStartTime;
-            buttons = e.buttons;
+          if (!isPaused) {
+            if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
+              responseTime = p - loggingStartTime;
+              buttons = e.buttons;
 
-            show_reward_counter = p;
-            delay = p;
-            movement_stop_time = p;
-            skipCnt = 0;
+              show_reward_counter = p;
+              delay = p;
+              movement_stop_time = p;
+              skipCnt = 0;
 
-            const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-            const current_target_success = target_radius - distance > 0 ? 1 : 0;
-            let inaccurate = 0;
+              const distance = distanceBetweenTwoPoint(
+                x,
+                y,
+                target_x,
+                target_y
+              );
+              const current_target_success =
+                target_radius - distance > 0 ? 1 : 0;
+              let inaccurate = 0;
 
+              if (
+                false &&
+                inch(ppi, balls.max_target_radius) * 5 - distance < 0
+              ) {
+                // if (target_radius * 5 - distance < 0) {
+                inaccurate = 1;
+                show_rough_counter = p;
+                pushSummaryLog(current_target_success, 0, inaccurate);
+                targetInit(currentDesign.d, currentDesign.w);
+
+                return;
+                // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
+                //   show_rough_counter = p;
+                //   roughClickCnt = 0;
+                // }
+              } else if (target_radius - distance > 0) {
+                let reward = temporal_discounting_reward(
+                  target_reward,
+                  responseTime
+                );
+
+                reward = Math.min(target_reward, reward);
+                reward = Math.max(reward, 0);
+                reward = financial(reward);
+
+                current_reward = reward;
+                summary.point += reward;
+                lastClickResult.success = true;
+                lastClickResult.point = reward;
+                pushSummaryLog(current_target_success, 0, inaccurate);
+                summary.success++;
+              } else {
+                let reward = temporal_discounting_reward(
+                  target_reward,
+                  responseTime
+                );
+                reward = Math.min(target_reward, reward);
+                reward = Math.max(reward, 0);
+                reward = financial(reward);
+
+                current_reward = reward;
+                summary.point -= reward;
+
+                lastClickResult.success = false;
+                lastClickResult.point = 0;
+                pushSummaryLog(current_target_success, 0, inaccurate);
+                summary.fail++;
+              }
+
+              if (balls.getRandomDesignArray().length === 0 && !end) {
+                end = true;
+                uploadCSV();
+                setIsUploading(true);
+              } else {
+                currentDesign = balls.popStack();
+                targetInit(currentDesign.d, currentDesign.w);
+              }
+            }
+            //세션 구분시 쓰는부분
             if (
-              false &&
-              inch(ppi, balls.max_target_radius) * 5 - distance < 0
+              (summary.fail + summary.success) %
+                (TOTAL_TRIALS / NUM_SESSIONS) ===
+              0
             ) {
-              // if (target_radius * 5 - distance < 0) {
-              inaccurate = 1;
-              show_rough_counter = p;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              targetInit(currentDesign.d, currentDesign.w);
-
-              return;
-              // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
-              //   show_rough_counter = p;
-              //   roughClickCnt = 0;
-              // }
-            } else if (target_radius - distance > 0) {
-              let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
-              reward = Math.min(target_reward, reward);
-              reward = Math.max(reward, 0);
-              reward = financial(reward);
-
-              current_reward = reward;
-              summary.point += reward;
-              lastClickResult.success = true;
-              lastClickResult.point = reward;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              summary.success++;
-            } else {
-              let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
-              reward = Math.min(target_reward, reward);
-              reward = Math.max(reward, 0);
-              reward = financial(reward);
-
-              current_reward = reward;
-              summary.point -= reward;
-
-              lastClickResult.success = false;
-              lastClickResult.point = 0;
-              pushSummaryLog(current_target_success, 0, inaccurate);
-              summary.fail++;
+              isSessionEnded = true;
+              session.current++;
+              current_reward = null;
+              cancelAnimationFrame(myReq);
+              requestAnimationFrame(session_show_step);
             }
-
-            if (balls.getRandomDesignArray().length === 0 && !end) {
-              end = true;
-              uploadCSV();
-              setIsUploading(true);
-            } else {
-              currentDesign = balls.popStack();
-              targetInit(currentDesign.d, currentDesign.w);
-            }
-          }
-          //세션 구분시 쓰는부분
-          if (
-            (summary.fail + summary.success) % (TOTAL_TRIALS / NUM_SESSIONS) ===
-            0
-          ) {
-            isSessionEnded = true;
-            session.current++;
-            current_reward = null;
-            cancelAnimationFrame(myReq);
-            requestAnimationFrame(session_show_step);
           }
         }
       };
@@ -524,7 +544,7 @@ const MTPCanvas = () => {
       console.log("SESSION_STEP");
       resetCanvas(ctx, monitorBound);
       drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-      drawCurrentRewardText(ctx, target_reward);
+      drawCurrentRewardText(ctx, target_reward, 50);
       myReq = requestAnimationFrame(session_show_step);
     }
 
@@ -554,7 +574,7 @@ const MTPCanvas = () => {
 
     function handlePause(e) {
       console.log(isSessionEnded);
-      if ((isPaused || isSessionEnded) && e.key === "Enter") {
+      if ((isPaused || isSessionEnded) && (e.key === "s" || e.key === "S")) {
         cancelAnimationFrame(myReq);
         isPaused = false;
         isSessionEnded = false;
@@ -655,9 +675,9 @@ const MTPCanvas = () => {
         logging();
         // drawMaxDistance(
         //   ctx,
-        //   target_x,
-        //   target_y,
-        //   inch(ppi, balls.max_target_radius) * 5
+        //   window.innerWidth / 2,
+        //   window.innerHeight / 2,
+        //   inch(ppi, currentDesign.d)
         // );
         drawMTPTarget(ctx, target_x, target_y, 0, target_radius, target_reward);
         drawPointer(ctx, x, y);

@@ -1,37 +1,48 @@
 import {
   getDistanceByWidthAndId,
+  getRandomArbitrary,
   getWidthByIDAndDistance,
   shuffle,
 } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
 export const BALL_POINTS = [0, 4, 10];
+export const BALL_POINTS_MINIMUM = [0, 1, 3];
 export class Balls {
   designs = [];
   randomDesignArray = [];
 
   generateRandomDesigns = function () {
+    console.log(this.monitorBound);
     const randomDesignArray = [];
     for (let design of this.designs) {
       for (let i = 0; i < design.cnt; i++) {
         const random = Math.random();
-        const minDistance = 2;
-        const maxDistance = INCH_24_HEIGHT / 2;
+
+        //랜덤한 id 값
         const randId = random * design.idStep + design.idStart;
-
+        const randomWidth = getRandomArbitrary(0.1, 0.5);
+        const randomDistance = getRandomArbitrary(3, this.monitorBound / 2 - 1);
         let distance, width;
-        // distance = random * (maxDistance - minDistance) + minDistance;
-        // width = getWidthByIDAndDistance(randId, distance) / 2;
 
-        if (randId <= this.startStep + this.stepSize) {
-          width = 0.5;
-        } else if (randId <= this.startStep + this.stepSize * 2) {
-          width = 0.3;
-        } else if (randId <= this.startStep + this.stepSize * 3) {
+        //이부분은 삭제하지말것
+        // if (randId <= this.startStep + this.stepSize) {
+        //   width = 0.5;
+        // } else if (randId <= this.startStep + this.stepSize * 2) {
+        //   width = 0.3;
+        // } else if (randId <= this.startStep + this.stepSize * 3) {
+        //   width = 0.1;
+        // }
+
+        // distance = getDistanceByWidthAndId(randId, width);
+        distance = randomDistance;
+
+        width = getWidthByIDAndDistance(randId, randomDistance);
+        if (width < 0.1) {
           width = 0.1;
+          distance = getDistanceByWidthAndId(randId, width);
         }
 
-        distance = getDistanceByWidthAndId(randId, width);
         randomDesignArray.push({
           random: random,
           id: randId,
@@ -41,14 +52,20 @@ export class Balls {
         });
       }
     }
-    this.randomDesignArray = shuffle(randomDesignArray);
-    this.randomDesignArray.sort((a, b) => a.reward - b.reward);
 
-    const designArrayChunk = this.chunk(
-      this.randomDesignArray,
-      this.totalCount / this.num_sessions
-    );
-    this.randomDesignArray = shuffle(designArrayChunk).flat();
+    if (this.shuffle) {
+      this.randomDesignArray = shuffle(randomDesignArray);
+      this.randomDesignArray.sort((a, b) => a.reward - b.reward);
+
+      const designArrayChunk = this.chunk(
+        this.randomDesignArray,
+        this.totalCount / this.num_sessions
+      );
+      this.randomDesignArray = shuffle(designArrayChunk).flat();
+    } else {
+      this.randomDesignArray = randomDesignArray;
+      this.randomDesignArray.sort((a, b) => a.reward - b.reward);
+    }
   };
 
   getRandomDesignArray = function () {
@@ -100,7 +117,9 @@ export class Balls {
     stepSize,
     startStep,
     totalCount,
+    monitorBound,
     num_sessions = 0,
+    shuffle = true,
   }) {
     this.designs = [];
     this.stepSize = stepSize;
@@ -108,6 +127,8 @@ export class Balls {
     this.totalCount = totalCount;
     this.num_sessions = num_sessions;
     this.sessions = [];
+    this.shuffle = shuffle;
+    this.monitorBound = monitorBound;
 
     const reward = this.createRewardArray(totalCount);
 

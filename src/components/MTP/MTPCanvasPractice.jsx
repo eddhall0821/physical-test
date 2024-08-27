@@ -22,6 +22,7 @@ import {
   random_point_between_circles,
   resetCanvas,
   shuffle,
+  temporal_discounting_reward,
 } from "../../utils";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
@@ -162,10 +163,12 @@ const MTPCanvasPractice = () => {
     const balls = new Balls();
     balls.init({
       groupCount: 3,
-      stepSize: 1.33333,
-      startStep: 3,
+      stepSize: 1,
+      startStep: 4,
       totalCount: TOTAL_TRIALS,
       num_sessions: NUM_SESSIONS,
+      shuffle: false,
+      monitorBound: monitorBound.width / ppi,
     });
     balls.generateRandomDesigns();
 
@@ -231,80 +234,95 @@ const MTPCanvasPractice = () => {
       const mouseDown = (e) => {
         if (e.buttons === 1 && !isSessionEnded) {
           const p = performance.now();
-          if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME && !isPaused) {
-            responseTime = p - loggingStartTime;
-            console.log(responseTime);
-            buttons = e.buttons;
+          if (!isPaused) {
+            if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
+              responseTime = p - loggingStartTime;
+              console.log(responseTime);
+              buttons = e.buttons;
 
-            show_reward_counter = p;
-            delay = p;
-            movement_stop_time = p;
-            skipCnt = 0;
+              show_reward_counter = p;
+              delay = p;
+              movement_stop_time = p;
+              skipCnt = 0;
 
-            const distance = distanceBetweenTwoPoint(x, y, target_x, target_y);
-            const current_target_success = target_radius - distance > 0 ? 1 : 0;
-            let inaccurate = 0;
+              const distance = distanceBetweenTwoPoint(
+                x,
+                y,
+                target_x,
+                target_y
+              );
+              const current_target_success =
+                target_radius - distance > 0 ? 1 : 0;
+              let inaccurate = 0;
+
+              if (
+                false &&
+                inch(ppi, balls.max_target_radius) * 5 - distance < 0
+              ) {
+                // if (target_radius * 5 - distance < 0) {
+                inaccurate = 1;
+                show_rough_counter = p;
+                targetInit(currentDesign.d, currentDesign.w);
+
+                return;
+                // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
+                //   show_rough_counter = p;
+                //   roughClickCnt = 0;
+                // }
+              } else if (target_radius - distance > 0) {
+                let reward = temporal_discounting_reward(
+                  target_reward,
+                  responseTime
+                );
+                reward = Math.min(target_reward, reward);
+                reward = Math.max(reward, 0);
+                reward = financial(reward);
+
+                current_reward = reward;
+                summary.point += reward;
+                lastClickResult.success = true;
+                lastClickResult.point = reward;
+                summary.success++;
+              } else {
+                //실패
+                let reward = temporal_discounting_reward(
+                  target_reward,
+                  responseTime
+                );
+                reward = Math.min(target_reward, reward);
+                reward = Math.max(reward, 0);
+                reward = financial(reward);
+
+                current_reward = reward;
+                summary.point -= reward;
+
+                lastClickResult.success = false;
+                lastClickResult.point = 0;
+                summary.fail++;
+              }
+
+              if (balls.getRandomDesignArray().length === 0 && !end) {
+                end = true;
+                navigate(
+                  `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+                );
+              } else {
+                currentDesign = balls.popStack();
+                targetInit(currentDesign.d, currentDesign.w);
+              }
+            }
 
             if (
-              false &&
-              inch(ppi, balls.max_target_radius) * 5 - distance < 0
+              (summary.fail + summary.success) %
+                (TOTAL_TRIALS / NUM_SESSIONS) ===
+              0
             ) {
-              // if (target_radius * 5 - distance < 0) {
-              inaccurate = 1;
-              show_rough_counter = p;
-              targetInit(currentDesign.d, currentDesign.w);
-
-              return;
-              // if (roughClickCnt > MAXIMUM_ERROR_STREAK) {
-              //   show_rough_counter = p;
-              //   roughClickCnt = 0;
-              // }
-            } else if (target_radius - distance > 0) {
-              let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
-              reward = Math.min(target_reward, reward);
-              reward = Math.max(reward, 0);
-              reward = financial(reward);
-
-              current_reward = reward;
-              summary.point += reward;
-              lastClickResult.success = true;
-              lastClickResult.point = reward;
-              summary.success++;
-            } else {
-              //실패
-              let reward = target_reward / (1 + (0.6 * responseTime) / 1000);
-              reward = Math.min(target_reward, reward);
-              reward = Math.max(reward, 0);
-              reward = financial(reward);
-
-              current_reward = reward;
-              summary.point -= reward;
-
-              lastClickResult.success = false;
-              lastClickResult.point = 0;
-              summary.fail++;
+              isSessionEnded = true;
+              session.current++;
+              current_reward = null;
+              cancelAnimationFrame(myReq);
+              requestAnimationFrame(session_show_step);
             }
-
-            if (balls.getRandomDesignArray().length === 0 && !end) {
-              end = true;
-              navigate(
-                `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
-              );
-            } else {
-              currentDesign = balls.popStack();
-              targetInit(currentDesign.d, currentDesign.w);
-            }
-          }
-
-          if (
-            (summary.fail + summary.success) % (TOTAL_TRIALS / NUM_SESSIONS) ===
-            0
-          ) {
-            isSessionEnded = true;
-            session.current++;
-            current_reward = null;
-            cancelAnimationFrame(myReq);
-            requestAnimationFrame(session_show_step);
           }
         }
       };
@@ -367,7 +385,7 @@ const MTPCanvasPractice = () => {
       console.log("SESSION_STEP");
       resetCanvas(ctx, monitorBound);
       drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-      drawCurrentRewardText(ctx, target_reward);
+      drawCurrentRewardText(ctx, target_reward, 10);
       myReq = requestAnimationFrame(session_show_step);
     }
 
@@ -397,7 +415,7 @@ const MTPCanvasPractice = () => {
     }
 
     function handlePause(e) {
-      if ((isPaused || isSessionEnded) && e.key === "Enter") {
+      if ((isPaused || isSessionEnded) && (e.key === "s" || e.key === "S")) {
         cancelAnimationFrame(myReq);
         isPaused = false;
         isSessionEnded = false;

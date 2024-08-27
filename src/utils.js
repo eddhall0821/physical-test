@@ -1,4 +1,4 @@
-import { BALL_POINTS } from "./components/MTP/Balls";
+import { BALL_POINTS, BALL_POINTS_MINIMUM } from "./components/MTP/Balls";
 import { SHOW_REWARD_TIME } from "./components/MTP/MTPCanvas";
 
 export const GREEN_BALL = "#00ff00";
@@ -100,26 +100,53 @@ export const drawPauseText = (ctx) => {
     window.innerHeight / 2
   );
   ctx.fillText(
-    "Press Enter key to start.",
+    `Press "S" key to start.`,
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
 };
 
-export const drawCurrentRewardText = (ctx, current_reward) => {
+export const drawCurrentRewardText = (ctx, current_reward, trials) => {
   ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+
+  if (current_reward === 0) {
+    ctx.fillText(
+      `In this session, there is no bonus.`,
+      window.innerWidth / 2,
+      window.innerHeight / 2
+    );
+    ctx.fillText(
+      `Regardless of your click performance, total bonus is fixed to 0 cents.`,
+      window.innerWidth / 2,
+      window.innerHeight / 2 + 50
+    );
+  } else {
+    ctx.fillText(
+      `In this session, each target has "${current_reward}" cents.`,
+      window.innerWidth / 2,
+      window.innerHeight / 2 - 50
+    );
+    ctx.fillText(
+      `Expected session total bonus ranges from ${
+        (((current_reward * trials) / 5) * 3.5) / 100
+      } ~ ${(((current_reward * trials) / 5) * 4) / 100} dollars.`,
+      window.innerWidth / 2,
+      window.innerHeight / 2
+    );
+    ctx.fillText(
+      `Successful click with shorter time will give you more bonuses.`,
+      window.innerWidth / 2,
+      window.innerHeight / 2 + 50
+    );
+  }
+
   ctx.fillText(
-    `The Reward for this session is maximum ${current_reward} cents for each trial.`,
+    `Press "S" key to start.`,
     window.innerWidth / 2,
-    window.innerHeight / 2
-  );
-  ctx.fillText(
-    "Press Enter key to start.",
-    window.innerWidth / 2,
-    window.innerHeight / 2 + 100
+    window.innerHeight / 2 + 150
   );
 };
 
@@ -244,20 +271,23 @@ export const random_point_between_circles = ({
   top,
   left,
 }) => {
-  for (let i = 0; i < 1000; i++) {
-    console.log("create target");
-    const theta = getRandomArbitrary(0, 2 * Math.PI);
-    const r = getRandomArbitrary(inner_radius, outer_radius);
+  let radius = ball_radius;
+  for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
+      console.log("create target");
+      const theta = getRandomArbitrary(0, 2 * Math.PI);
+      const r = getRandomArbitrary(inner_radius, outer_radius);
 
-    const x = center.x + r * Math.cos(theta);
-    const y = center.y + r * Math.sin(theta);
-    if (
-      left + ball_radius <= x &&
-      x <= left + screen_width - ball_radius &&
-      top + ball_radius <= y &&
-      y <= screen_height + top - ball_radius
-    ) {
-      return { x: x, y: y, gen: 1 };
+      const x = center.x + r * Math.cos(theta);
+      const y = center.y + r * Math.sin(theta);
+      if (
+        left + radius <= x &&
+        x <= left + screen_width - radius &&
+        top + radius <= y &&
+        y <= screen_height + top - radius
+      ) {
+        return { x: x, y: y, gen: 1 };
+      }
     }
   }
 
@@ -276,6 +306,7 @@ export const drawClickResultText = (
   const successText = success ? "✅ Success!" : "❌ Failed...";
   const successColor = success ? "white" : "red";
   reward = Number(reward);
+  let minBallPoint = 0;
 
   if (Math.abs(reward) === BALL_POINTS[0]) {
     ctx.font = `${FONT_SIZE - 4}px san-serif bold`;
@@ -283,6 +314,14 @@ export const drawClickResultText = (
     ctx.font = `${FONT_SIZE}px san-serif bold`;
   } else {
     ctx.font = `${FONT_SIZE + 4}px san-serif bold`;
+  }
+
+  if (Math.abs(reward) < 1) {
+    minBallPoint = BALL_POINTS_MINIMUM[0];
+  } else if (Math.abs(reward) < 4) {
+    minBallPoint = BALL_POINTS_MINIMUM[1];
+  } else {
+    minBallPoint = BALL_POINTS_MINIMUM[2];
   }
 
   let textY = 0;
@@ -429,21 +468,27 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "The practice study has ended.",
+    "Now you will begin the main session.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
 
-  // ctx.fillText(
-  //   "In the main session, you have 15 minutes.",
-  //   window.innerWidth / 2,
-  //   window.innerHeight / 2
-  // );
+  ctx.fillText(
+    "Remember, there are three types of bonuses: 0, 4, or 10 cents.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
+
+  ctx.fillText(
+    "Build your own strategy and earn as much as you can.",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 50
+  );
 
   ctx.fillText(
     "Press Enter key to start main study.",
     window.innerWidth / 2,
-    window.innerHeight / 2 + 100
+    window.innerHeight / 2 + 150
   );
 };
 
@@ -459,15 +504,15 @@ export const drawPracticeStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Let's do practice first.",
+    "Each session has different bonus levels.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
-  // ctx.fillText(
-  //   "Think about how you should do to earn as many bonuses as possible in limited time.",
-  //   window.innerWidth / 2,
-  //   window.innerHeight / 2
-  // );
+  ctx.fillText(
+    "Let's do three practice sessions first.",
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  );
 
   ctx.fillText(
     "Press Enter key to continue.",
@@ -531,6 +576,26 @@ export const drawText = (
     boardInterval * 4,
     50
   );
+};
+export const tdr1 = (max_reward, tct) => {
+  return max_reward / (1 + (0.6 * tct) / 1000);
+};
+
+export const temporal_discounting_reward = (max_reward, tctms) => {
+  const tct = tctms / 1000;
+  const k1 = 0.5;
+  const k2 = 2.1;
+  let reward = 0;
+
+  if (tct < k1) {
+    reward = max_reward;
+  } else if (tct > k2) {
+    reward = 0;
+  } else {
+    reward = (-0.714 * tct + 1.5712) * max_reward;
+  }
+
+  return reward;
 };
 
 export const inch = (ppi, inch) => {
