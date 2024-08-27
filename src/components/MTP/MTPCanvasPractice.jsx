@@ -15,11 +15,15 @@ import {
   drawText,
   fastRound3,
   financial,
+  FONT_SIZE,
+  getTimePercent,
+  getTimerColor,
   inch,
   initCanvas,
   initMultipleCanvas,
   millisToMinutesAndSeconds,
   random_point_between_circles,
+  repeatAnimation,
   resetCanvas,
   shuffle,
   temporal_discounting_reward,
@@ -51,41 +55,42 @@ import {
 } from "./MTPCanvas";
 import { useTimer } from "react-use-precision-timer";
 import { Subs } from "react-sub-unsub";
+import Cent from "../../images/cent.png";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
-const TOTAL_TIME = 1.5 * 60 * 1000;
+const TOTAL_TIME = 0.3 * 60 * 1000;
 
-const TOTAL_TRIALS = 30;
+const TOTAL_TRIALS = 300;
 
 const STOP_TIME = 3000;
 const MAXIMUM_ERROR_STREAK = 3;
 let myReq;
 
-const NUM_SESSIONS = 3;
+const NUM_SESSIONS = 0;
 const NUM_SUB_SESSIONS_PER_SESSIONS = 2;
 
 const MTPCanvasPractice = () => {
-  // const callback = useCallback(() => {
-  //   cancelAnimationFrame(myReq);
-  //   navigate(
-  //     `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
-  //   );
-  //   // setIsUploading(true);
-  // }, []);
+  const callback = useCallback(() => {
+    cancelAnimationFrame(myReq);
+    navigate(
+      `/pnc?PROLIFIC_PID=${prolificUser.PROLIFIC_PID}&STUDY_ID=${prolificUser.STUDY_ID}&SESSION_ID=${prolificUser.SESSION_ID}`
+    );
+    // setIsUploading(true);
+  }, []);
+  const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
 
-  // useEffect(() => {
-  //   if (timer.isStarted()) {
-  //     const subs = new Subs();
-  //     subs.setInterval(() => setRemainTime(timer.getRemainingTime()), 500);
-  //     return subs.createCleanup();
-  //   }
-  // }, [timer.isStarted()]);
+  useEffect(() => {
+    if (timer.isStarted()) {
+      const subs = new Subs();
+      subs.setInterval(() => setRemainTime(timer.getRemainingTime()), 500);
+      return subs.createCleanup();
+    }
+  }, [timer.isStarted()]);
 
   let end = false;
 
-  // const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
-  // const [remainTime, setRemainTime] = useState(0);
+  const [remainTime, setRemainTime] = useState(0);
 
   const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
@@ -97,7 +102,6 @@ const MTPCanvasPractice = () => {
   const navigate = useNavigate();
   useEffect(() => {
     let isPaused = false;
-    let isSessionEnded = false;
 
     let movement_stop_time = 0;
     let show_reward_counter = performance.now();
@@ -113,10 +117,12 @@ const MTPCanvasPractice = () => {
     let reward0 = new Image({});
     let reward4 = new Image({});
     let reward20 = new Image({});
+    let cent = new Image({});
 
     reward0.src = Reward0;
     reward4.src = Reward4;
     reward20.src = Reward20;
+    cent.src = Cent;
 
     const rewardImages = {
       0: reward0,
@@ -232,7 +238,7 @@ const MTPCanvasPractice = () => {
       //test---
 
       const mouseDown = (e) => {
-        if (e.buttons === 1 && !isSessionEnded) {
+        if (e.buttons === 1) {
           const p = performance.now();
           if (!isPaused) {
             if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
@@ -270,10 +276,21 @@ const MTPCanvasPractice = () => {
                 //   roughClickCnt = 0;
                 // }
               } else if (target_radius - distance > 0) {
-                let reward = temporal_discounting_reward(
+                let reward = target_reward;
+
+                repeatAnimation(
+                  ctx,
+                  x,
+                  y,
+                  window.innerWidth / 6,
+                  50,
+                  15,
+                  300,
+                  30,
                   target_reward,
-                  responseTime
+                  cent
                 );
+
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
                 reward = financial(reward);
@@ -285,10 +302,7 @@ const MTPCanvasPractice = () => {
                 summary.success++;
               } else {
                 //실패
-                let reward = temporal_discounting_reward(
-                  target_reward,
-                  responseTime
-                );
+                let reward = target_reward;
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
                 reward = financial(reward);
@@ -312,17 +326,17 @@ const MTPCanvasPractice = () => {
               }
             }
 
-            if (
-              (summary.fail + summary.success) %
-                (TOTAL_TRIALS / NUM_SESSIONS) ===
-              0
-            ) {
-              isSessionEnded = true;
-              session.current++;
-              current_reward = null;
-              cancelAnimationFrame(myReq);
-              requestAnimationFrame(session_show_step);
-            }
+            // if (
+            //   (summary.fail + summary.success) %
+            //     (TOTAL_TRIALS / NUM_SESSIONS) ===
+            //   0
+            // ) {
+            //   isSessionEnded = true;
+            //   session.current++;
+            //   current_reward = null;
+            //   cancelAnimationFrame(myReq);
+            //   requestAnimationFrame(session_show_step);
+            // }
           }
         }
       };
@@ -381,24 +395,15 @@ const MTPCanvasPractice = () => {
       }
     }
 
-    function session_show_step(timestamp) {
-      console.log("SESSION_STEP");
-      resetCanvas(ctx, monitorBound);
-      drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-      drawCurrentRewardText(ctx, target_reward, 10);
-      myReq = requestAnimationFrame(session_show_step);
-    }
-
     function pre_step() {
       resetCanvas(ctx, monitorBound);
       if (start) {
         targetInit(currentDesign.d, currentDesign.w);
         show_reward_counter = performance.now();
-        // timer.start();
+        timer.start();
         // step();
-        isSessionEnded = true;
         cancelAnimationFrame(myReq);
-        requestAnimationFrame(session_show_step);
+        requestAnimationFrame(step);
       } else {
         drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
         drawPracticeStartButton(ctx);
@@ -415,10 +420,9 @@ const MTPCanvasPractice = () => {
     }
 
     function handlePause(e) {
-      if ((isPaused || isSessionEnded) && (e.key === "s" || e.key === "S")) {
+      if (isPaused && (e.key === "s" || e.key === "S")) {
         cancelAnimationFrame(myReq);
         isPaused = false;
-        isSessionEnded = false;
         skipCnt = 0;
         movement_stop_time = performance.now();
         show_reward_counter = performance.now();
@@ -543,7 +547,7 @@ const MTPCanvasPractice = () => {
           left: 0,
           width: monitorBound.width,
           height: 50,
-          fontSize: 36,
+          fontSize: FONT_SIZE - 20,
           color: "white",
           display: "flex",
           justifyContent: "space-between",
@@ -554,14 +558,24 @@ const MTPCanvasPractice = () => {
       >
         <div style={{ width: "33%" }}></div>
         <div style={{ width: "33%" }}>
-          {/* Time:{" "}
+          Time:{" "}
           {!!timer.isRunning()
             ? millisToMinutesAndSeconds(remainTime)
-            : millisToMinutesAndSeconds(TOTAL_TIME)} */}
+            : millisToMinutesAndSeconds(TOTAL_TIME)}
+          <div style={{ width: "100%", height: 20, background: "grey" }}>
+            <div
+              style={{
+                width: `${getTimePercent(remainTime, TOTAL_TIME)}%`,
+                height: 20,
+                background: getTimerColor(remainTime, TOTAL_TIME),
+              }}
+            ></div>
+          </div>
         </div>
-        {/* <div style={{ width: "33%" }}>
+
+        <div style={{ width: "33%" }}>
           <img src={reward_settings} width={300} />
-        </div> */}
+        </div>
       </div>
       <div
         style={{
@@ -574,7 +588,7 @@ const MTPCanvasPractice = () => {
           left: 0,
         }}
       >
-        THIS IS PRACTICE STUDY.
+        This is practice session.
       </div>
       <>
         <canvas

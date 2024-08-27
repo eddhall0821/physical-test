@@ -4,7 +4,7 @@ import { SHOW_REWARD_TIME } from "./components/MTP/MTPCanvas";
 export const GREEN_BALL = "#00ff00";
 export const BLUE_BALL = "#00bfff";
 export const BROWN_BALL = "#ff7f00";
-export const FONT_SIZE = 36;
+export const FONT_SIZE = 50;
 
 export const shuffle = (array) => {
   return array.sort(() => Math.random() - 0.5);
@@ -248,7 +248,15 @@ export const initMultipleCanvas = async (canvas1, container) => {
 export const drawMTPTarget = (ctx, x, y, speed, radius, reward) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, degToRad(360), true);
-  ctx.fillStyle = "#00bfff";
+  console.log(reward, radius);
+
+  if (reward === BALL_POINTS[0]) {
+    ctx.fillStyle = "#ffffff";
+  } else if (reward === BALL_POINTS[1]) {
+    ctx.fillStyle = "#ff7b7b";
+  } else {
+    ctx.fillStyle = "#ff0000";
+  }
 
   ctx.fill();
 };
@@ -294,6 +302,55 @@ export const random_point_between_circles = ({
   return { x: window.screen.width / 2, y: window.screen.height / 2, gen: 0 };
 };
 
+export function getTimerColor(remainTime, maxTime) {
+  const percent = getTimePercent(remainTime, maxTime);
+
+  if (remainTime >= (2 / 3) * maxTime) {
+    return "#ffffff";
+  } else if (remainTime >= (1 / 3) * maxTime) {
+    console.log(percent);
+    // return "#ff7b7b";
+    return `rgb(255,
+    ${255 - (66 - percent) * 4},
+    ${255 - (66 - percent) * 4})`;
+  } else {
+    return `rgb(255,
+    ${255 - (66 - percent) * 4},
+    ${255 - (66 - percent) * 4})`;
+  }
+}
+
+export function getTimePercent(remainTime, maxTime) {
+  return (remainTime * 100) / maxTime;
+}
+
+export function moveCircle(ctx, x1, y1, x2, y2, r, duration, image) {
+  const startTime = performance.now();
+  console.log(image);
+
+  function animate(time) {
+    const elapsed = time - startTime;
+
+    let progress = Math.min(elapsed / duration, 1);
+    progress = progress * progress * progress * progress;
+
+    const currentX = x1 + (x2 - x1) * progress;
+    const currentY = y1 + (y2 - y1) * progress;
+
+    // ctx.beginPath();
+    // ctx.arc(currentX, currentY, r, 0, 2 * Math.PI);
+    // ctx.fillStyle = "red";
+    // ctx.fill();
+    ctx.drawImage(image, currentX, currentY, 50, 50);
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
 export const drawClickResultText = (
   ctx,
   success,
@@ -304,16 +361,16 @@ export const drawClickResultText = (
 ) => {
   // const successText = success ? "Success" : "failed";
   const successText = success ? "✅ Success!" : "❌ Failed...";
-  const successColor = success ? "white" : "red";
+  const successColor = success ? "white" : "white";
   reward = Number(reward);
   let minBallPoint = 0;
 
   if (Math.abs(reward) === BALL_POINTS[0]) {
-    ctx.font = `${FONT_SIZE - 4}px san-serif bold`;
+    ctx.font = `${FONT_SIZE - 10}px san-serif bold`;
   } else if (Math.abs(reward) == BALL_POINTS[1]) {
     ctx.font = `${FONT_SIZE}px san-serif bold`;
   } else {
-    ctx.font = `${FONT_SIZE + 4}px san-serif bold`;
+    ctx.font = `${FONT_SIZE + 10}px san-serif bold`;
   }
 
   if (Math.abs(reward) < 1) {
@@ -350,7 +407,7 @@ export const drawClickResultText = (
   //   adjX,
   //   adY - 50
   // );
-  ctx.fillText(`${success ? "+" : "-"}${reward} cents`, adjX, adY - 100);
+  ctx.fillText(`${success ? "+" : "-"}${reward} ¢`, adjX, adY - 100);
   ctx.fillStyle = "#fff";
   ctx.font = `${FONT_SIZE}px san-serif bold`;
 };
@@ -468,27 +525,27 @@ export const drawStartButton2 = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Now you will begin the main session.",
+    "Now, you will begin the main session.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
 
   ctx.fillText(
-    "Remember, there are three types of bonuses: 0, 4, or 10 cents.",
-    window.innerWidth / 2,
-    window.innerHeight / 2
-  );
-
-  ctx.fillText(
-    "Build your own strategy and earn as much as you can.",
+    "Reminder: Bonus is either 0, 4, or 10 cents.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 50
   );
 
   ctx.fillText(
-    "Press Enter key to start main study.",
+    "Build strategy to earn as many bonuses as possible in 15 minutes.",
     window.innerWidth / 2,
-    window.innerHeight / 2 + 150
+    window.innerHeight / 2 + 100
+  );
+
+  ctx.fillText(
+    "Press Enter key to start",
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 200
   );
 };
 
@@ -504,12 +561,12 @@ export const drawPracticeStartButton = (ctx) => {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(
-    "Each session has different bonus levels.",
+    "Let's do 90-seconds practice first.",
     window.innerWidth / 2,
     window.innerHeight / 2 - 50
   );
   ctx.fillText(
-    "Let's do three practice sessions first.",
+    "Try to earn as many bonuses as possible in the limited time.",
     window.innerWidth / 2,
     window.innerHeight / 2
   );
@@ -520,6 +577,33 @@ export const drawPracticeStartButton = (ctx) => {
     window.innerHeight / 2 + 100
   );
 };
+
+export function repeatAnimation(
+  ctx,
+  x1,
+  y1,
+  x2,
+  y2,
+  r,
+  duration,
+  interval,
+  repeatCount,
+  image
+) {
+  let count = 0;
+  console.log(image);
+
+  const intervalId = setInterval(() => {
+    if (count < repeatCount) {
+      moveCircle(ctx, x1, y1, x2, y2, r, duration, image, () => {
+        // 애니메이션이 끝난 후 할 일 (필요시)
+      });
+      count++;
+    } else {
+      clearInterval(intervalId); // 반복 종료
+    }
+  }, interval);
+}
 
 export const drawFullscreenAlertText = (ctx) => {
   ctx.font = `${FONT_SIZE}px serif`;
@@ -543,59 +627,36 @@ export const drawText = (
   ctx.font = `${FONT_SIZE}px san-serif`;
   ctx.fillStyle = "#fff";
   const boardInterval = window.innerWidth / 6;
+
+  ctx.fillText(`Total Bonus: ${summary.point} cents`, boardInterval * 1, 50);
   // ctx.fillText(
-  //   `Trials: ${summary.fail + summary.success} / ${remain}`,
-  //   boardInterval,
+  //   `Current Bonus: ${
+  //     typeof target_reward === "number" ? target_reward : "-"
+  //   } cents`,
+  //   boardInterval * 4,
   //   50
   // );
-  ctx.fillText(
-    `Trials: ${
-      summary.fail +
-      summary.success +
-      1 -
-      session.current * (summary.total / session.total)
-    }/${summary.total / session.total}`,
-    boardInterval * 1,
-    50
-  );
-  ctx.fillText(
-    `Sessions: ${session.current + 1}/${session.total}`,
-    boardInterval * 2,
-    50
-  );
-
-  ctx.fillText(
-    `Total Bonus: ${(summary.point / 100).toFixed(3)}$`,
-    boardInterval * 3,
-    50
-  );
-  ctx.fillText(
-    `Current Bonus: ${
-      typeof target_reward === "number" ? target_reward : "-"
-    } cents`,
-    boardInterval * 4,
-    50
-  );
 };
 export const tdr1 = (max_reward, tct) => {
   return max_reward / (1 + (0.6 * tct) / 1000);
 };
 
 export const temporal_discounting_reward = (max_reward, tctms) => {
-  const tct = tctms / 1000;
-  const k1 = 0.5;
-  const k2 = 2.1;
-  let reward = 0;
+  return max_reward;
+  // const tct = tctms / 1000;
+  // const k1 = 0.5;
+  // const k2 = 2.1;
+  // let reward = 0;
 
-  if (tct < k1) {
-    reward = max_reward;
-  } else if (tct > k2) {
-    reward = 0;
-  } else {
-    reward = (-0.714 * tct + 1.5712) * max_reward;
-  }
+  // if (tct < k1) {
+  //   reward = max_reward;
+  // } else if (tct > k2) {
+  //   reward = 0;
+  // } else {
+  //   reward = (-0.714 * tct + 1.5712) * max_reward;
+  // }
 
-  return reward;
+  // return reward;
 };
 
 export const inch = (ppi, inch) => {

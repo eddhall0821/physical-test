@@ -16,11 +16,16 @@ import {
   drawText,
   fastRound3,
   financial,
+  FONT_SIZE,
+  getTimePercent,
+  getTimerColor,
   inch,
   initCanvas,
   initMultipleCanvas,
   millisToMinutesAndSeconds,
+  moveCircle,
   random_point_between_circles,
+  repeatAnimation,
   resetCanvas,
   shuffle,
   temporal_discounting_reward,
@@ -28,11 +33,12 @@ import {
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useTimer, useStopwatch } from "react-use-precision-timer";
+import { useTimer } from "react-use-precision-timer";
 import reward_settings from "../../images/reward_setting.png";
 import Reward0 from "../../images/max_reward/reward_0.png";
 import Reward4 from "../../images/max_reward/reward_4.png";
 import Reward20 from "../../images/max_reward/reward_20.png";
+import Cent from "../../images/cent.png";
 
 import { useRecoilValue } from "recoil";
 import {
@@ -57,32 +63,33 @@ export const SHOW_ROUGH_TIME = 2400;
 export const SHOW_LATE_TIME = 2400;
 
 // const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
-const TOTAL_TRIALS = 300;
+const TOTAL_TRIALS = 600;
 
 export const STOP_TIME = 3000;
 export const MAXIMUM_ERROR_STREAK = 3;
 
-const NUM_SESSIONS = 6;
+const NUM_SESSIONS = 0;
 
 const MTPCanvas = () => {
-  // useEffect(() => {
-  //   if (timer.isStarted()) {
-  //     const subs = new Subs();
-  //     subs.setInterval(() => setRemainTime(timer.getRemainingTime()), 500);
-  //     return subs.createCleanup();
-  //   }
-  // }, [timer.isStarted()]);
+  const callback = useCallback(() => {
+    end = true;
+    uploadCSV();
+    setIsUploading(true);
+  }, []);
 
-  // const callback = useCallback(() => {
-  //   end = true;
-  //   uploadCSV();
-  //   setIsUploading(true);
-  // }, []);
-  // const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
+  const timer = useTimer({ delay: TOTAL_TIME, runOnce: true }, callback);
+
+  useEffect(() => {
+    if (timer.isStarted()) {
+      const subs = new Subs();
+      subs.setInterval(() => setRemainTime(timer.getRemainingTime()), 500);
+      return subs.createCleanup();
+    }
+  }, [timer.isStarted()]);
 
   let end = false;
 
-  // const [remainTime, setRemainTime] = useState(0);
+  const [remainTime, setRemainTime] = useState(0);
 
   const [isUploading, setIsUploading] = useState(false);
   const weight = useRecoilValue(pointerWeightState);
@@ -212,7 +219,7 @@ const MTPCanvas = () => {
 
   useEffect(() => {
     let isPaused = false;
-    let isSessionEnded = false;
+    // let isSessionEnded = false;
 
     let movement_stop_time = 0;
     let show_reward_counter = performance.now();
@@ -229,10 +236,12 @@ const MTPCanvas = () => {
     let reward0 = new Image({});
     let reward4 = new Image({});
     let reward20 = new Image({});
+    let cent = new Image({});
 
     reward0.src = Reward0;
     reward4.src = Reward4;
     reward20.src = Reward20;
+    cent.src = Cent;
 
     const rewardImages = {
       0: reward0,
@@ -292,7 +301,6 @@ const MTPCanvas = () => {
       skipped = 0,
       inaccurate = 0
     ) => {
-      console.log("log_" + target_radius);
       const summaryLogRow = [
         summary.fail + summary.success,
         current_target_success,
@@ -355,7 +363,6 @@ const MTPCanvas = () => {
       loggingStartTime = null;
       target_radius = inch(ppi, w);
       target_reward = currentDesign.reward;
-      console.log(currentDesign);
       const target_location = random_point_between_circles({
         center: { x, y },
         inner_radius: inch(ppi, d),
@@ -389,7 +396,7 @@ const MTPCanvas = () => {
       document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
       const mouseDown = (e) => {
-        if (e.buttons === 1 && !isSessionEnded) {
+        if (e.buttons === 1) {
           const p = performance.now();
           if (!isPaused) {
             if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
@@ -431,6 +438,19 @@ const MTPCanvas = () => {
                   target_reward,
                   responseTime
                 );
+                repeatAnimation(
+                  ctx,
+                  x,
+                  y,
+                  window.innerWidth / 6,
+                  50,
+                  15,
+
+                  300,
+                  30,
+                  target_reward,
+                  cent
+                );
 
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
@@ -469,18 +489,6 @@ const MTPCanvas = () => {
                 targetInit(currentDesign.d, currentDesign.w);
               }
             }
-            //세션 구분시 쓰는부분
-            if (
-              (summary.fail + summary.success) %
-                (TOTAL_TRIALS / NUM_SESSIONS) ===
-              0
-            ) {
-              isSessionEnded = true;
-              session.current++;
-              current_reward = null;
-              cancelAnimationFrame(myReq);
-              requestAnimationFrame(session_show_step);
-            }
           }
         }
       };
@@ -494,7 +502,6 @@ const MTPCanvas = () => {
           show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
         ) {
           responseTime = (p - loggingStartTime) / 1000;
-          console.log(responseTime);
         }
 
         if (show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p) {
@@ -540,23 +547,14 @@ const MTPCanvas = () => {
       }
     }
 
-    function session_show_step(timestamp) {
-      console.log("SESSION_STEP");
-      resetCanvas(ctx, monitorBound);
-      drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-      drawCurrentRewardText(ctx, target_reward, 50);
-      myReq = requestAnimationFrame(session_show_step);
-    }
-
     function pre_step() {
       resetCanvas(ctx, monitorBound);
       if (start) {
         targetInit(currentDesign.d, currentDesign.w);
         show_reward_counter = performance.now();
-        // timer.start();
-        isSessionEnded = true;
+        timer.start();
         cancelAnimationFrame(myReq);
-        requestAnimationFrame(session_show_step);
+        requestAnimationFrame(step);
       } else {
         drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
         drawStartButton2(ctx);
@@ -573,11 +571,10 @@ const MTPCanvas = () => {
     }
 
     function handlePause(e) {
-      console.log(isSessionEnded);
-      if ((isPaused || isSessionEnded) && (e.key === "s" || e.key === "S")) {
+      if (isPaused && (e.key === "s" || e.key === "S")) {
         cancelAnimationFrame(myReq);
         isPaused = false;
-        isSessionEnded = false;
+        // isSessionEnded = false;
         skipCnt = 0;
         movement_stop_time = performance.now();
         show_reward_counter = performance.now();
@@ -709,7 +706,7 @@ const MTPCanvas = () => {
             left: 0,
             width: monitorBound.width,
             height: 50,
-            fontSize: 36,
+            fontSize: FONT_SIZE - 20,
             color: "white",
             display: "flex",
             justifyContent: "space-between",
@@ -720,15 +717,24 @@ const MTPCanvas = () => {
         >
           <div style={{ width: "33%" }}></div>
           <div style={{ width: "33%" }}>
-            {/* Time:{" "}
+            Time:{" "}
             {!!timer.isRunning()
               ? millisToMinutesAndSeconds(remainTime)
-              : millisToMinutesAndSeconds(TOTAL_TIME)} */}
+              : millisToMinutesAndSeconds(TOTAL_TIME)}
+            <div style={{ width: "100%", height: 15, background: "grey" }}>
+              <div
+                style={{
+                  width: `${getTimePercent(remainTime, TOTAL_TIME)}%`,
+                  height: 15,
+                  background: getTimerColor(remainTime, TOTAL_TIME),
+                }}
+              ></div>
+            </div>
           </div>
-          {/* <div style={{ width: "33%" }}>
-            Current Bonus:
-            <img src={reward_settings} width={100} />
-          </div> */}
+
+          <div style={{ width: "33%" }}>
+            <img src={reward_settings} width={350} />
+          </div>
         </div>
 
         <canvas

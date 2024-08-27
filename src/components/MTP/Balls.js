@@ -12,6 +12,14 @@ export class Balls {
   designs = [];
   randomDesignArray = [];
 
+  fisherYatesShuffle = function (array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   generateRandomDesigns = function () {
     console.log(this.monitorBound);
     const randomDesignArray = [];
@@ -53,6 +61,7 @@ export class Balls {
       }
     }
 
+    //세션을 섞는거임
     if (this.shuffle) {
       this.randomDesignArray = shuffle(randomDesignArray);
       this.randomDesignArray.sort((a, b) => a.reward - b.reward);
@@ -63,8 +72,16 @@ export class Balls {
       );
       this.randomDesignArray = shuffle(designArrayChunk).flat();
     } else {
+      //세션을 안섞는거임
       this.randomDesignArray = randomDesignArray;
       this.randomDesignArray.sort((a, b) => a.reward - b.reward);
+    }
+
+    //피셔 예이츠 셔플 하는거임
+    if (this.num_sessions === 0) {
+      this.randomDesignArray.sort((a, b) => a.reward - b.reward);
+      this.randomDesignArray = this.fisherYatesShuffle(this.randomDesignArray);
+      console.log(this.randomDesignArray);
     }
   };
 

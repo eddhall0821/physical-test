@@ -12,6 +12,7 @@ import task from "../../images/task.png";
 import click_success from "../../images/success_click.png";
 import click_fail from "../../images/fail_click.png";
 import reward_setting from "../../images/reward_setting.png";
+import { FONT_SIZE } from "../../utils";
 
 const MainGuideLines = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -37,6 +38,7 @@ const MainGuideLines = () => {
   const refRewardSettings = useRef(null);
   const refReward = useRef(null);
   const ref8 = useRef(null);
+  const refTime = useRef(null);
   const ref9 = useRef(null);
 
   const [open, setOpen] = useState(false);
@@ -74,16 +76,6 @@ const MainGuideLines = () => {
       target: () => ref9.current,
     },
     {
-      title: <StepTitle>Sessions</StepTitle>,
-      description: (
-        <StepContent>
-          The amount of bonuses you can earn in this session.
-        </StepContent>
-      ),
-      target: () => refSessionEnd.current,
-    },
-
-    {
       title: <StepTitle>Circular Target</StepTitle>,
       description: (
         <StepContent>This is the target. You have to click it.</StepContent>
@@ -91,64 +83,54 @@ const MainGuideLines = () => {
       target: () => ref6.current,
     },
 
-    // {
-    //   title: <StepTitle>Target Reward</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       There are three types of targets. Each type has a different bonus or
-    //       penalty.
-    //     </StepContent>
-    //   ),
-    //   target: () => refReward.current,
-    // },
-    // {
-    //   title: <StepTitle>Target Reward</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       <b style={{ color: "#ff7f00" }}>
-    //         Orange gives 0.1 cents of bonus/penalty.
-    //       </b>
-    //     </StepContent>
-    //   ),
-    //   target: () => refOrange.current,
-    // },
-    // {
-    //   title: <StepTitle>Target Reward</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       <b style={{ color: "#00bfff" }}>
-    //         Blue gives 2 cents of bonus/penalty.
-    //       </b>
-    //     </StepContent>
-    //   ),
-    //   target: () => refBlue.current,
-    // },
-    // {
-    //   title: <StepTitle>Target Reward</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       <b style={{ color: "#00ff00" }}>
-    //         Green gives 4 cents of bonus/penalty.
-    //       </b>
-    //     </StepContent>
-    //   ),
-    //   target: () => refGreen.current,
-    // },
     {
-      title: <StepTitle>Successful clicks</StepTitle>,
+      title: <StepTitle>Target Bonus</StepTitle>,
       description: (
         <StepContent>
-          You will get a bonus if you successfully click the target. Click on
-          the targets as quickly and accurately as possible.
+          There are three types of targets. Each type has a different bonus or
+          penalty.
         </StepContent>
       ),
-      target: () => refSuccess.current,
+      target: () => refReward.current,
+    },
+    {
+      title: <StepTitle>Target Bonus</StepTitle>,
+      description: (
+        <StepContent>
+          <b style={{ color: "black" }}>
+            White gives 0 cents of bonus/penalty.
+          </b>
+        </StepContent>
+      ),
+      target: () => refOrange.current,
+    },
+    {
+      title: <StepTitle>Target Bonus</StepTitle>,
+      description: (
+        <StepContent>
+          <b style={{ color: "#ff7b7b" }}>
+            Light red gives 4 cents of bonus/penalty.
+          </b>
+        </StepContent>
+      ),
+      target: () => refBlue.current,
+    },
+    {
+      title: <StepTitle>Target Bonus</StepTitle>,
+      description: (
+        <StepContent>
+          <b style={{ color: "#ff0000 " }}>
+            Red gives 10 cents of bonus/penalty.
+          </b>
+        </StepContent>
+      ),
+      target: () => refGreen.current,
     },
     {
       title: <StepTitle>Successful clicks</StepTitle>,
       description: (
         <StepContent>
-          The faster you click, the closer you will get to the current bonus.
+          You will get a bonus if you successfully click the target.
         </StepContent>
       ),
       target: () => refSuccess2.current,
@@ -176,25 +158,6 @@ const MainGuideLines = () => {
       target: () => ref8.current,
     },
     {
-      title: <StepTitle>Trials</StepTitle>,
-      description: (
-        <StepContent>
-          The number of trials remaining in this session and the total number of
-          trials in this session.
-        </StepContent>
-      ),
-      target: () => refTrials.current,
-    },
-    {
-      title: <StepTitle>Sessions</StepTitle>,
-      description: (
-        <StepContent>
-          The current session and total number of sessions.
-        </StepContent>
-      ),
-      target: () => refSessions.current,
-    },
-    {
       title: <StepTitle>Total bonus</StepTitle>,
       description: (
         <StepContent>
@@ -204,34 +167,27 @@ const MainGuideLines = () => {
       ),
       target: () => ref1.current,
     },
-    {
-      title: <StepTitle>Current Bonus</StepTitle>,
-      description: (
-        <StepContent>The amount of bonuses for this session.</StepContent>
-      ),
-      target: () => refCurrentBonus.current,
-    },
 
-    // {
-    //   title: <StepTitle>Time Limits</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       You will perform the task for 15 minutes. Earn as many bonuses as
-    //       possible before the time limit ends.
-    //     </StepContent>
-    //   ),
-    //   target: () => ref3.current,
-    // },
-    // {
-    //   title: <StepTitle>Target Bonus Information</StepTitle>,
-    //   description: (
-    //     <StepContent>
-    //       Reminder: Orange gives 0.1 cents, Blue gives 2 cents, and Green gives
-    //       4 cents.
-    //     </StepContent>
-    //   ),
-    //   target: () => refRewardSettings.current,
-    // },
+    {
+      title: <StepTitle>Time Limits</StepTitle>,
+      description: (
+        <StepContent>
+          You will perform the task for 15 minutes. Earn as many bonuses as
+          possible before the time limit ends.
+        </StepContent>
+      ),
+      target: () => refTime.current,
+    },
+    {
+      title: <StepTitle>Target Bonus Information</StepTitle>,
+      description: (
+        <StepContent>
+          Reminder: White gives 0 cents, Light red gives 4 cents, and Red gives
+          10 cents.
+        </StepContent>
+      ),
+      target: () => refRewardSettings.current,
+    },
   ];
   return (
     <>
@@ -300,19 +256,18 @@ const MainGuideLines = () => {
             justifyContent: "space-between",
             flexDirection: "row",
             zIndex: 1,
+            fontSize: FONT_SIZE,
           }}
         >
-          <div ref={refTrials}>Trials: 1/50</div>
-          <div ref={refSessions}>Sessions: 1/6</div>
-          <div ref={ref1}>Total Bonus: 1$</div>
-          <div ref={refCurrentBonus}>Current Bonus: 1 cents</div>
-          {/* <div ref={refRewardSettings}>
+          <div ref={ref1}>Total Bonus: 10 cents</div>
+          <div ref={refTime}>Time: 14:59</div>
+          <div ref={refRewardSettings}>
             <img src={reward_setting} width={300} />
-          </div> */}
+          </div>
         </div>
         <div
           style={{
-            display: currentGuideIndex !== 2 ? "none" : "flex",
+            display: currentGuideIndex !== 1 ? "none" : "flex",
             position: "absolute",
             top: "50%",
             left: "50%",
@@ -342,7 +297,7 @@ const MainGuideLines = () => {
             height: 150,
           }}
         >
-          {/* <div
+          <div
             style={{
               display:
                 currentGuideIndex !== 2 &&
@@ -356,7 +311,7 @@ const MainGuideLines = () => {
               transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#ff7f00",
+              background: "#ffffff",
               borderRadius: "100%",
             }}
             ref={refOrange}
@@ -375,7 +330,7 @@ const MainGuideLines = () => {
               transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#00bfff",
+              background: "#ff7b7b",
               borderRadius: "100%",
             }}
             ref={refBlue}
@@ -395,57 +350,16 @@ const MainGuideLines = () => {
               transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#00ff00",
+              background: "#ff0000",
               borderRadius: "100%",
             }}
             ref={refGreen}
-          /> */}
-        </div>
-        <div
-          style={{
-            display: currentGuideIndex !== 1 && "none",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          ref={refSessionEnd}
-        >
-          <div>
-            <MainTaskFont>
-              In this session, each target has 4 cents.
-            </MainTaskFont>
-            <MainTaskFont>
-              Successful click with shorter time will give you more bonuses.
-            </MainTaskFont>
-          </div>
+          />
         </div>
 
         <div
           style={{
-            display: currentGuideIndex !== 3 && "none",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(0%, -50%)",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          ref={refSuccess}
-        >
-          <div>
-            <MainTaskFont>1.6 Cents</MainTaskFont>
-          </div>
-          <img alt="money" src={click_success} />
-        </div>
-
-        <div
-          style={{
-            display: currentGuideIndex !== 4 && "none",
+            display: currentGuideIndex !== 6 && "none",
             position: "absolute",
             top: "50%",
             left: "50%",
@@ -457,14 +371,14 @@ const MainGuideLines = () => {
           ref={refSuccess2}
         >
           <div>
-            <MainTaskFont>+2 Cents</MainTaskFont>
+            <MainTaskFont style={{ color: "red" }}>+10 Cents</MainTaskFont>
           </div>
           <img alt="money" src={click_success} />
         </div>
 
         <div
           style={{
-            display: currentGuideIndex !== 5 && "none",
+            display: currentGuideIndex !== 7 && "none",
             position: "absolute",
             top: "50%",
             left: "50%",
@@ -476,7 +390,7 @@ const MainGuideLines = () => {
           ref={refFail}
         >
           <div>
-            <MainTaskFont style={{ color: "red" }}>-1.6 Cents</MainTaskFont>
+            <MainTaskFont style={{ color: "red" }}>-10 Cents</MainTaskFont>
           </div>
           <img alt="money" src={click_fail} />
         </div>
@@ -499,7 +413,7 @@ const MainGuideLines = () => {
 
         <div
           style={{
-            display: currentGuideIndex !== 6 ? "none" : "flex",
+            display: currentGuideIndex !== 8 ? "none" : "flex",
             position: "absolute",
             top: "50%",
             left: "50%",
