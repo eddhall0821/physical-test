@@ -1,4 +1,4 @@
-import { BALL_POINTS, BALL_POINTS_MINIMUM } from "./components/MTP/Balls";
+import { BALL_POINTS } from "./components/MTP/Balls";
 import { SHOW_REWARD_TIME } from "./components/MTP/MTPCanvas";
 
 export const GREEN_BALL = "#00ff00";
@@ -363,7 +363,6 @@ export const drawClickResultText = (
   const successText = success ? "✅ Success!" : "❌ Failed...";
   const successColor = success ? "white" : "white";
   reward = Number(reward);
-  let minBallPoint = 0;
 
   if (Math.abs(reward) === BALL_POINTS[0]) {
     ctx.font = `${FONT_SIZE - 10}px san-serif bold`;
@@ -371,14 +370,6 @@ export const drawClickResultText = (
     ctx.font = `${FONT_SIZE}px san-serif bold`;
   } else {
     ctx.font = `${FONT_SIZE + 10}px san-serif bold`;
-  }
-
-  if (Math.abs(reward) < 1) {
-    minBallPoint = BALL_POINTS_MINIMUM[0];
-  } else if (Math.abs(reward) < 4) {
-    minBallPoint = BALL_POINTS_MINIMUM[1];
-  } else {
-    minBallPoint = BALL_POINTS_MINIMUM[2];
   }
 
   let textY = 0;

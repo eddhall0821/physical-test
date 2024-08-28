@@ -59,7 +59,7 @@ import Cent from "../../images/cent.png";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
-const TOTAL_TIME = 0.3 * 60 * 1000;
+const TOTAL_TIME = 1.5 * 60 * 1000;
 
 const TOTAL_TRIALS = 300;
 

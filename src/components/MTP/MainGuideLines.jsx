@@ -12,7 +12,8 @@ import task from "../../images/task.png";
 import click_success from "../../images/success_click.png";
 import click_fail from "../../images/fail_click.png";
 import reward_setting from "../../images/reward_setting.png";
-import { FONT_SIZE } from "../../utils";
+import { FONT_SIZE, getTimePercent, getTimerColor } from "../../utils";
+import { BALL_POINTS } from "./Balls";
 
 const MainGuideLines = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -98,7 +99,7 @@ const MainGuideLines = () => {
       description: (
         <StepContent>
           <b style={{ color: "black" }}>
-            White gives 0 cents of bonus/penalty.
+            White gives {BALL_POINTS[0]} cents of bonus/penalty.
           </b>
         </StepContent>
       ),
@@ -109,7 +110,7 @@ const MainGuideLines = () => {
       description: (
         <StepContent>
           <b style={{ color: "#ff7b7b" }}>
-            Light red gives 4 cents of bonus/penalty.
+            Light red gives {BALL_POINTS[1]} cents of bonus/penalty.
           </b>
         </StepContent>
       ),
@@ -120,7 +121,7 @@ const MainGuideLines = () => {
       description: (
         <StepContent>
           <b style={{ color: "#ff0000 " }}>
-            Red gives 10 cents of bonus/penalty.
+            Red gives {BALL_POINTS[2]} cents of bonus/penalty.
           </b>
         </StepContent>
       ),
@@ -182,8 +183,7 @@ const MainGuideLines = () => {
       title: <StepTitle>Target Bonus Information</StepTitle>,
       description: (
         <StepContent>
-          Reminder: White gives 0 cents, Light red gives 4 cents, and Red gives
-          10 cents.
+          {`Reminder: White gives ${BALL_POINTS[0]} cents, Light red gives ${BALL_POINTS[1]} cents, and Red gives ${BALL_POINTS[2]} cents.`}
         </StepContent>
       ),
       target: () => refRewardSettings.current,
@@ -259,8 +259,19 @@ const MainGuideLines = () => {
             fontSize: FONT_SIZE,
           }}
         >
-          <div ref={ref1}>Total Bonus: 10 cents</div>
-          <div ref={refTime}>Time: 14:59</div>
+          <div ref={ref1}>Total Bonus: {BALL_POINTS[2]} cents</div>
+          <div ref={refTime}>
+            Time: 14:59
+            <div style={{ width: "100%", height: 20, background: "grey" }}>
+              <div
+                style={{
+                  width: `${getTimePercent(50, 100)}%`,
+                  height: 20,
+                  background: getTimerColor(50, 100),
+                }}
+              ></div>
+            </div>
+          </div>
           <div ref={refRewardSettings}>
             <img src={reward_setting} width={300} />
           </div>
@@ -371,7 +382,9 @@ const MainGuideLines = () => {
           ref={refSuccess2}
         >
           <div>
-            <MainTaskFont style={{ color: "red" }}>+10 Cents</MainTaskFont>
+            <MainTaskFont style={{ color: "red" }}>
+              +{BALL_POINTS[2]} Cents
+            </MainTaskFont>
           </div>
           <img alt="money" src={click_success} />
         </div>
@@ -390,7 +403,9 @@ const MainGuideLines = () => {
           ref={refFail}
         >
           <div>
-            <MainTaskFont style={{ color: "red" }}>-10 Cents</MainTaskFont>
+            <MainTaskFont style={{ color: "red" }}>
+              -{BALL_POINTS[2]} Cents
+            </MainTaskFont>
           </div>
           <img alt="money" src={click_fail} />
         </div>
