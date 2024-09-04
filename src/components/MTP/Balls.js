@@ -6,7 +6,14 @@ import {
 } from "../../utils";
 import { INCH_24_HEIGHT } from "./MTPCanvas";
 
-export const BALL_POINTS = [1, 3, 9];
+export const BALL_POINTS = [0, 0.1, 1, 10];
+export const BALL_COLORS = ["#ffffff", "#ABE7FF", "#57D0FF", "#00AAFF"];
+export const BALL_COLOR_NAME = [
+  "White",
+  "This color",
+  "This color",
+  "This color",
+];
 
 export class Balls {
   designs = [];
@@ -110,20 +117,12 @@ export class Balls {
 
   createRewardArray = function (n) {
     const resultArray = [];
+    const length = BALL_POINTS.length;
 
     for (let i = 0; i < n; i++) {
-      switch (i % 3) {
-        case 0:
-          resultArray.push(BALL_POINTS[0]);
-          break;
-        case 1:
-          resultArray.push(BALL_POINTS[1]);
-          break;
-        case 2:
-          resultArray.push(BALL_POINTS[2]);
-          break;
-      }
+      resultArray.push(BALL_POINTS[i % length]);
     }
+
     return resultArray;
   };
 

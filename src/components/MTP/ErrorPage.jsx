@@ -1,4 +1,5 @@
 import { Result } from "antd";
+import { COMPLETE_CODE } from "./Done";
 
 const ErrorPage = () => {
   return (
@@ -10,7 +11,7 @@ const ErrorPage = () => {
           An error occurred during the upload. The data file will be downloaded
           directly to your PC. please send the two downloaded files to{" "}
           <b>eddhall0821@yonsei.ac.kr</b> and we will process them. your
-          completion code is CSE63DRO.
+          completion code is {COMPLETE_CODE}.
         </p>
       }
     ></Result>

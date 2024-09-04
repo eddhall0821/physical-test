@@ -1,4 +1,4 @@
-import { BALL_POINTS } from "./components/MTP/Balls";
+import { BALL_COLORS, BALL_POINTS } from "./components/MTP/Balls";
 import { SHOW_REWARD_TIME } from "./components/MTP/MTPCanvas";
 
 export const GREEN_BALL = "#00ff00";
@@ -245,18 +245,49 @@ export const initMultipleCanvas = async (canvas1, container) => {
   });
 };
 
+export function calculatePoint(x1, y1, x2, y2, distance) {
+  const ABx = x1 - x2;
+  const ABy = y1 - y2;
+
+  const magnitude = Math.sqrt(ABx * ABx + ABy * ABy);
+
+  const unitX = ABx / magnitude;
+  const unitY = ABy / magnitude;
+
+  const scaledX = unitX * distance;
+  const scaledY = unitY * distance;
+
+  const x3 = x1 + scaledX;
+  const y3 = y1 + scaledY;
+
+  return { x: x3, y: y3 };
+}
+
+export const drawGuideText = (
+  ctx,
+  x,
+  y,
+  monitorBound,
+  reward,
+  target_radius
+) => {
+  ctx.font = `${FONT_SIZE - 10}px san-serif`;
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  const idx = BALL_POINTS.indexOf(reward);
+  ctx.fillStyle = BALL_COLORS[idx];
+
+  ctx.fillText(`${reward}`, x, y);
+};
+
 export const drawMTPTarget = (ctx, x, y, speed, radius, reward) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, degToRad(360), true);
-  console.log(reward, radius);
 
-  if (reward === BALL_POINTS[0]) {
-    ctx.fillStyle = "#ffffff";
-  } else if (reward === BALL_POINTS[1]) {
-    ctx.fillStyle = "#ff7b7b";
-  } else {
-    ctx.fillStyle = "#ff0000";
-  }
+  const idx = BALL_POINTS.indexOf(reward);
+  ctx.fillStyle = BALL_COLORS[idx];
 
   ctx.fill();
 };
@@ -308,7 +339,6 @@ export function getTimerColor(remainTime, maxTime) {
   if (remainTime >= (2 / 3) * maxTime) {
     return "#ffffff";
   } else if (remainTime >= (1 / 3) * maxTime) {
-    console.log(percent);
     // return "#ff7b7b";
     return `rgb(255,
     ${255 - (66 - percent) * 4},
@@ -324,9 +354,18 @@ export function getTimePercent(remainTime, maxTime) {
   return (remainTime * 100) / maxTime;
 }
 
-export function moveCircle(ctx, x1, y1, x2, y2, r, duration, image) {
+export function moveCircle(
+  ctx,
+  x1,
+  y1,
+  x2,
+  y2,
+  width,
+  height,
+  duration,
+  image
+) {
   const startTime = performance.now();
-  console.log(image);
 
   function animate(time) {
     const elapsed = time - startTime;
@@ -341,7 +380,8 @@ export function moveCircle(ctx, x1, y1, x2, y2, r, duration, image) {
     // ctx.arc(currentX, currentY, r, 0, 2 * Math.PI);
     // ctx.fillStyle = "red";
     // ctx.fill();
-    ctx.drawImage(image, currentX, currentY, 50, 50);
+
+    ctx.drawImage(image, currentX, currentY, width, height);
 
     if (progress < 1) {
       requestAnimationFrame(animate);
@@ -359,15 +399,16 @@ export const drawClickResultText = (
   y,
   monitorBound
 ) => {
-  // const successText = success ? "Success" : "failed";
-  const successText = success ? "✅ Success!" : "❌ Failed...";
+  const successText = success ? "Success!" : "Failed..";
   const successColor = success ? "white" : "white";
   reward = Number(reward);
 
   if (Math.abs(reward) === BALL_POINTS[0]) {
-    ctx.font = `${FONT_SIZE - 10}px san-serif bold`;
+    ctx.font = `${FONT_SIZE - 5}px san-serif bold`;
   } else if (Math.abs(reward) == BALL_POINTS[1]) {
     ctx.font = `${FONT_SIZE}px san-serif bold`;
+  } else if (Math.abs(reward) == BALL_POINTS[2]) {
+    ctx.font = `${FONT_SIZE + 5}px san-serif bold`;
   } else {
     ctx.font = `${FONT_SIZE + 10}px san-serif bold`;
   }
@@ -391,14 +432,15 @@ export const drawClickResultText = (
   ctx.fillStyle = successColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  // ctx.fillText(`${successText}`, adjX, adY - 50);
 
   // ctx.fillText(
   //   `It took ${time} seconds.`,
   //   adjX,
   //   adY - 50
   // );
-  ctx.fillText(`${success ? "+" : "-"}${reward} ¢`, adjX, adY - 100);
+  ctx.fillText(`${success ? "+" : "-"}${reward} ¢`, adjX, adY - 70);
+  // ctx.fillStyle = successColor;
+  // ctx.fillText(`${successText}`, adjX, adY - 100);
   ctx.fillStyle = "#fff";
   ctx.font = `${FONT_SIZE}px san-serif bold`;
 };
@@ -458,15 +500,6 @@ export const drawRewardText = (
 
   const width = 420;
   const height = 270;
-
-  // if (target_reward === BALL_POINTS[2]) {
-  //   ctx.drawImage(moneybag, adjX - width / 2, adY, width, 280);
-  // } else if (target_reward === BALL_POINTS[1]) {
-  //   ctx.drawImage(moneybag, adjX - width / 2, adY, width, 210);
-  // } else {
-  //   const w = width * 0.8;
-  //   ctx.drawImage(moneybag, adjX - w / 2, adY, w, 230 * 0.8);
-  // }
 };
 
 export const drawStartButton = (ctx) => {
@@ -510,7 +543,7 @@ export const drawStartButton = (ctx) => {
   );
 };
 
-export const drawStartButton2 = (ctx) => {
+export const drawStartButton2 = (ctx, elapsed_time) => {
   ctx.font = `${FONT_SIZE}px serif`;
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
@@ -522,21 +555,30 @@ export const drawStartButton2 = (ctx) => {
   );
 
   ctx.fillText(
-    "Reminder: Bonus is either 0, 4, or 10 cents.",
+    `Reminder: Bonus is either ${BALL_POINTS[0]}, ${BALL_POINTS[1]}, ${BALL_POINTS[2]}, or ${BALL_POINTS[3]} cents.`,
     window.innerWidth / 2,
     window.innerHeight / 2 + 50
   );
 
+  ctx.fillStyle = "red";
   ctx.fillText(
-    "Build strategy to earn as many bonuses as possible in 15 minutes.",
+    "Build strategy to earn as many bonuses as possible in 30 minutes.",
     window.innerWidth / 2,
     window.innerHeight / 2 + 100
   );
+  ctx.fillStyle = "#fff";
 
   ctx.fillText(
     "Press Enter key to start",
     window.innerWidth / 2,
     window.innerHeight / 2 + 200
+  );
+
+  ctx.font = `${FONT_SIZE - 30}px serif`;
+  ctx.fillText(
+    `Wait ${Math.max(5 - Math.round(elapsed_time / 1000), 0)} seconds...`,
+    window.innerWidth / 2,
+    window.innerHeight / 2 + 250
   );
 };
 
@@ -569,7 +611,17 @@ export const drawPracticeStartButton = (ctx) => {
   );
 };
 
-export function repeatAnimation(
+export function getRandomCoordinateNearby(x, y, d) {
+  const angle = Math.random() * 2 * Math.PI;
+
+  const distance = Math.random() * d;
+  const newX = x + distance * Math.cos(angle);
+  const newY = y + distance * Math.sin(angle);
+
+  return { x: newX - d, y: newY - d };
+}
+
+export function repeatAnimation({
   ctx,
   x1,
   y1,
@@ -579,19 +631,37 @@ export function repeatAnimation(
   duration,
   interval,
   repeatCount,
-  image
-) {
+  image,
+  width = r,
+  height = r,
+}) {
   let count = 0;
-  console.log(image);
+  if (repeatCount < 1) {
+    width = 15;
+    height = 15;
+  }
 
+  let coord = { x: x1, y: y1 };
   const intervalId = setInterval(() => {
     if (count < repeatCount) {
-      moveCircle(ctx, x1, y1, x2, y2, r, duration, image, () => {
-        // 애니메이션이 끝난 후 할 일 (필요시)
-      });
+      if (repeatCount !== 1) {
+        coord = getRandomCoordinateNearby(x1, y1, 50);
+      }
+      moveCircle(
+        ctx,
+        coord.x,
+        coord.y,
+        x2,
+        y2,
+        width,
+        height,
+        duration,
+        image,
+        () => {}
+      );
       count++;
     } else {
-      clearInterval(intervalId); // 반복 종료
+      clearInterval(intervalId);
     }
   }, interval);
 }
@@ -604,7 +674,7 @@ export const drawFullscreenAlertText = (ctx) => {
   ctx.fillText(
     "Press Enter twice!",
     window.innerWidth / 2,
-    window.innerHeight / 2
+    window.innerHeight / 2 + 50
   );
 };
 
@@ -619,7 +689,11 @@ export const drawText = (
   ctx.fillStyle = "#fff";
   const boardInterval = window.innerWidth / 6;
 
-  ctx.fillText(`Total Bonus: ${summary.point} cents`, boardInterval * 1, 50);
+  ctx.fillText(
+    `Total Bonus: ${summary.point.toFixed(1)} ¢`,
+    boardInterval * 1,
+    50
+  );
   // ctx.fillText(
   //   `Current Bonus: ${
   //     typeof target_reward === "number" ? target_reward : "-"

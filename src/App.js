@@ -42,15 +42,20 @@ function App() {
       withAuth: process.env.REACT_APP_PNC_AUTH === "true",
     },
     {
+      path: "dev_mode",
+      element: <MTPCanvas />,
+      withAuth: false,
+    },
+    {
       path: "practice",
       element: <MTPCanvasPractice />,
       withAuth: process.env.REACT_APP_PNC_AUTH === "true",
     },
-    // {
-    //   path: "replay",
-    //   element: <MTPReplay />,
-    //   withAuth: false,
-    // },
+    {
+      path: "replay",
+      element: <MTPReplay />,
+      withAuth: false,
+    },
     // {
     //   path: "replay2",
     //   element: <ReplayTimeinteval />,

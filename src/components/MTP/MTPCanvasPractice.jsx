@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from "react";
 import {
+  calculatePoint,
   distanceBetweenTwoPoint,
   drawClickResultText,
-  drawCurrentRewardText,
   drawFullscreenAlertText,
+  drawGuideText,
   drawLateClickText,
   drawMTPTarget,
   drawPauseText,
@@ -11,24 +12,18 @@ import {
   drawPracticeStartButton,
   drawRewardText,
   drawRoughClickText,
-  drawStartButton2,
   drawText,
-  fastRound3,
   financial,
   FONT_SIZE,
   getTimePercent,
   getTimerColor,
   inch,
-  initCanvas,
   initMultipleCanvas,
   millisToMinutesAndSeconds,
   random_point_between_circles,
   repeatAnimation,
   resetCanvas,
-  shuffle,
-  temporal_discounting_reward,
 } from "../../utils";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -56,12 +51,13 @@ import {
 import { useTimer } from "react-use-precision-timer";
 import { Subs } from "react-sub-unsub";
 import Cent from "../../images/cent.png";
+import Trash from "../../images/trashcan.png";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 const TOTAL_TIME = 1.5 * 60 * 1000;
 
-const TOTAL_TRIALS = 300;
+const TOTAL_TRIALS = 1200;
 
 const STOP_TIME = 3000;
 const MAXIMUM_ERROR_STREAK = 3;
@@ -111,18 +107,22 @@ const MTPCanvasPractice = () => {
     let responseTime = null;
     let loggingStartTime = null;
     let current_reward = null;
-    let end = false;
+    let guide_text_x;
+    let guide_text_y;
 
+    let end = false;
     let skipCnt = 0;
     let reward0 = new Image({});
     let reward4 = new Image({});
     let reward20 = new Image({});
     let cent = new Image({});
+    let trash = new Image({});
 
     reward0.src = Reward0;
     reward4.src = Reward4;
     reward20.src = Reward20;
     cent.src = Cent;
+    trash.src = Trash;
 
     const rewardImages = {
       0: reward0,
@@ -212,6 +212,17 @@ const MTPCanvasPractice = () => {
 
       target_x = target_location.x;
       target_y = target_location.y;
+
+      const guide_coord = calculatePoint(
+        target_x,
+        target_y,
+        x,
+        y,
+        50 + target_radius
+      );
+      guide_text_x = guide_coord.x;
+      guide_text_y = guide_coord.y;
+
       target_gen_error = target_location.gen;
     };
 
@@ -243,7 +254,6 @@ const MTPCanvasPractice = () => {
           if (!isPaused) {
             if (p - delay > SHOW_REWARD_TIME + SHOW_RESULT_TIME) {
               responseTime = p - loggingStartTime;
-              console.log(responseTime);
               buttons = e.buttons;
 
               show_reward_counter = p;
@@ -278,18 +288,18 @@ const MTPCanvasPractice = () => {
               } else if (target_radius - distance > 0) {
                 let reward = target_reward;
 
-                repeatAnimation(
-                  ctx,
-                  x,
-                  y,
-                  window.innerWidth / 6,
-                  50,
-                  15,
-                  300,
-                  30,
-                  target_reward,
-                  cent
-                );
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: x,
+                  y1: y,
+                  x2: window.innerWidth / 6,
+                  y2: 50,
+                  r: 50,
+                  duration: 300,
+                  interval: 30,
+                  repeatCount: target_reward,
+                  image: cent,
+                });
 
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
@@ -303,6 +313,34 @@ const MTPCanvasPractice = () => {
               } else {
                 //실패
                 let reward = target_reward;
+
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: window.innerWidth / 6,
+                  y1: 60,
+                  x2: 200 + 75,
+                  y2: 120,
+                  r: 50,
+                  duration: 300,
+                  interval: 30,
+                  repeatCount: target_reward,
+                  image: cent,
+                });
+
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: 200,
+                  y1: 120,
+                  x2: 200,
+                  y2: 120,
+                  duration: 800,
+                  interval: 30,
+                  repeatCount: target_reward ? 1 : 0,
+                  image: trash,
+                  width: 150,
+                  height: 200,
+                });
+
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
                 reward = financial(reward);
@@ -344,21 +382,29 @@ const MTPCanvasPractice = () => {
       function updatePosition(e) {
         const p = performance.now();
 
-        if (
-          !responseTime &&
-          loggingStartTime &&
-          show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
-        ) {
-          responseTime = (p - loggingStartTime) / 1000;
-          console.log(responseTime);
-        }
+        // if (
+        //   !responseTime &&
+        //   loggingStartTime &&
+        //   show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
+        // ) {
+        //   responseTime = (p - loggingStartTime) / 1000;
+        // }
 
         if (show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p) {
-          // movementX += e.movementX;
-          // movementY += e.movementY;
-
-          x += e.movementX * weight;
-          y += e.movementY * weight;
+          const dx = e.movementX * weight;
+          const dy = e.movementY * weight;
+          // const threshold = 100;
+          // if (
+          //   dx < -threshold ||
+          //   dy < -threshold ||
+          //   dx > threshold ||
+          //   dy > threshold
+          // ) {
+          //   console.log(dx, dy);
+          // } else {
+          x += dx;
+          y += dy;
+          // }
         } else {
           if (
             (e.movementX > 2 || e.movementY > 2) &&
@@ -378,6 +424,7 @@ const MTPCanvasPractice = () => {
           Math.min(y, window.screen.height - monitorBound.top)
         );
       }
+
       const container = document.getElementById("container");
       initMultipleCanvas(canvas, container);
       myReq = requestAnimationFrame(pre_step);
@@ -524,6 +571,14 @@ const MTPCanvasPractice = () => {
         //   inch(ppi, balls.max_target_radius) * 5
         // );
         drawMTPTarget(ctx, target_x, target_y, 0, target_radius, target_reward);
+        drawGuideText(
+          ctx,
+          guide_text_x,
+          guide_text_y,
+          monitorBound,
+          target_reward,
+          target_radius
+        );
         drawPointer(ctx, x, y);
       }
 
@@ -558,7 +613,7 @@ const MTPCanvasPractice = () => {
       >
         <div style={{ width: "33%" }}></div>
         <div style={{ width: "33%" }}>
-          Time:{" "}
+          Remaining Time:{" "}
           {!!timer.isRunning()
             ? millisToMinutesAndSeconds(remainTime)
             : millisToMinutesAndSeconds(TOTAL_TIME)}
@@ -574,7 +629,7 @@ const MTPCanvasPractice = () => {
         </div>
 
         <div style={{ width: "33%" }}>
-          <img src={reward_settings} width={300} />
+          <img src={reward_settings} width={400} />
         </div>
       </div>
       <div

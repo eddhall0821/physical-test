@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from "react";
 import {
+  calculatePoint,
   distanceBetweenTwoPoint,
   drawClickResultText,
   drawCurrentRewardText,
   drawFullscreenAlertText,
+  drawGuideText,
   drawLateClickText,
   drawMaxDistance,
   drawMTPTarget,
@@ -24,6 +26,7 @@ import {
   initMultipleCanvas,
   millisToMinutesAndSeconds,
   moveCircle,
+  normalizeVector,
   random_point_between_circles,
   repeatAnimation,
   resetCanvas,
@@ -39,6 +42,7 @@ import Reward0 from "../../images/max_reward/reward_0.png";
 import Reward4 from "../../images/max_reward/reward_4.png";
 import Reward20 from "../../images/max_reward/reward_20.png";
 import Cent from "../../images/cent.png";
+import Trash from "../../images/trashcan.png";
 
 import { useRecoilValue } from "recoil";
 import {
@@ -51,11 +55,12 @@ import { Balls } from "./Balls";
 import usePreventRefresh from "../PreventRefresh";
 import { Spin, Typography } from "antd";
 import { Subs } from "react-sub-unsub";
+import { COMPLETE_CODE } from "./Done";
 
 export const INCH_24_WIDTH = 20.92;
 export const INCH_24_HEIGHT = 11.77;
 
-const TOTAL_TIME = 15 * 60 * 1000;
+const TOTAL_TIME = 30 * 60 * 1000;
 
 export const SHOW_REWARD_TIME = 800; //ms
 export const SHOW_RESULT_TIME = 0; //ms
@@ -63,7 +68,7 @@ export const SHOW_ROUGH_TIME = 2400;
 export const SHOW_LATE_TIME = 2400;
 
 // const TOTAL_TRIALS = process.env.REACT_APP_TOTAL_TRIALS;
-const TOTAL_TRIALS = 600;
+const TOTAL_TRIALS = 2400;
 
 export const STOP_TIME = 3000;
 export const MAXIMUM_ERROR_STREAK = 3;
@@ -178,7 +183,7 @@ const MTPCanvas = () => {
       navigate("/done");
     } catch {
       alert(
-        "An error occurred during the upload. The data file will be downloaded directly to your PC. please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them. your completion code is CSE63DRO."
+        `An error occurred during the upload. The data file will be downloaded directly to your PC. please send the two downloaded files to eddhall0821@yonsei.ac.kr and we will process them. your completion code is ${COMPLETE_CODE}.`
       );
       //---download in local pc---
       var summaryEncodedUri = encodeURI(
@@ -229,6 +234,8 @@ const MTPCanvas = () => {
     let responseTime = null;
     let loggingStartTime = null;
     let current_reward = null;
+    let guide_text_x;
+    let guide_text_y;
 
     let skipCnt = 0;
     let roughClickCnt = 0;
@@ -237,11 +244,13 @@ const MTPCanvas = () => {
     let reward4 = new Image({});
     let reward20 = new Image({});
     let cent = new Image({});
+    let trash = new Image({});
 
     reward0.src = Reward0;
     reward4.src = Reward4;
     reward20.src = Reward20;
     cent.src = Cent;
+    trash.src = Trash;
 
     const rewardImages = {
       0: reward0,
@@ -260,6 +269,7 @@ const MTPCanvas = () => {
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
     let delay = 0;
+    const start_time = performance.now();
     let summary = {
       fail: 0,
       success: 0,
@@ -363,6 +373,7 @@ const MTPCanvas = () => {
       loggingStartTime = null;
       target_radius = inch(ppi, w);
       target_reward = currentDesign.reward;
+
       const target_location = random_point_between_circles({
         center: { x, y },
         inner_radius: inch(ppi, d),
@@ -376,6 +387,17 @@ const MTPCanvas = () => {
 
       target_x = target_location.x;
       target_y = target_location.y;
+
+      const guide_coord = calculatePoint(
+        target_x,
+        target_y,
+        x,
+        y,
+        50 + target_radius
+      );
+      guide_text_x = guide_coord.x;
+      guide_text_y = guide_coord.y;
+
       target_gen_error = target_location.gen;
     };
 
@@ -438,19 +460,18 @@ const MTPCanvas = () => {
                   target_reward,
                   responseTime
                 );
-                repeatAnimation(
-                  ctx,
-                  x,
-                  y,
-                  window.innerWidth / 6,
-                  50,
-                  15,
-
-                  300,
-                  30,
-                  target_reward,
-                  cent
-                );
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: x,
+                  y1: y,
+                  x2: window.innerWidth / 6,
+                  y2: 50,
+                  r: 50,
+                  duration: 300,
+                  interval: 30,
+                  repeatCount: target_reward,
+                  image: cent,
+                });
 
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
@@ -467,6 +488,34 @@ const MTPCanvas = () => {
                   target_reward,
                   responseTime
                 );
+
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: window.innerWidth / 6,
+                  y1: 60,
+                  x2: 200 + 75,
+                  y2: 120,
+                  r: 50,
+                  duration: 300,
+                  interval: 30,
+                  repeatCount: target_reward,
+                  image: cent,
+                });
+
+                repeatAnimation({
+                  ctx: ctx,
+                  x1: 200,
+                  y1: 120,
+                  x2: 200,
+                  y2: 120,
+                  duration: 800,
+                  interval: 30,
+                  repeatCount: target_reward ? 1 : 0,
+                  image: trash,
+                  width: 150,
+                  height: 200,
+                });
+
                 reward = Math.min(target_reward, reward);
                 reward = Math.max(reward, 0);
                 reward = financial(reward);
@@ -495,21 +544,22 @@ const MTPCanvas = () => {
 
       function updatePosition(e) {
         const p = performance.now();
-
-        if (
-          !responseTime &&
-          loggingStartTime &&
-          show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
-        ) {
-          responseTime = (p - loggingStartTime) / 1000;
-        }
+        console.log(p);
+        // if (
+        //   !responseTime &&
+        //   loggingStartTime &&
+        //   show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p
+        // ) {
+        //   responseTime = (p - loggingStartTime) / 1000;
+        // }
 
         if (show_reward_counter + SHOW_REWARD_TIME + SHOW_RESULT_TIME < p) {
-          // movementX += e.movementX;
-          // movementY += e.movementY;
+          const dx = e.movementX * weight;
+          const dy = e.movementY * weight;
+          const threshold = 100;
 
-          x += e.movementX * weight;
-          y += e.movementY * weight;
+          x += dx;
+          y += dy;
         } else {
           if (
             (e.movementX > 2 || e.movementY > 2) &&
@@ -530,7 +580,9 @@ const MTPCanvas = () => {
         );
       }
       const container = document.getElementById("container");
-      initMultipleCanvas(canvas, container);
+      setTimeout(() => {
+        initMultipleCanvas(canvas, container);
+      }, 5000);
       myReq = requestAnimationFrame(pre_step);
     }
 
@@ -557,7 +609,7 @@ const MTPCanvas = () => {
         requestAnimationFrame(step);
       } else {
         drawText(ctx, summary, TOTAL_TRIALS, session, target_reward);
-        drawStartButton2(ctx);
+        drawStartButton2(ctx, performance.now() - start_time);
         myReq = requestAnimationFrame(pre_step);
       }
     }
@@ -677,6 +729,14 @@ const MTPCanvas = () => {
         //   inch(ppi, currentDesign.d)
         // );
         drawMTPTarget(ctx, target_x, target_y, 0, target_radius, target_reward);
+        drawGuideText(
+          ctx,
+          guide_text_x,
+          guide_text_y,
+          monitorBound,
+          target_reward,
+          target_radius
+        );
         drawPointer(ctx, x, y);
       }
 
@@ -717,7 +777,7 @@ const MTPCanvas = () => {
         >
           <div style={{ width: "33%" }}></div>
           <div style={{ width: "33%" }}>
-            Time:{" "}
+            Remaining Time:{" "}
             {!!timer.isRunning()
               ? millisToMinutesAndSeconds(remainTime)
               : millisToMinutesAndSeconds(TOTAL_TIME)}
@@ -733,7 +793,7 @@ const MTPCanvas = () => {
           </div>
 
           <div style={{ width: "33%" }}>
-            <img src={reward_settings} width={350} />
+            <img src={reward_settings} width={400} />
           </div>
         </div>
 

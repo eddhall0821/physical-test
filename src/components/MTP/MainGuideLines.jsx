@@ -13,7 +13,7 @@ import click_success from "../../images/success_click.png";
 import click_fail from "../../images/fail_click.png";
 import reward_setting from "../../images/reward_setting.png";
 import { FONT_SIZE, getTimePercent, getTimerColor } from "../../utils";
-import { BALL_POINTS } from "./Balls";
+import { BALL_COLOR_NAME, BALL_COLORS, BALL_POINTS } from "./Balls";
 
 const MainGuideLines = () => {
   const monitorBound = useRecoilValue(mointorBoundState);
@@ -33,6 +33,7 @@ const MainGuideLines = () => {
   const refOrange = useRef(null);
   const refBlue = useRef(null);
   const refGreen = useRef(null);
+  const refBall3 = useRef(null);
   const refSuccess = useRef(null);
   const refSuccess2 = useRef(null);
   const refFail = useRef(null);
@@ -109,8 +110,8 @@ const MainGuideLines = () => {
       title: <StepTitle>Target Bonus</StepTitle>,
       description: (
         <StepContent>
-          <b style={{ color: "#ff7b7b" }}>
-            Light red gives {BALL_POINTS[1]} cents of bonus/penalty.
+          <b style={{ color: BALL_COLORS[1] }}>
+            {BALL_COLOR_NAME[1]} gives {BALL_POINTS[1]} cents of bonus/penalty.
           </b>
         </StepContent>
       ),
@@ -120,13 +121,25 @@ const MainGuideLines = () => {
       title: <StepTitle>Target Bonus</StepTitle>,
       description: (
         <StepContent>
-          <b style={{ color: "#ff0000 " }}>
-            Red gives {BALL_POINTS[2]} cents of bonus/penalty.
+          <b style={{ color: BALL_COLORS[2] }}>
+            {BALL_COLOR_NAME[2]} gives {BALL_POINTS[2]} cents of bonus/penalty.
           </b>
         </StepContent>
       ),
       target: () => refGreen.current,
     },
+    {
+      title: <StepTitle>Target Bonus</StepTitle>,
+      description: (
+        <StepContent>
+          <b style={{ color: BALL_COLORS[3] }}>
+            {BALL_COLOR_NAME[3]} gives {BALL_POINTS[3]} cents of bonus/penalty.
+          </b>
+        </StepContent>
+      ),
+      target: () => refBall3.current,
+    },
+
     {
       title: <StepTitle>Successful clicks</StepTitle>,
       description: (
@@ -173,7 +186,7 @@ const MainGuideLines = () => {
       title: <StepTitle>Time Limits</StepTitle>,
       description: (
         <StepContent>
-          You will perform the task for 15 minutes. Earn as many bonuses as
+          You will perform the task for 30 minutes. Earn as many bonuses as
           possible before the time limit ends.
         </StepContent>
       ),
@@ -182,9 +195,7 @@ const MainGuideLines = () => {
     {
       title: <StepTitle>Target Bonus Information</StepTitle>,
       description: (
-        <StepContent>
-          {`Reminder: White gives ${BALL_POINTS[0]} cents, Light red gives ${BALL_POINTS[1]} cents, and Red gives ${BALL_POINTS[2]} cents.`}
-        </StepContent>
+        <StepContent>{`Displays point information matching the color.`}</StepContent>
       ),
       target: () => refRewardSettings.current,
     },
@@ -259,9 +270,9 @@ const MainGuideLines = () => {
             fontSize: FONT_SIZE,
           }}
         >
-          <div ref={ref1}>Total Bonus: {BALL_POINTS[2]} cents</div>
+          <div ref={ref1}>Total Bonus: {BALL_POINTS[3]} cents</div>
           <div ref={refTime}>
-            Time: 14:59
+            Remaining Time: 29:59
             <div style={{ width: "100%", height: 20, background: "grey" }}>
               <div
                 style={{
@@ -273,7 +284,7 @@ const MainGuideLines = () => {
             </div>
           </div>
           <div ref={refRewardSettings}>
-            <img src={reward_setting} width={300} />
+            <img src={reward_setting} width={400} />
           </div>
         </div>
         <div
@@ -294,18 +305,20 @@ const MainGuideLines = () => {
         <div
           ref={refReward}
           style={{
+            position: "absolute",
             display:
               currentGuideIndex !== 2 &&
               currentGuideIndex !== 3 &&
               currentGuideIndex !== 4 &&
               currentGuideIndex !== 5 &&
-              "none",
-            position: "absolute",
+              currentGuideIndex !== 6
+                ? "none"
+                : "flex",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 500,
-            height: 150,
+            padding: 20,
+            gap: 30,
           }}
         >
           <div
@@ -315,14 +328,11 @@ const MainGuideLines = () => {
                 currentGuideIndex !== 3 &&
                 currentGuideIndex !== 4 &&
                 currentGuideIndex !== 5 &&
+                currentGuideIndex !== 6 &&
                 "none",
-              position: "absolute",
-              top: "50%",
-              left: "20%",
-              transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#ffffff",
+              background: BALL_COLORS[0],
               borderRadius: "100%",
             }}
             ref={refOrange}
@@ -334,14 +344,11 @@ const MainGuideLines = () => {
                 currentGuideIndex !== 3 &&
                 currentGuideIndex !== 4 &&
                 currentGuideIndex !== 5 &&
+                currentGuideIndex !== 6 &&
                 "none",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#ff7b7b",
+              background: BALL_COLORS[1],
               borderRadius: "100%",
             }}
             ref={refBlue}
@@ -354,39 +361,31 @@ const MainGuideLines = () => {
                 currentGuideIndex !== 3 &&
                 currentGuideIndex !== 4 &&
                 currentGuideIndex !== 5 &&
+                currentGuideIndex !== 6 &&
                 "none",
-              position: "absolute",
-              top: "50%",
-              left: "80%",
-              transform: "translate(-50%, -50%)",
               width: 100,
               height: 100,
-              background: "#ff0000",
+              background: BALL_COLORS[2],
               borderRadius: "100%",
             }}
             ref={refGreen}
           />
-        </div>
-
-        <div
-          style={{
-            display: currentGuideIndex !== 6 && "none",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(0%, -50%)",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          ref={refSuccess2}
-        >
-          <div>
-            <MainTaskFont style={{ color: "red" }}>
-              +{BALL_POINTS[2]} Cents
-            </MainTaskFont>
-          </div>
-          <img alt="money" src={click_success} />
+          <div
+            style={{
+              display:
+                currentGuideIndex !== 2 &&
+                currentGuideIndex !== 3 &&
+                currentGuideIndex !== 4 &&
+                currentGuideIndex !== 5 &&
+                currentGuideIndex !== 6 &&
+                "none",
+              width: 100,
+              height: 100,
+              background: BALL_COLORS[3],
+              borderRadius: "100%",
+            }}
+            ref={refBall3}
+          />
         </div>
 
         <div
@@ -400,11 +399,32 @@ const MainGuideLines = () => {
             justifyContent: "center",
             alignItems: "center",
           }}
+          ref={refSuccess2}
+        >
+          <div>
+            <MainTaskFont style={{ color: "red" }}>
+              +{BALL_POINTS[3]} Cents
+            </MainTaskFont>
+          </div>
+          <img alt="money" src={click_success} />
+        </div>
+
+        <div
+          style={{
+            display: currentGuideIndex !== 8 && "none",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(0%, -50%)",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
           ref={refFail}
         >
           <div>
             <MainTaskFont style={{ color: "red" }}>
-              -{BALL_POINTS[2]} Cents
+              -{BALL_POINTS[3]} Cents
             </MainTaskFont>
           </div>
           <img alt="money" src={click_fail} />
@@ -428,7 +448,7 @@ const MainGuideLines = () => {
 
         <div
           style={{
-            display: currentGuideIndex !== 8 ? "none" : "flex",
+            display: currentGuideIndex !== 9 ? "none" : "flex",
             position: "absolute",
             top: "50%",
             left: "50%",

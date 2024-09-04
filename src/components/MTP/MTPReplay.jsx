@@ -83,7 +83,7 @@ const MTPReplay = () => {
         }
 
         if (logArr.length > logIndex) {
-          resetCanvas(canvas, {
+          resetCanvas(ctx, {
             width: screenX,
             height: screenY,
             top: 0,

@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { mointorBoundState, pointerWeightState } from "../../recoil/atom";
 
 const DemoPointing = () => {
-  const weight = useRecoilValue(pointerWeightState);
+  const weight = 0.22;
   // const weight = 1;
   const monitorBound = useRecoilValue(mointorBoundState);
   const canvasRef = useRef(null);
@@ -15,6 +15,9 @@ const DemoPointing = () => {
     const ctx = canvas.getContext("2d");
 
     function updatePosition(e) {
+      const p = performance.now();
+      console.log(p);
+      console.log(e.movementX, e.movementY);
       positionRef.current.x += e.movementX * weight;
       positionRef.current.y += e.movementY * weight;
 
