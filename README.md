@@ -10,8 +10,8 @@ node, npm 최신 버전 필요
 
 In the project directory, you can run:
 
-### `npm intall` 한 후,
-### `npm start` 로 실행
+### `npm intall`
+### `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
